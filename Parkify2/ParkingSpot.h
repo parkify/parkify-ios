@@ -9,7 +9,23 @@
 #import <Foundation/Foundation.h>
 #import <MapKit/MapKit.h>
 
-@interface ParkingSpot : NSObject <MKAnnotation> {
+@class ParkingSpot;
+
+@protocol ParkingSpotObserver <NSObject>
+
+-(void)spotsWereUpdated;
+
+@end
+
+@interface ParkingSpotCollection : NSObject
+- (ParkingSpot*)parkingSpotForID:(int)key;
+- (id)initFromJSONString:(NSString*)strJson;
+- (void)updateFromJSONString:(NSString*)strJson;
+@property (nonatomic, strong) NSDictionary* parkingSpots;
+@property (nonatomic, weak) id <ParkingSpotObserver> observerDelegate;
+@end
+
+@interface ParkingSpot : NSObject {
     int _mID;
     double _mLat;
     double _mLong;
@@ -19,10 +35,12 @@
     NSString *_mPhoneNumber;
     NSString *_mDesc;
     Boolean _mFree;
-    CLLocationCoordinate2D coordinate;
     
     Boolean _mRemove;
 }
+
+
+
 @property int mID;
 @property double mLat;
 @property double mLong;
@@ -32,15 +50,20 @@
 @property (copy) NSString *mPhoneNumber;
 @property (copy) NSString *mDesc;
 @property Boolean mFree;
-@property (nonatomic, assign, readonly) CLLocationCoordinate2D coordinate;
 @property Boolean mRemove;
+
 
 - (id)initWithID:(int)idIn lat:(double)latIn
              lng:(double)lngIn companyName:(NSString*)companyNameIn
          localID:(int)localIDIn price:(double)priceIn
      phoneNumber:(NSString*)phoneNumberIn desc:(NSString*)descIn
             free:(Boolean)freeIn;
-
 @end
 
-//{"mID"="1","mLat"="37.872708","mLong"="-122.266824","mCompanyName"="Mike's Bikes","mLocalID"="1","mPrice"="5.0","mPhoneNumber"="408-421-1194","mDesc"="A Fantastic Spot!","mFree"="true"}
+@interface ParkingSpotAnnotation : NSObject <MKAnnotation> 
+
+@property (nonatomic, strong) ParkingSpot* spot;
+
++ (ParkingSpotAnnotation *)annotationForSpot:(ParkingSpot*)spot;
+
+@end

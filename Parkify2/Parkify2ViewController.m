@@ -12,7 +12,6 @@
 #import "ParkingSpot.h"
 
 @interface Parkify2ViewController ()
-        
 
 @end
 
@@ -25,6 +24,17 @@
 @synthesize currentLong = _currentLong;
 
 @synthesize annotations = _annotations;
+
+@synthesize parkingSpots = _parkingSpots;
+
+-(void)spotsWereUpdated 
+{
+    NSMutableArray* annotations = [[NSMutableArray alloc] init ];
+    for (ParkingSpot* spot in [self.parkingSpots.parkingSpots allValues]) {
+        [annotations addObject:[ParkingSpotAnnotation annotationForSpot:spot]];
+    }
+    self.annotations = annotations;
+}
 
 - (void)updateMapView {
     if(self.mapView.annotations) [self.mapView removeAnnotations:self.mapView.annotations];
@@ -39,6 +49,14 @@
 - (void)setAnnotations:(NSArray *)annotations {
     _annotations = annotations;
     [self updateMapView];
+}
+
+- (ParkingSpotCollection*)parkingSpots {
+    if(!_parkingSpots) {
+        _parkingSpots = [[ParkingSpotCollection alloc] init];
+        _parkingSpots.observerDelegate = self;
+    }
+    return _parkingSpots;
 }
 
 - (void)refreshSpots
@@ -137,37 +155,7 @@
 }
 
 - (void)plotParkingSpotsFromString:(NSString *)responseString {
-    
-    NSMutableArray* parkingSpots = [[NSMutableArray alloc] init];
-    
-        
-    NSDictionary * root = [responseString JSONValue];
-    for (NSDictionary * spot in root) {
-        //NSLog(@"(spot=%@)\n", spot);
-        
-        int idIn = [[spot objectForKey:@"mID"] intValue];
-        double latIn = [[spot objectForKey:@"mLat"] doubleValue];
-        double lngIn = [[spot objectForKey:@"mLong"] doubleValue];
-        NSString * companyNameIn = [spot objectForKey:@"mCompanyName"];
-        int localIDIn = [[spot objectForKey:@"mLocalID"] intValue];
-        double priceIn = [[spot objectForKey:@"mPrice"] doubleValue];
-        NSString * phoneNumberIn = [spot objectForKey:@"mPhoneNumber"];
-        NSString * descIn = [spot objectForKey:@"mDesc"];
-        Boolean freeIn = [[spot objectForKey:@"mFree"] boolValue];
-                         
-        ParkingSpot *annotation = [[ParkingSpot alloc] initWithID:idIn 
-                                                              lat:latIn
-                                                              lng:lngIn 
-                                                      companyName:companyNameIn
-                                                          localID:localIDIn 
-                                                            price:priceIn
-                                                      phoneNumber:phoneNumberIn 
-                                                             desc:descIn
-                                                             free:freeIn];    
-        [parkingSpots addObject:annotation];    
-    }
-    
-    self.annotations = parkingSpots;
+    [self.parkingSpots updateFromJSONString:responseString];
 }
 
 
@@ -198,10 +186,11 @@
     static NSString *identifier; 
     
     
-    if ([annotation isKindOfClass:[ParkingSpot class]]) {
+    if ([annotation isKindOfClass:[ParkingSpotAnnotation class]]) {
         
+        ParkingSpot* spot = ((ParkingSpotAnnotation*)annotation).spot;
         
-        if([(ParkingSpot*)annotation mFree])
+        if([spot mFree])
         {
             identifier = @"ParkingSpot-Free";
         } else {
@@ -218,7 +207,7 @@
         
         annotationView.enabled = YES;
         annotationView.canShowCallout = YES;
-        if([(ParkingSpot*)annotation mFree])
+        if([spot mFree])
         {
             annotationView.image=[UIImage imageNamed:@"parking_icon_free.png"];//here we use a nice image instead of the default pins
         } else {
