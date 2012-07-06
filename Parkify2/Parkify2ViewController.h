@@ -7,7 +7,34 @@
 //
 
 #import <UIKit/UIKit.h>
+#import <MapKit/MapKit.h>
+#import "MKMapView+ZoomLevel.h"
+#import <CoreLocation/CoreLocation.h>
 
-@interface Parkify2ViewController : UIViewController
+#define METERS_PER_MILE 1609.344
+
+@interface Parkify2ViewController : UIViewController <MKMapViewDelegate, CLLocationManagerDelegate>
+{
+    CLLocationManager *_locationManager;
+    double _currentLat;
+    double _currentLong;
+}
+@property(nonatomic, retain)CLLocationManager *locationManager;
+@property (weak, nonatomic) IBOutlet MKMapView *mapView;
+@property (strong, nonatomic) NSTimer *timerPolling;
+@property float timerDuration;
+@property double currentLat;
+@property double currentLong;
+
+@property (nonatomic, strong) NSArray* annotations; //Of type id <MKAnnotation>
+
+- (IBAction)refreshTapped:(id)sender;
+
+- (IBAction)myLocationTapped:(id)sender;
+
+- (IBAction)AddressEntered:(id)sender;
+
+- (BOOL)textFieldShouldReturn:(UITextField *)textField;
+
 
 @end

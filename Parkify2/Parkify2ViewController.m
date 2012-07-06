@@ -7,12 +7,78 @@
 //
 
 #import "Parkify2ViewController.h"
+#import "ASIHTTPRequest.h"
+#import "SBJSON.h"
+#import "ParkingSpot.h"
 
 @interface Parkify2ViewController ()
+        
 
 @end
 
 @implementation Parkify2ViewController
+@synthesize mapView = _mapView;
+@synthesize timerPolling = _timerPolling;
+@synthesize timerDuration = _timerDuration;
+@synthesize locationManager = _locationManager;
+@synthesize currentLat = _currentLat;
+@synthesize currentLong = _currentLong;
+
+@synthesize annotations = _annotations;
+
+- (void)updateMapView {
+    if(self.mapView.annotations) [self.mapView removeAnnotations:self.mapView.annotations];
+    [self.mapView addAnnotations:self.annotations];
+}
+
+- (void)setMapView:(MKMapView *)mapView {
+    _mapView = mapView;
+    [self updateMapView];
+}
+
+- (void)setAnnotations:(NSArray *)annotations {
+    _annotations = annotations;
+    [self updateMapView];
+}
+
+- (void)refreshSpots
+{
+    //MKCoordinateRegion mapRegion = [self.mapView region];
+    //CLLocationCoordinate2D centerLocation = mapRegion.center;
+    
+    // 2
+    /*
+     NSString *jsonFile = [[NSBundle mainBundle] pathForResource:@"command" ofType:@"json"];
+     NSString *formatString = [NSString stringWithContentsOfFile:jsonFile encoding:NSUTF8StringEncoding error:nil];
+     NSString *json = [NSString stringWithFormat:formatString, 
+     centerLocation.latitude, centerLocation.longitude, 0.5*METERS_PER_MILE];
+     */
+    // 3
+    NSURL *url = [NSURL URLWithString:@"http://swooplot.herokuapp.com/parking_spots"];
+    
+    // 4
+    ASIHTTPRequest *_request = [ASIHTTPRequest requestWithURL:url];
+    __weak ASIHTTPRequest *request = _request;
+    
+    request.requestMethod = @"GET";    
+    //[request addRequestHeader:@"Content-Type" value:@"application/json"];
+    //[request appendPostData:[json dataUsingEncoding:NSUTF8StringEncoding]];
+    // 5
+    [request setDelegate:self];
+    [request setCompletionBlock:^{         
+        NSString *responseString = [request responseString];
+        //NSLog(@"Response: %@", responseString);
+        [self plotParkingSpotsFromString:responseString];
+    }];
+    [request setFailedBlock:^{
+        NSError *error = [request error];
+        NSLog(@"Error: %@", error.localizedDescription);
+    }];
+    
+    // 6
+    [request startAsynchronous];
+}
+
 
 - (void)viewDidLoad
 {
@@ -22,6 +88,7 @@
 
 - (void)viewDidUnload
 {
+    [self setMapView:nil];
     [super viewDidUnload];
     // Release any retained subviews of the main view.
 }
@@ -33,6 +100,192 @@
     } else {
         return YES;
     }
+}
+
+- (void)viewWillAppear:(BOOL)animated {
+    CLLocationCoordinate2D zoomLocation;
+    zoomLocation.latitude = 37.872679;
+    zoomLocation.longitude = -122.266797;
+    MKCoordinateRegion viewRegion = MKCoordinateRegionMakeWithDistance(zoomLocation, 0.5*METERS_PER_MILE, 0.5*METERS_PER_MILE);
+    MKCoordinateRegion adjustedRegion = [self.mapView regionThatFits:viewRegion];
+    [self.mapView setRegion:adjustedRegion animated:YES];
+    
+    
+    self.locationManager = [[CLLocationManager alloc] init];
+    self.locationManager.delegate = self;
+    self.locationManager.desiredAccuracy = kCLLocationAccuracyBest;
+    [self.locationManager startUpdatingLocation];
+    
+    
+    self.timerDuration = 3;
+    [self refreshSpots];
+    [self startPolling];
+    
+    
+    
+}
+
+- (void)locationManager:(CLLocationManager *)manager 
+    didUpdateToLocation:(CLLocation *)newLocation 
+           fromLocation:(CLLocation *)oldLocation {
+
+    self.currentLat = newLocation.coordinate.latitude;
+    self.currentLong = newLocation.coordinate.longitude;
+    
+    //NSLog(@"New latitude: %f", newLocation.coordinate.latitude);
+    //NSLog(@"New longitude: %f", newLocation.coordinate.longitude);
+}
+
+- (void)plotParkingSpotsFromString:(NSString *)responseString {
+    
+    NSMutableArray* parkingSpots = [[NSMutableArray alloc] init];
+    
+        
+    NSDictionary * root = [responseString JSONValue];
+    for (NSDictionary * spot in root) {
+        //NSLog(@"(spot=%@)\n", spot);
+        
+        int idIn = [[spot objectForKey:@"mID"] intValue];
+        double latIn = [[spot objectForKey:@"mLat"] doubleValue];
+        double lngIn = [[spot objectForKey:@"mLong"] doubleValue];
+        NSString * companyNameIn = [spot objectForKey:@"mCompanyName"];
+        int localIDIn = [[spot objectForKey:@"mLocalID"] intValue];
+        double priceIn = [[spot objectForKey:@"mPrice"] doubleValue];
+        NSString * phoneNumberIn = [spot objectForKey:@"mPhoneNumber"];
+        NSString * descIn = [spot objectForKey:@"mDesc"];
+        Boolean freeIn = [[spot objectForKey:@"mFree"] boolValue];
+                         
+        ParkingSpot *annotation = [[ParkingSpot alloc] initWithID:idIn 
+                                                              lat:latIn
+                                                              lng:lngIn 
+                                                      companyName:companyNameIn
+                                                          localID:localIDIn 
+                                                            price:priceIn
+                                                      phoneNumber:phoneNumberIn 
+                                                             desc:descIn
+                                                             free:freeIn];    
+        [parkingSpots addObject:annotation];    
+    }
+    
+    self.annotations = parkingSpots;
+}
+
+
+- (IBAction)refreshTapped:(id)sender {
+    [self refreshSpots];
+    NSLog(@"ZOOM LEVEL: %d\n", [self.mapView zoomLevel]);
+}
+
+- (IBAction)myLocationTapped:(id)sender {
+    int curZoom = [self.mapView zoomLevel];
+    
+    CLLocationCoordinate2D zoomLocation;
+    zoomLocation.latitude = self.currentLat;
+    zoomLocation.longitude = self.currentLong;
+    
+    [self.mapView setCenterCoordinate:zoomLocation zoomLevel:curZoom animated:TRUE];
+    
+}
+
+- (IBAction)AddressEntered:(UITextField*)sender {
+    NSLog(@"%@",sender.text);
+    [sender resignFirstResponder];
+}
+
+- (MKAnnotationView *)mapView:(MKMapView *)mapView viewForAnnotation:(id <MKAnnotation>)annotation {
+    
+    
+    static NSString *identifier; 
+    
+    
+    if ([annotation isKindOfClass:[ParkingSpot class]]) {
+        
+        
+        if([(ParkingSpot*)annotation mFree])
+        {
+            identifier = @"ParkingSpot-Free";
+        } else {
+            identifier = @"ParkingSpot-Taken";
+        }
+        
+        
+        MKPinAnnotationView *annotationView = (MKPinAnnotationView *) [_mapView dequeueReusableAnnotationViewWithIdentifier:identifier];
+        if (annotationView == nil) {
+            annotationView = [[MKPinAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:identifier];
+        } else {
+            annotationView.annotation = annotation;
+        }
+        
+        annotationView.enabled = YES;
+        annotationView.canShowCallout = YES;
+        if([(ParkingSpot*)annotation mFree])
+        {
+            annotationView.image=[UIImage imageNamed:@"parking_icon_free.png"];//here we use a nice image instead of the default pins
+        } else {
+            annotationView.image=[UIImage imageNamed:@"parking_icon_taken.png"];
+        }
+        
+        return annotationView;
+    }
+    
+    return nil;    
+}
+
+//TODO: Change make this happen based on the max zoom level, not just a hard-coded value.
+- (void)mapView:(MKMapView *)mapView regionDidChangeAnimated:(BOOL)animated {
+    //Temporarily removed because messes with the annotation images.
+    /*
+    NSLog(@"%d",[self.mapView zoomLevel]);
+    if([self.mapView zoomLevel]>17) {
+        [self.mapView setMapType:MKMapTypeSatellite];
+        //[mapView setCenterCoordinate:[mapView centerCoordinate] zoomLevel:10 animated:TRUE];
+    }
+    if([self.mapView zoomLevel]<=17) {
+        [self.mapView setMapType:MKMapTypeStandard];
+        //[mapView setCenterCoordinate:[mapView centerCoordinate] zoomLevel:10 animated:TRUE];
+    }
+     */
+}
+
+//Starts polling if not already. Otherwise continues polling.
+-(void)startPolling {
+    if (self.timerPolling != nil)
+    {
+        return;
+    } else {
+        self.timerPolling = [NSTimer scheduledTimerWithTimeInterval: self.timerDuration
+                                                             target: self
+                                                           selector:@selector(onTick:)
+                                                           userInfo: nil repeats:NO];
+    }
+}
+
+-(void)stopPolling {
+    if (self.timerPolling == nil)
+    {
+        return;
+    } else {
+        [self.timerPolling invalidate];
+        self.timerPolling = nil;
+    }
+}
+
+-(void)onTick:(NSTimer *)timer {
+    //do smth
+    
+    [self refreshSpots];
+    
+    self.timerPolling = [NSTimer scheduledTimerWithTimeInterval: self.timerDuration
+                                                         target: self
+                                                       selector:@selector(onTick:)
+                                                       userInfo: nil repeats:NO];
+
+}
+
+- (BOOL)textFieldShouldReturn:(UITextField *)textField {
+    NSLog(@"%@",textField.text);
+    [textField resignFirstResponder];
+    return NO;
 }
 
 @end
