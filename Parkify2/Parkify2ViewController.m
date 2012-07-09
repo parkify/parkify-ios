@@ -10,9 +10,12 @@
 #import "ASIHTTPRequest.h"
 #import "SBJSON.h"
 #import "ParkingSpot.h"
+#import "BSForwardGeocoder.h"
+#import "ParkifySpotViewController.h"
+
 
 @interface Parkify2ViewController ()
-
+@property (nonatomic, strong) BSForwardGeocoder* forwardGeocoder;
 @end
 
 @implementation Parkify2ViewController
@@ -22,10 +25,21 @@
 @synthesize locationManager = _locationManager;
 @synthesize currentLat = _currentLat;
 @synthesize currentLong = _currentLong;
+@synthesize addressBar = _addressBar;
+@synthesize targetSpot = _targetSpot;
 
 @synthesize annotations = _annotations;
 
 @synthesize parkingSpots = _parkingSpots;
+
+@synthesize forwardGeocoder = _forwardGeocoder;
+
+- (BSForwardGeocoder*)forwardGeocoder {
+    if(_forwardGeocoder == nil) {
+        _forwardGeocoder = [[BSForwardGeocoder alloc] initWithDelegate:self];
+    }
+    return _forwardGeocoder;
+}
 
 -(void)spotsWereUpdated 
 {
@@ -37,8 +51,39 @@
 }
 
 - (void)updateMapView {
-    if(self.mapView.annotations) [self.mapView removeAnnotations:self.mapView.annotations];
-    [self.mapView addAnnotations:self.annotations];
+    //Terrible, must be some better way to update.
+    BOOL bChanged = false;
+    NSMutableArray* annotationsToRemove = [[NSMutableArray alloc] init];
+    NSMutableArray* annotationsAdded = [[NSMutableArray alloc] init];
+    
+    //NSLog(@"Before_m=%d, Before_map=%d\t", [self.annotations count],[self.mapView.annotations count] );
+    for(ParkingSpotAnnotation* map_annotation in self.mapView.annotations) {
+        bChanged = false;
+        if([map_annotation respondsToSelector:@selector(updateAnnotationWith:onlyifIDsAreSame:)]) {
+            for(id m_annotation in self.annotations) {
+                bChanged = [map_annotation updateAnnotationWith:m_annotation onlyifIDsAreSame:true];
+                if(bChanged) {
+                    [annotationsAdded addObject:m_annotation];
+                    break;
+                }
+            }
+            if(!bChanged) {
+                [annotationsToRemove addObject:map_annotation];
+            }
+        }
+    }
+    
+    for(id m_annotation in self.annotations) {
+        if(![annotationsAdded containsObject:m_annotation]) {
+            [self.mapView addAnnotation:m_annotation];
+        }
+    }
+    
+    [self.mapView removeAnnotations:annotationsToRemove];
+                   
+    //NSLog(@"After_m=%d, After_map=%d\n", [self.annotations count],[self.mapView.annotations count] );
+    //if(self.mapView.annotations) [self.mapView removeAnnotations:self.mapView.annotations];
+    //[self.mapView addAnnotations:self.annotations];
 }
 
 - (void)setMapView:(MKMapView *)mapView {
@@ -54,49 +99,15 @@
 - (ParkingSpotCollection*)parkingSpots {
     if(!_parkingSpots) {
         _parkingSpots = [[ParkingSpotCollection alloc] init];
-        _parkingSpots.observerDelegate = self;
     }
+    _parkingSpots.observerDelegate = self;
     return _parkingSpots;
 }
 
 - (void)refreshSpots
 {
-    //MKCoordinateRegion mapRegion = [self.mapView region];
-    //CLLocationCoordinate2D centerLocation = mapRegion.center;
-    
-    // 2
-    /*
-     NSString *jsonFile = [[NSBundle mainBundle] pathForResource:@"command" ofType:@"json"];
-     NSString *formatString = [NSString stringWithContentsOfFile:jsonFile encoding:NSUTF8StringEncoding error:nil];
-     NSString *json = [NSString stringWithFormat:formatString, 
-     centerLocation.latitude, centerLocation.longitude, 0.5*METERS_PER_MILE];
-     */
-    // 3
-    NSURL *url = [NSURL URLWithString:@"http://swooplot.herokuapp.com/parking_spots"];
-    
-    // 4
-    ASIHTTPRequest *_request = [ASIHTTPRequest requestWithURL:url];
-    __weak ASIHTTPRequest *request = _request;
-    
-    request.requestMethod = @"GET";    
-    //[request addRequestHeader:@"Content-Type" value:@"application/json"];
-    //[request appendPostData:[json dataUsingEncoding:NSUTF8StringEncoding]];
-    // 5
-    [request setDelegate:self];
-    [request setCompletionBlock:^{         
-        NSString *responseString = [request responseString];
-        //NSLog(@"Response: %@", responseString);
-        [self plotParkingSpotsFromString:responseString];
-    }];
-    [request setFailedBlock:^{
-        NSError *error = [request error];
-        NSLog(@"Error: %@", error.localizedDescription);
-    }];
-    
-    // 6
-    [request startAsynchronous];
+    [self.parkingSpots updateWithRequest:nil];
 }
-
 
 - (void)viewDidLoad
 {
@@ -107,6 +118,7 @@
 - (void)viewDidUnload
 {
     [self setMapView:nil];
+    [self setAddressBar:nil];
     [super viewDidUnload];
     // Release any retained subviews of the main view.
 }
@@ -121,6 +133,7 @@
 }
 
 - (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
     CLLocationCoordinate2D zoomLocation;
     zoomLocation.latitude = 37.872679;
     zoomLocation.longitude = -122.266797;
@@ -133,7 +146,9 @@
     self.locationManager.delegate = self;
     self.locationManager.desiredAccuracy = kCLLocationAccuracyBest;
     [self.locationManager startUpdatingLocation];
+    self.mapView.delegate = self;
     
+    self.addressBar.delegate = self;
     
     self.timerDuration = 3;
     [self refreshSpots];
@@ -154,25 +169,19 @@
     //NSLog(@"New longitude: %f", newLocation.coordinate.longitude);
 }
 
-- (void)plotParkingSpotsFromString:(NSString *)responseString {
-    [self.parkingSpots updateFromJSONString:responseString];
-}
-
-
-- (IBAction)refreshTapped:(id)sender {
-    [self refreshSpots];
-    NSLog(@"ZOOM LEVEL: %d\n", [self.mapView zoomLevel]);
+- (void)goToCoord:(CLLocationCoordinate2D)target {
+    int curZoom = [self.mapView zoomLevel];
+    [self.mapView setCenterCoordinate:target zoomLevel:curZoom animated:TRUE];
 }
 
 - (IBAction)myLocationTapped:(id)sender {
     int curZoom = [self.mapView zoomLevel];
     
-    CLLocationCoordinate2D zoomLocation;
-    zoomLocation.latitude = self.currentLat;
-    zoomLocation.longitude = self.currentLong;
+    CLLocationCoordinate2D myLocation;
+    myLocation.latitude = self.currentLat;
+    myLocation.longitude = self.currentLong;
     
-    [self.mapView setCenterCoordinate:zoomLocation zoomLevel:curZoom animated:TRUE];
-    
+    [self goToCoord:myLocation];
 }
 
 - (IBAction)AddressEntered:(UITextField*)sender {
@@ -201,12 +210,13 @@
         MKPinAnnotationView *annotationView = (MKPinAnnotationView *) [_mapView dequeueReusableAnnotationViewWithIdentifier:identifier];
         if (annotationView == nil) {
             annotationView = [[MKPinAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:identifier];
-        } else {
-            annotationView.annotation = annotation;
+            annotationView.canShowCallout = YES;
+            annotationView.enabled = YES;
+            annotationView.leftCalloutAccessoryView = [[UIImageView alloc] initWithFrame:CGRectMake(0,0,30,30)];
         }
         
-        annotationView.enabled = YES;
-        annotationView.canShowCallout = YES;
+        annotationView.annotation = annotation;
+        [(UIImageView*)annotationView.leftCalloutAccessoryView setImage:nil];
         if([spot mFree])
         {
             annotationView.image=[UIImage imageNamed:@"parking_icon_free.png"];//here we use a nice image instead of the default pins
@@ -214,10 +224,41 @@
             annotationView.image=[UIImage imageNamed:@"parking_icon_taken.png"];
         }
         
+        UIButton* btnViewVenue = [UIButton buttonWithType:UIButtonTypeDetailDisclosure];
+        btnViewVenue.tag = spot.mID;
+        [btnViewVenue addTarget:self action:@selector(spotMoreInfo:) forControlEvents:UIControlEventTouchUpInside];
+        annotationView.rightCalloutAccessoryView = btnViewVenue;
+        
         return annotationView;
     }
     
     return nil;    
+}
+
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+    if ([segue.identifier isEqualToString:@"ViewSpot"]) {
+        ParkifySpotViewController *newController = segue.destinationViewController;
+        newController.parkingSpots = self.parkingSpots;
+        self.parkingSpots.observerDelegate = newController;
+        newController.spot = self.targetSpot;
+    }
+}
+
+- (void)openSpotViewControllerWithSpot:(int)spotID {
+    [self stopPolling];
+    self.targetSpot = [self.parkingSpots parkingSpotForID:spotID];
+    [self performSegueWithIdentifier:@"ViewSpot" sender:self];
+}
+
+- (IBAction)spotMoreInfo:(UIButton*)sender {
+    [self openSpotViewControllerWithSpot:sender.tag];
+}
+//- calloutAccessoryControlTapped:
+
+
+- (void)mapView:(MKMapView *)mapView didSelectAnnotationView:(MKAnnotationView *)view {
+    UIImage* image = [UIImage imageNamed:@"crosshair.png"];
+    [(UIImageView*)view.leftCalloutAccessoryView setImage:image];
 }
 
 //TODO: Change make this happen based on the max zoom level, not just a hard-coded value.
@@ -271,10 +312,45 @@
 
 }
 
+// --ADDRESS BAR-- //
+/*
 - (BOOL)textFieldShouldReturn:(UITextField *)textField {
-    NSLog(@"%@",textField.text);
+    //NSLog(@"%@",textField.text);
     [textField resignFirstResponder];
     return NO;
 }
+*/
+
+- (void)searchBarSearchButtonClicked:(UISearchBar *)searchBar {
+    [self handleSearch:searchBar];
+}
+
+- (void)searchBarTextDidEndEditing:(UISearchBar *)searchBar {
+    //[self handleSearch:searchBar];
+}
+
+- (void)handleSearch:(UISearchBar *)searchBar {
+    NSLog(@"Searching for: %@", searchBar.text);
+    [self.forwardGeocoder forwardGeocodeWithQuery:searchBar.text regionBiasing:nil];
+    [searchBar resignFirstResponder]; //close the keyboard
+}
+- (void)forwardGeocodingDidSucceed:(BSForwardGeocoder*)geocoder withResults:(NSArray *)results{
+    if([results count] >= 1) {
+        BSKmlResult* place = [results objectAtIndex:0];
+        NSLog(@"Found place at location (%g,%g)", place.latitude, place.longitude);
+        
+        CLLocationCoordinate2D targetLocation;
+        targetLocation.latitude = place.latitude;
+        targetLocation.longitude = place.longitude;
+        
+        [self goToCoord:targetLocation];
+    }
+}
+
+- (void)searchBarCancelButtonClicked:(UISearchBar *)searchBar {
+    [searchBar resignFirstResponder]; //close the keyboard
+}
+
+// --END ADDRESS BAR-- //
 
 @end

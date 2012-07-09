@@ -11,10 +11,11 @@
 #import "MKMapView+ZoomLevel.h"
 #import <CoreLocation/CoreLocation.h>
 #import "ParkingSpot.h"
+#import "BSForwardGeocoder.h"
 
 #define METERS_PER_MILE 1609.344
 
-@interface Parkify2ViewController : UIViewController <MKMapViewDelegate, CLLocationManagerDelegate,ParkingSpotObserver>
+@interface Parkify2ViewController : UIViewController <MKMapViewDelegate, CLLocationManagerDelegate,ParkingSpotObserver, UISearchBarDelegate, BSForwardGeocoderDelegate>
 {
     CLLocationManager *_locationManager;
     double _currentLat;
@@ -26,8 +27,10 @@
 @property float timerDuration;
 @property double currentLat;
 @property double currentLong;
+@property (weak, nonatomic) IBOutlet UISearchBar *addressBar;
 
 @property (nonatomic, strong) ParkingSpotCollection* parkingSpots;
+@property (nonatomic, strong) ParkingSpot* targetSpot;
 
 @property (nonatomic, strong) NSArray* annotations; //Of type id <MKAnnotation>
 

@@ -8,11 +8,25 @@
 
 /* Begin PBXBuildFile section */
 		8C7489D415A4102B00D7C167 /* ParkingSpot.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C7489D315A4102B00D7C167 /* ParkingSpot.m */; };
+		8C7578B815AA5515004BEB55 /* ParkifySignupViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C7578B715AA5515004BEB55 /* ParkifySignupViewController.m */; };
 		8C76882915A43C200035E7B4 /* MKMapView+ZoomLevel.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C76882815A43B590035E7B4 /* MKMapView+ZoomLevel.m */; };
 		8C76882E15A442C50035E7B4 /* crosshair.png in Resources */ = {isa = PBXBuildFile; fileRef = 8C76882B15A442C50035E7B4 /* crosshair.png */; };
 		8C76882F15A442C50035E7B4 /* parking_icon_free.png in Resources */ = {isa = PBXBuildFile; fileRef = 8C76882C15A442C50035E7B4 /* parking_icon_free.png */; };
 		8C76883015A442C50035E7B4 /* parking_icon_taken.png in Resources */ = {isa = PBXBuildFile; fileRef = 8C76882D15A442C50035E7B4 /* parking_icon_taken.png */; };
 		8C76883215A45CE70035E7B4 /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8C76883115A45CE70035E7B4 /* CoreLocation.framework */; };
+		8C7688FE15A95603005BAB60 /* RangeBar.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C7688FD15A95603005BAB60 /* RangeBar.m */; };
+		8C76890215A99D5C005BAB60 /* Callout Background.png in Resources */ = {isa = PBXBuildFile; fileRef = 8C76890115A99D5C005BAB60 /* Callout Background.png */; };
+		8C79D2A115AA451A00AF90AB /* ParkifyFrontPageViewControllerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C79D2A015AA451A00AF90AB /* ParkifyFrontPageViewControllerViewController.m */; };
+		8C79D2A415AA456D00AF90AB /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8C79D2A315AA456D00AF90AB /* QuartzCore.framework */; };
+		8C79E1CB15A8F20D00B49D73 /* ParkifySpotViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C79E1CA15A8F20D00B49D73 /* ParkifySpotViewController.m */; };
+		8C79E1FA15A8FC6C00B49D73 /* bar-background.png in Resources */ = {isa = PBXBuildFile; fileRef = 8C79E1F215A8FC6C00B49D73 /* bar-background.png */; };
+		8C79E1FB15A8FC6C00B49D73 /* bar-background@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 8C79E1F315A8FC6C00B49D73 /* bar-background@2x.png */; };
+		8C79E1FC15A8FC6C00B49D73 /* bar-highlight.png in Resources */ = {isa = PBXBuildFile; fileRef = 8C79E1F415A8FC6C00B49D73 /* bar-highlight.png */; };
+		8C79E1FD15A8FC6C00B49D73 /* bar-highlight@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 8C79E1F515A8FC6C00B49D73 /* bar-highlight@2x.png */; };
+		8C79E1FE15A8FC6C00B49D73 /* handle-hover.png in Resources */ = {isa = PBXBuildFile; fileRef = 8C79E1F615A8FC6C00B49D73 /* handle-hover.png */; };
+		8C79E1FF15A8FC6C00B49D73 /* handle-hover@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 8C79E1F715A8FC6C00B49D73 /* handle-hover@2x.png */; };
+		8C79E20015A8FC6C00B49D73 /* handle.png in Resources */ = {isa = PBXBuildFile; fileRef = 8C79E1F815A8FC6C00B49D73 /* handle.png */; };
+		8C79E20115A8FC6C00B49D73 /* handle@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 8C79E1F915A8FC6C00B49D73 /* handle@2x.png */; };
 		8C958D0615A4FAB500870E8C /* BSAddressComponent.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C958CFF15A4FA8D00870E8C /* BSAddressComponent.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		8C958D0715A4FAB500870E8C /* BSForwardGeocoder.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C958D0115A4FA8D00870E8C /* BSForwardGeocoder.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		8C958D0815A4FAB500870E8C /* BSGoogleV3KmlParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C958D0315A4FA8D00870E8C /* BSGoogleV3KmlParser.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
@@ -58,12 +72,30 @@
 /* Begin PBXFileReference section */
 		8C7489D215A4102B00D7C167 /* ParkingSpot.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ParkingSpot.h; sourceTree = "<group>"; };
 		8C7489D315A4102B00D7C167 /* ParkingSpot.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ParkingSpot.m; sourceTree = "<group>"; };
+		8C7578B615AA5515004BEB55 /* ParkifySignupViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ParkifySignupViewController.h; sourceTree = "<group>"; };
+		8C7578B715AA5515004BEB55 /* ParkifySignupViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ParkifySignupViewController.m; sourceTree = "<group>"; };
 		8C76882715A43B590035E7B4 /* MKMapView+ZoomLevel.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "MKMapView+ZoomLevel.h"; path = "../MKMapView+ZoomLevel.h"; sourceTree = "<group>"; };
 		8C76882815A43B590035E7B4 /* MKMapView+ZoomLevel.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = "MKMapView+ZoomLevel.m"; path = "../MKMapView+ZoomLevel.m"; sourceTree = "<group>"; };
 		8C76882B15A442C50035E7B4 /* crosshair.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = crosshair.png; sourceTree = "<group>"; };
 		8C76882C15A442C50035E7B4 /* parking_icon_free.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = parking_icon_free.png; sourceTree = "<group>"; };
 		8C76882D15A442C50035E7B4 /* parking_icon_taken.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = parking_icon_taken.png; sourceTree = "<group>"; };
 		8C76883115A45CE70035E7B4 /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = System/Library/Frameworks/CoreLocation.framework; sourceTree = SDKROOT; };
+		8C7688FC15A95603005BAB60 /* RangeBar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RangeBar.h; sourceTree = "<group>"; };
+		8C7688FD15A95603005BAB60 /* RangeBar.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RangeBar.m; sourceTree = "<group>"; };
+		8C76890115A99D5C005BAB60 /* Callout Background.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Callout Background.png"; sourceTree = "<group>"; };
+		8C79D29F15AA451A00AF90AB /* ParkifyFrontPageViewControllerViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ParkifyFrontPageViewControllerViewController.h; sourceTree = "<group>"; };
+		8C79D2A015AA451A00AF90AB /* ParkifyFrontPageViewControllerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ParkifyFrontPageViewControllerViewController.m; sourceTree = "<group>"; };
+		8C79D2A315AA456D00AF90AB /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
+		8C79E1C915A8F20D00B49D73 /* ParkifySpotViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ParkifySpotViewController.h; sourceTree = "<group>"; };
+		8C79E1CA15A8F20D00B49D73 /* ParkifySpotViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ParkifySpotViewController.m; sourceTree = "<group>"; };
+		8C79E1F215A8FC6C00B49D73 /* bar-background.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "bar-background.png"; sourceTree = "<group>"; };
+		8C79E1F315A8FC6C00B49D73 /* bar-background@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "bar-background@2x.png"; sourceTree = "<group>"; };
+		8C79E1F415A8FC6C00B49D73 /* bar-highlight.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "bar-highlight.png"; sourceTree = "<group>"; };
+		8C79E1F515A8FC6C00B49D73 /* bar-highlight@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "bar-highlight@2x.png"; sourceTree = "<group>"; };
+		8C79E1F615A8FC6C00B49D73 /* handle-hover.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "handle-hover.png"; sourceTree = "<group>"; };
+		8C79E1F715A8FC6C00B49D73 /* handle-hover@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "handle-hover@2x.png"; sourceTree = "<group>"; };
+		8C79E1F815A8FC6C00B49D73 /* handle.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = handle.png; sourceTree = "<group>"; };
+		8C79E1F915A8FC6C00B49D73 /* handle@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "handle@2x.png"; sourceTree = "<group>"; };
 		8C958CFE15A4FA8D00870E8C /* BSAddressComponent.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BSAddressComponent.h; sourceTree = "<group>"; };
 		8C958CFF15A4FA8D00870E8C /* BSAddressComponent.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = BSAddressComponent.m; sourceTree = "<group>"; };
 		8C958D0015A4FA8D00870E8C /* BSForwardGeocoder.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BSForwardGeocoder.h; sourceTree = "<group>"; };
@@ -205,6 +237,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8C79D2A415AA456D00AF90AB /* QuartzCore.framework in Frameworks */,
 				8C76883215A45CE70035E7B4 /* CoreLocation.framework in Frameworks */,
 				8CA7A25015A3EA3A0051567D /* libz.1.1.3.dylib in Frameworks */,
 				8CA7A24E15A3EA2D0051567D /* MobileCoreServices.framework in Frameworks */,
@@ -234,6 +267,15 @@
 		8C76882A15A442AE0035E7B4 /* res */ = {
 			isa = PBXGroup;
 			children = (
+				8C76890115A99D5C005BAB60 /* Callout Background.png */,
+				8C79E1F215A8FC6C00B49D73 /* bar-background.png */,
+				8C79E1F315A8FC6C00B49D73 /* bar-background@2x.png */,
+				8C79E1F415A8FC6C00B49D73 /* bar-highlight.png */,
+				8C79E1F515A8FC6C00B49D73 /* bar-highlight@2x.png */,
+				8C79E1F615A8FC6C00B49D73 /* handle-hover.png */,
+				8C79E1F715A8FC6C00B49D73 /* handle-hover@2x.png */,
+				8C79E1F815A8FC6C00B49D73 /* handle.png */,
+				8C79E1F915A8FC6C00B49D73 /* handle@2x.png */,
 			);
 			name = res;
 			sourceTree = "<group>";
@@ -256,6 +298,7 @@
 		8CA7A1D115A3DC980051567D = {
 			isa = PBXGroup;
 			children = (
+				8C79D2A315AA456D00AF90AB /* QuartzCore.framework */,
 				8C958CFC15A4FA6F00870E8C /* BSForwardGeocoder */,
 				8C76883115A45CE70035E7B4 /* CoreLocation.framework */,
 				8C76882515A43B320035E7B4 /* MKMapViewZoom */,
@@ -300,11 +343,19 @@
 				8CA7A1F015A3DC980051567D /* Parkify2AppDelegate.m */,
 				8CA7A1F215A3DC980051567D /* MainStoryboard_iPhone.storyboard */,
 				8CA7A1F515A3DC980051567D /* MainStoryboard_iPad.storyboard */,
+				8C79D29F15AA451A00AF90AB /* ParkifyFrontPageViewControllerViewController.h */,
+				8C79D2A015AA451A00AF90AB /* ParkifyFrontPageViewControllerViewController.m */,
 				8CA7A1F815A3DC980051567D /* Parkify2ViewController.h */,
 				8CA7A1F915A3DC980051567D /* Parkify2ViewController.m */,
 				8CA7A1E715A3DC980051567D /* Supporting Files */,
 				8C7489D215A4102B00D7C167 /* ParkingSpot.h */,
 				8C7489D315A4102B00D7C167 /* ParkingSpot.m */,
+				8C79E1C915A8F20D00B49D73 /* ParkifySpotViewController.h */,
+				8C79E1CA15A8F20D00B49D73 /* ParkifySpotViewController.m */,
+				8C7688FC15A95603005BAB60 /* RangeBar.h */,
+				8C7688FD15A95603005BAB60 /* RangeBar.m */,
+				8C7578B615AA5515004BEB55 /* ParkifySignupViewController.h */,
+				8C7578B715AA5515004BEB55 /* ParkifySignupViewController.m */,
 			);
 			path = Parkify2;
 			sourceTree = "<group>";
@@ -537,6 +588,15 @@
 				8C76882E15A442C50035E7B4 /* crosshair.png in Resources */,
 				8C76882F15A442C50035E7B4 /* parking_icon_free.png in Resources */,
 				8C76883015A442C50035E7B4 /* parking_icon_taken.png in Resources */,
+				8C79E1FA15A8FC6C00B49D73 /* bar-background.png in Resources */,
+				8C79E1FB15A8FC6C00B49D73 /* bar-background@2x.png in Resources */,
+				8C79E1FC15A8FC6C00B49D73 /* bar-highlight.png in Resources */,
+				8C79E1FD15A8FC6C00B49D73 /* bar-highlight@2x.png in Resources */,
+				8C79E1FE15A8FC6C00B49D73 /* handle-hover.png in Resources */,
+				8C79E1FF15A8FC6C00B49D73 /* handle-hover@2x.png in Resources */,
+				8C79E20015A8FC6C00B49D73 /* handle.png in Resources */,
+				8C79E20115A8FC6C00B49D73 /* handle@2x.png in Resources */,
+				8C76890215A99D5C005BAB60 /* Callout Background.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -578,6 +638,10 @@
 				8CA7A22715A3E6DA0051567D /* SBJsonUTF8Stream.m in Sources */,
 				8CA7A22815A3E6DA0051567D /* SBJsonWriter.m in Sources */,
 				8C7489D415A4102B00D7C167 /* ParkingSpot.m in Sources */,
+				8C79E1CB15A8F20D00B49D73 /* ParkifySpotViewController.m in Sources */,
+				8C7688FE15A95603005BAB60 /* RangeBar.m in Sources */,
+				8C79D2A115AA451A00AF90AB /* ParkifyFrontPageViewControllerViewController.m in Sources */,
+				8C7578B815AA5515004BEB55 /* ParkifySignupViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

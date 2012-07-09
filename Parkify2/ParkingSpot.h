@@ -21,6 +21,7 @@
 - (ParkingSpot*)parkingSpotForID:(int)key;
 - (id)initFromJSONString:(NSString*)strJson;
 - (void)updateFromJSONString:(NSString*)strJson;
+- (void)updateWithRequest:(id)Request;
 @property (nonatomic, strong) NSDictionary* parkingSpots;
 @property (nonatomic, weak) id <ParkingSpotObserver> observerDelegate;
 @end
@@ -65,5 +66,8 @@
 @property (nonatomic, strong) ParkingSpot* spot;
 
 + (ParkingSpotAnnotation *)annotationForSpot:(ParkingSpot*)spot;
+
+//Returns true if the annotation was updated.
+- (BOOL)updateAnnotationWith:(id)annotation onlyifIDsAreSame:(BOOL)boolIDsSame;
 
 @end

@@ -8,6 +8,7 @@
 
 #import "ParkingSpot.h"
 #import "SBJSON.h"
+#import "ASIHTTPRequest.h"
 
 @interface ParkingSpotCollection()
 
@@ -33,6 +34,29 @@
         [self updateFromJSONString:strJson];
     }
     return self;
+}
+
+- (void)updateWithRequest:(id)Request {
+    NSURL *url = [NSURL URLWithString:@"http://swooplot.herokuapp.com/parking_spots"];
+    
+    ASIHTTPRequest *_request = [ASIHTTPRequest requestWithURL:url];
+    __weak ASIHTTPRequest *request = _request;
+    
+    request.requestMethod = @"GET";    
+    
+    [request setDelegate:self];
+    [request setCompletionBlock:^{         
+        NSString *responseString = [request responseString];
+        [self updateFromJSONString:responseString];
+    }];
+    [request setFailedBlock:^{
+        NSError *error = [request error];
+        NSLog(@"Error: %@", error.localizedDescription);
+    }];
+    
+    // 6
+    [request startAsynchronous];
+
 }
 
 - (void)updateFromJSONString:(NSString*)strJson {
@@ -64,7 +88,7 @@
     }
     for (id key in [newParkingSpots allKeys]) {
         ParkingSpot* pot = [newParkingSpots objectForKey:key];
-        NSLog(@"key: %@, value: %@\n", key, pot);
+        //NSLog(@"key: %@, value: %@\n", key, pot);
     }
     
     self.parkingSpots = [newParkingSpots copy];
@@ -142,6 +166,24 @@
 }
 - (NSString *)subtitle {
     return [NSString stringWithFormat:@"%@ to Book", self.spot.mPhoneNumber];
+}
+
+- (BOOL)updateAnnotationWith:(id)annotation onlyifIDsAreSame:(BOOL)boolIDsSame
+{
+    if (![annotation isKindOfClass:[ParkingSpotAnnotation class]]) {
+        return false;
+    }
+    if(!boolIDsSame || ((ParkingSpotAnnotation*)annotation).spot.mID == self.spot.mID) {
+        [self willChangeValueForKey:@"coordinate"];
+        [self willChangeValueForKey:@"title"];
+        [self willChangeValueForKey:@"subtitle"];
+        self.spot = ((ParkingSpotAnnotation*)annotation).spot;
+        [self didChangeValueForKey:@"subtitle"];
+        [self didChangeValueForKey:@"title"];
+        [self didChangeValueForKey:@"coordinate"];
+        return true;
+    }
+    return false;
 }
 
 @end
