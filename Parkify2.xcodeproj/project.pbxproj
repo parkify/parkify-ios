@@ -16,6 +16,12 @@
 		8C76883215A45CE70035E7B4 /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8C76883115A45CE70035E7B4 /* CoreLocation.framework */; };
 		8C7688FE15A95603005BAB60 /* RangeBar.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C7688FD15A95603005BAB60 /* RangeBar.m */; };
 		8C76890215A99D5C005BAB60 /* Callout Background.png in Resources */ = {isa = PBXBuildFile; fileRef = 8C76890115A99D5C005BAB60 /* Callout Background.png */; };
+		8C76A84B15AB8E1B00414A76 /* geolocation_icon_white.png in Resources */ = {isa = PBXBuildFile; fileRef = 8C76A84A15AB8E1B00414A76 /* geolocation_icon_white.png */; };
+		8C78946315AE5F3100576C4D /* Authentication.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C78946215AE5F3100576C4D /* Authentication.m */; };
+		8C78D3A515AABDC000B4D929 /* ParkifyConfirmationViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C78D3A415AABDC000B4D929 /* ParkifyConfirmationViewController.m */; };
+		8C78D3AC15AADD2300B4D929 /* TPKeyboardAvoidingScrollView.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C78D3A915AADCF000B4D929 /* TPKeyboardAvoidingScrollView.m */; };
+		8C78D3AD15AADD2300B4D929 /* TPKeyboardAvoidingTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C78D3AB15AADCF000B4D929 /* TPKeyboardAvoidingTableView.m */; };
+		8C78D3B115AAEEFD00B4D929 /* iToast.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C78D3B015AAEEAD00B4D929 /* iToast.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		8C79D2A115AA451A00AF90AB /* ParkifyFrontPageViewControllerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C79D2A015AA451A00AF90AB /* ParkifyFrontPageViewControllerViewController.m */; };
 		8C79D2A415AA456D00AF90AB /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8C79D2A315AA456D00AF90AB /* QuartzCore.framework */; };
 		8C79E1CB15A8F20D00B49D73 /* ParkifySpotViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C79E1CA15A8F20D00B49D73 /* ParkifySpotViewController.m */; };
@@ -83,6 +89,17 @@
 		8C7688FC15A95603005BAB60 /* RangeBar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RangeBar.h; sourceTree = "<group>"; };
 		8C7688FD15A95603005BAB60 /* RangeBar.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RangeBar.m; sourceTree = "<group>"; };
 		8C76890115A99D5C005BAB60 /* Callout Background.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Callout Background.png"; sourceTree = "<group>"; };
+		8C76A84A15AB8E1B00414A76 /* geolocation_icon_white.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = geolocation_icon_white.png; sourceTree = "<group>"; };
+		8C78946115AE5F3100576C4D /* Authentication.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Authentication.h; sourceTree = "<group>"; };
+		8C78946215AE5F3100576C4D /* Authentication.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Authentication.m; sourceTree = "<group>"; };
+		8C78D3A315AABDC000B4D929 /* ParkifyConfirmationViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ParkifyConfirmationViewController.h; sourceTree = "<group>"; };
+		8C78D3A415AABDC000B4D929 /* ParkifyConfirmationViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ParkifyConfirmationViewController.m; sourceTree = "<group>"; };
+		8C78D3A815AADCF000B4D929 /* TPKeyboardAvoidingScrollView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TPKeyboardAvoidingScrollView.h; sourceTree = "<group>"; };
+		8C78D3A915AADCF000B4D929 /* TPKeyboardAvoidingScrollView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TPKeyboardAvoidingScrollView.m; sourceTree = "<group>"; };
+		8C78D3AA15AADCF000B4D929 /* TPKeyboardAvoidingTableView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TPKeyboardAvoidingTableView.h; sourceTree = "<group>"; };
+		8C78D3AB15AADCF000B4D929 /* TPKeyboardAvoidingTableView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TPKeyboardAvoidingTableView.m; sourceTree = "<group>"; };
+		8C78D3AF15AAEEAD00B4D929 /* iToast.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = iToast.h; sourceTree = "<group>"; };
+		8C78D3B015AAEEAD00B4D929 /* iToast.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = iToast.m; sourceTree = "<group>"; };
 		8C79D29F15AA451A00AF90AB /* ParkifyFrontPageViewControllerViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ParkifyFrontPageViewControllerViewController.h; sourceTree = "<group>"; };
 		8C79D2A015AA451A00AF90AB /* ParkifyFrontPageViewControllerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ParkifyFrontPageViewControllerViewController.m; sourceTree = "<group>"; };
 		8C79D2A315AA456D00AF90AB /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
@@ -267,6 +284,7 @@
 		8C76882A15A442AE0035E7B4 /* res */ = {
 			isa = PBXGroup;
 			children = (
+				8C76A84A15AB8E1B00414A76 /* geolocation_icon_white.png */,
 				8C76890115A99D5C005BAB60 /* Callout Background.png */,
 				8C79E1F215A8FC6C00B49D73 /* bar-background.png */,
 				8C79E1F315A8FC6C00B49D73 /* bar-background@2x.png */,
@@ -278,6 +296,26 @@
 				8C79E1F915A8FC6C00B49D73 /* handle@2x.png */,
 			);
 			name = res;
+			sourceTree = "<group>";
+		};
+		8C78D3A715AADCD600B4D929 /* TPKeyboardAvoiding */ = {
+			isa = PBXGroup;
+			children = (
+				8C78D3A815AADCF000B4D929 /* TPKeyboardAvoidingScrollView.h */,
+				8C78D3A915AADCF000B4D929 /* TPKeyboardAvoidingScrollView.m */,
+				8C78D3AA15AADCF000B4D929 /* TPKeyboardAvoidingTableView.h */,
+				8C78D3AB15AADCF000B4D929 /* TPKeyboardAvoidingTableView.m */,
+			);
+			name = TPKeyboardAvoiding;
+			sourceTree = "<group>";
+		};
+		8C78D3AE15AAEE9500B4D929 /* iToast */ = {
+			isa = PBXGroup;
+			children = (
+				8C78D3AF15AAEEAD00B4D929 /* iToast.h */,
+				8C78D3B015AAEEAD00B4D929 /* iToast.m */,
+			);
+			name = iToast;
 			sourceTree = "<group>";
 		};
 		8C958CFC15A4FA6F00870E8C /* BSForwardGeocoder */ = {
@@ -298,6 +336,8 @@
 		8CA7A1D115A3DC980051567D = {
 			isa = PBXGroup;
 			children = (
+				8C78D3AE15AAEE9500B4D929 /* iToast */,
+				8C78D3A715AADCD600B4D929 /* TPKeyboardAvoiding */,
 				8C79D2A315AA456D00AF90AB /* QuartzCore.framework */,
 				8C958CFC15A4FA6F00870E8C /* BSForwardGeocoder */,
 				8C76883115A45CE70035E7B4 /* CoreLocation.framework */,
@@ -343,6 +383,8 @@
 				8CA7A1F015A3DC980051567D /* Parkify2AppDelegate.m */,
 				8CA7A1F215A3DC980051567D /* MainStoryboard_iPhone.storyboard */,
 				8CA7A1F515A3DC980051567D /* MainStoryboard_iPad.storyboard */,
+				8C78D3A315AABDC000B4D929 /* ParkifyConfirmationViewController.h */,
+				8C78D3A415AABDC000B4D929 /* ParkifyConfirmationViewController.m */,
 				8C79D29F15AA451A00AF90AB /* ParkifyFrontPageViewControllerViewController.h */,
 				8C79D2A015AA451A00AF90AB /* ParkifyFrontPageViewControllerViewController.m */,
 				8CA7A1F815A3DC980051567D /* Parkify2ViewController.h */,
@@ -356,6 +398,8 @@
 				8C7688FD15A95603005BAB60 /* RangeBar.m */,
 				8C7578B615AA5515004BEB55 /* ParkifySignupViewController.h */,
 				8C7578B715AA5515004BEB55 /* ParkifySignupViewController.m */,
+				8C78946115AE5F3100576C4D /* Authentication.h */,
+				8C78946215AE5F3100576C4D /* Authentication.m */,
 			);
 			path = Parkify2;
 			sourceTree = "<group>";
@@ -597,6 +641,7 @@
 				8C79E20015A8FC6C00B49D73 /* handle.png in Resources */,
 				8C79E20115A8FC6C00B49D73 /* handle@2x.png in Resources */,
 				8C76890215A99D5C005BAB60 /* Callout Background.png in Resources */,
+				8C76A84B15AB8E1B00414A76 /* geolocation_icon_white.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -607,6 +652,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8C78D3B115AAEEFD00B4D929 /* iToast.m in Sources */,
+				8C78D3AC15AADD2300B4D929 /* TPKeyboardAvoidingScrollView.m in Sources */,
+				8C78D3AD15AADD2300B4D929 /* TPKeyboardAvoidingTableView.m in Sources */,
 				8C958D0615A4FAB500870E8C /* BSAddressComponent.m in Sources */,
 				8C958D0715A4FAB500870E8C /* BSForwardGeocoder.m in Sources */,
 				8C958D0815A4FAB500870E8C /* BSGoogleV3KmlParser.m in Sources */,
@@ -642,6 +690,8 @@
 				8C7688FE15A95603005BAB60 /* RangeBar.m in Sources */,
 				8C79D2A115AA451A00AF90AB /* ParkifyFrontPageViewControllerViewController.m in Sources */,
 				8C7578B815AA5515004BEB55 /* ParkifySignupViewController.m in Sources */,
+				8C78D3A515AABDC000B4D929 /* ParkifyConfirmationViewController.m in Sources */,
+				8C78946315AE5F3100576C4D /* Authentication.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
