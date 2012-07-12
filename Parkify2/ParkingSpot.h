@@ -24,6 +24,7 @@
 - (void)updateWithRequest:(id)Request;
 @property (nonatomic, strong) NSDictionary* parkingSpots;
 @property (nonatomic, weak) id <ParkingSpotObserver> observerDelegate;
+- (ParkingSpot*)closestAvailableSpotToCoord:(CLLocationCoordinate2D)coord;
 @end
 
 @interface ParkingSpot : NSObject {

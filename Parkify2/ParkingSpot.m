@@ -95,6 +95,35 @@
     if(self.observerDelegate)[self.observerDelegate spotsWereUpdated];
 }
 
+-(CLLocation*) locFromCoord:(CLLocationCoordinate2D)coord {
+    return [[CLLocation alloc] initWithLatitude:coord.latitude longitude:coord.longitude];
+}
+
+-(double) distFromA:(CLLocationCoordinate2D)a toB:(CLLocationCoordinate2D)b {
+    return [[self locFromCoord:a] distanceFromLocation:[self locFromCoord:b]];
+}
+
+- (ParkingSpot*)closestAvailableSpotToCoord:(CLLocationCoordinate2D)coord {
+    ParkingSpot* bestSpotYet = nil;
+    double bestDistYet = 1000000000000;
+    for ( ParkingSpot* spot in [self.parkingSpots allValues]) {
+        if (spot.mFree) {
+            CLLocationCoordinate2D spotCoord;
+            spotCoord.latitude = spot.mLat;
+            spotCoord.longitude = spot.mLong;
+        
+            double thisDist = [self distFromA:spotCoord toB:coord];
+            if (thisDist < bestDistYet) {
+                bestDistYet = thisDist;
+                bestSpotYet = spot;
+            }
+        }
+    }
+    return bestSpotYet;
+}
+
+
+
 @end
 
 

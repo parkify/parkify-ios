@@ -7,6 +7,8 @@
 //
 
 #import "ParkifySpotViewController.h"
+#import <QuartzCore/QuartzCore.h> 
+#import "Authentication.h"
 
 @interface ParkifySpotViewController ()
 
@@ -63,6 +65,10 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+        CAGradientLayer *gradient = [CAGradientLayer layer];
+    gradient.frame = self.view.bounds;
+    gradient.colors = [NSArray arrayWithObjects:(id)[[UIColor colorWithWhite:0 alpha:0.8] CGColor], (id)[[UIColor colorWithWhite:1 alpha:0.8] CGColor], nil];
+    [self.view.layer insertSublayer:gradient atIndex:0];
 	// Do any additional setup after loading the view.
     /*
     RangeSlider *slider = [[RangeSlider alloc] initWithFrame:CGRectMake(0,0,100,20)];
@@ -86,7 +92,7 @@
     Formatter formatter = ^(double val) {
         NSDate* time = [[NSDate alloc] initWithTimeIntervalSince1970:val];
         NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-        [dateFormatter setDateFormat:@"HH:mm:ss"];
+        [dateFormatter setDateFormat:@"h:mm a"];
         return [dateFormatter stringFromDate:time]; };
     
     self.rangeBar = [[RangeBar alloc] initWithFrame:[self.rangeBarContainer bounds] minVal:currentTime maxVal:currentTime + 6*30*60 minRange:30*60 withValueFormatter:formatter];    
@@ -147,7 +153,7 @@
     Formatter formatter = ^(double val) {
         NSDate* time = [[NSDate alloc] initWithTimeIntervalSince1970:val];
         NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-        [dateFormatter setDateFormat:@"HH:mm:ss"];
+        [dateFormatter setDateFormat:@"h:mm a"];
         return [dateFormatter stringFromDate:time]; };
     
     [self.timeLabel setText:[NSString stringWithFormat:@"%@ - %@", formatter(self.rangeBar.selectedMinimumValue), formatter(self.rangeBar.selectedMaximumValue)]];
@@ -156,10 +162,10 @@
     double durationInHours = (self.rangeBar.selectedMaximumValue - self.rangeBar.selectedMinimumValue)/3600;
     double totalPrice = self.spot.mPrice * durationInHours;
     [self.priceLabel setText:[NSString stringWithFormat:@"Total Price: $%0.2f", totalPrice]];
-    
 }
 
 - (IBAction)parkButtonTapped:(UIButton *)sender {
+    
 }
 
 

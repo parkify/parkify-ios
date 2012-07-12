@@ -28,11 +28,15 @@
 @property double currentLat;
 @property double currentLong;
 @property (weak, nonatomic) IBOutlet UISearchBar *addressBar;
+@property (weak, nonatomic) IBOutlet UIButton *myLocationButton;
+@property CLLocationCoordinate2D lastSearchedLocation;
 
 @property (nonatomic, strong) ParkingSpotCollection* parkingSpots;
 @property (nonatomic, strong) ParkingSpot* targetSpot;
 
 @property (nonatomic, strong) NSArray* annotations; //Of type id <MKAnnotation>
+
+- (IBAction)parkMeNowButtonTapped:(UIButton *)sender;
 
 - (IBAction)refreshTapped:(id)sender;
 

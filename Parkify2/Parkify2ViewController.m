@@ -12,10 +12,17 @@
 #import "ParkingSpot.h"
 #import "BSForwardGeocoder.h"
 #import "ParkifySpotViewController.h"
+#import <QuartzCore/QuartzCore.h> 
+#import "iToast.h"
 
+typedef enum targetLocationType {
+    TARGET_CURRENT_LOCATION = 0,
+    TARGET_SEARCHED_LOCATION = 1,
+}targetLocationType;
 
 @interface Parkify2ViewController ()
 @property (nonatomic, strong) BSForwardGeocoder* forwardGeocoder;
+@property targetLocationType targetType;
 @end
 
 @implementation Parkify2ViewController
@@ -26,7 +33,10 @@
 @synthesize currentLat = _currentLat;
 @synthesize currentLong = _currentLong;
 @synthesize addressBar = _addressBar;
+@synthesize myLocationButton = _myLocationButton;
 @synthesize targetSpot = _targetSpot;
+@synthesize lastSearchedLocation = _lastSearchedLocation;
+@synthesize targetType = _targetType;
 
 @synthesize annotations = _annotations;
 
@@ -39,6 +49,17 @@
         _forwardGeocoder = [[BSForwardGeocoder alloc] initWithDelegate:self];
     }
     return _forwardGeocoder;
+}
+
+-(CLLocationCoordinate2D)targetLocation {
+    CLLocationCoordinate2D toRtn;
+    if(self.targetType == TARGET_CURRENT_LOCATION) {
+        toRtn.latitude = self.currentLat;
+        toRtn.longitude = self.currentLong;
+    } else if (self.targetType == TARGET_SEARCHED_LOCATION) {
+        toRtn = self.lastSearchedLocation;
+    }
+    return toRtn;
 }
 
 -(void)spotsWereUpdated 
@@ -113,12 +134,18 @@
 {
     [super viewDidLoad];
 	// Do any additional setup after loading the view, typically from a nib.
+        CAGradientLayer *gradient = [CAGradientLayer layer];
+    gradient.frame = self.view.bounds;
+    gradient.colors = [NSArray arrayWithObjects:(id)[[UIColor colorWithWhite:0 alpha:0.8] CGColor], (id)[[UIColor colorWithWhite:1 alpha:0.8] CGColor], nil];
+    [self.view.layer insertSublayer:gradient atIndex:0];
+    
 }
 
 - (void)viewDidUnload
 {
     [self setMapView:nil];
     [self setAddressBar:nil];
+    [self setMyLocationButton:nil];
     [super viewDidUnload];
     // Release any retained subviews of the main view.
 }
@@ -132,12 +159,21 @@
     }
 }
 
+- (void) viewWillDisappear:(BOOL)animated
+{
+    [self.navigationController setNavigationBarHidden:NO animated:animated];
+    [super viewWillDisappear:animated];
+}
+
 - (void)viewWillAppear:(BOOL)animated {
+    [self.navigationController setNavigationBarHidden:YES animated:animated];
     [super viewWillAppear:animated];
-    CLLocationCoordinate2D zoomLocation;
-    zoomLocation.latitude = 37.872679;
-    zoomLocation.longitude = -122.266797;
-    MKCoordinateRegion viewRegion = MKCoordinateRegionMakeWithDistance(zoomLocation, 0.5*METERS_PER_MILE, 0.5*METERS_PER_MILE);
+    CLLocationCoordinate2D targetLocation;
+    targetLocation.latitude = 37.872679;
+    targetLocation.longitude = -122.266797;
+    self.targetType = TARGET_SEARCHED_LOCATION;
+    self.lastSearchedLocation = targetLocation;
+    MKCoordinateRegion viewRegion = MKCoordinateRegionMakeWithDistance(targetLocation, 0.5*METERS_PER_MILE, 0.5*METERS_PER_MILE);
     MKCoordinateRegion adjustedRegion = [self.mapView regionThatFits:viewRegion];
     [self.mapView setRegion:adjustedRegion animated:YES];
     
@@ -161,7 +197,8 @@
 - (void)locationManager:(CLLocationManager *)manager 
     didUpdateToLocation:(CLLocation *)newLocation 
            fromLocation:(CLLocation *)oldLocation {
-
+    
+    //self.myLocationButton.enabled = true;
     self.currentLat = newLocation.coordinate.latitude;
     self.currentLong = newLocation.coordinate.longitude;
     
@@ -169,17 +206,33 @@
     //NSLog(@"New longitude: %f", newLocation.coordinate.longitude);
 }
 
-- (void)goToCoord:(CLLocationCoordinate2D)target {
+- (void)goToRegion:(MKCoordinateRegion)region {
+    //int curZoom = [self.mapView zoomLevel];
+    [self.mapView setRegion:region animated:TRUE];
+    //[self.mapView setCenterCoordinate:target zoomLevel:curZoom animated:TRUE];
+}
+
+- (void)goToCoord:(CLLocationCoordinate2D)target{
     int curZoom = [self.mapView zoomLevel];
     [self.mapView setCenterCoordinate:target zoomLevel:curZoom animated:TRUE];
 }
 
 - (IBAction)myLocationTapped:(id)sender {
+    if(![CLLocationManager headingAvailable]) {
+        //don't move!
+        [[[iToast makeText:@"Can't find current location."] setGravity:iToastGravityBottom ] show];
+        return;
+    }
+    
+    
+    
     int curZoom = [self.mapView zoomLevel];
     
     CLLocationCoordinate2D myLocation;
     myLocation.latitude = self.currentLat;
     myLocation.longitude = self.currentLong;
+    
+    self.targetType = TARGET_CURRENT_LOCATION;
     
     [self goToCoord:myLocation];
 }
@@ -224,7 +277,20 @@
             annotationView.image=[UIImage imageNamed:@"parking_icon_taken.png"];
         }
         
-        UIButton* btnViewVenue = [UIButton buttonWithType:UIButtonTypeDetailDisclosure];
+        //UIButton* btnViewVenue = [UIButton buttonWithType:UIButtonTypeDetailDisclosure];
+        UIButton* btnViewVenue = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+        btnViewVenue.frame = CGRectMake(0, 0,65, 25);
+        
+        NSString *btnString = @"PARK!";
+        CGSize s = [btnString sizeWithFont:[UIFont fontWithName:@"Arial Rounded MT Bold" size:(12.0)] constrainedToSize:btnViewVenue.frame.size lineBreakMode:UILineBreakModeMiddleTruncation];
+
+        btnViewVenue.titleLabel.frame = CGRectMake(0,0,s.width,s.height);
+        [btnViewVenue setTitle:btnString forState:UIControlStateNormal];
+        
+        btnViewVenue.titleLabel.textColor = [UIColor blackColor];
+        btnViewVenue.titleLabel.font = [UIFont fontWithName:@"Arial Rounded MT Bold" size:(12.0)];
+        
+        
         btnViewVenue.tag = spot.mID;
         [btnViewVenue addTarget:self action:@selector(spotMoreInfo:) forControlEvents:UIControlEventTouchUpInside];
         annotationView.rightCalloutAccessoryView = btnViewVenue;
@@ -325,7 +391,12 @@
     [self handleSearch:searchBar];
 }
 
+- (void)searchBarTextDidBeginEditing:(UISearchBar *)searchBar {
+    searchBar.showsCancelButton = true;
+}
+
 - (void)searchBarTextDidEndEditing:(UISearchBar *)searchBar {
+    searchBar.showsCancelButton = false;
     //[self handleSearch:searchBar];
 }
 
@@ -337,14 +408,22 @@
 - (void)forwardGeocodingDidSucceed:(BSForwardGeocoder*)geocoder withResults:(NSArray *)results{
     if([results count] >= 1) {
         BSKmlResult* place = [results objectAtIndex:0];
-        NSLog(@"Found place at location (%g,%g)", place.latitude, place.longitude);
         
-        CLLocationCoordinate2D targetLocation;
-        targetLocation.latitude = place.latitude;
-        targetLocation.longitude = place.longitude;
+        self.targetType = TARGET_SEARCHED_LOCATION;
+        self.lastSearchedLocation = place.coordinate;
+        NSString* toastText = [NSString stringWithFormat:@"Found place: %@", place.address];
         
-        [self goToCoord:targetLocation];
+        [[[iToast makeText:toastText] setGravity:iToastGravityBottom ] show];
+        
+        [self goToCoord:place.coordinate];
+        
+        //[self goToRegion:place.coordinateRegion];
     }
+}
+
+//for some reason, can't get this to be called.
+-(void)forwardGeocodingDidFail:(BSForwardGeocoder *)geocoder withErrorCode:(int)errorCode andErrorMessage:(NSString *)errorMessage {
+    [[[iToast makeText:errorMessage] setGravity:iToastGravityBottom ] show];
 }
 
 - (void)searchBarCancelButtonClicked:(UISearchBar *)searchBar {
@@ -353,4 +432,13 @@
 
 // --END ADDRESS BAR-- //
 
+
+- (IBAction)parkMeNowButtonTapped:(UIButton *)sender {
+    ParkingSpot* parkMeNowSpot = [self.parkingSpots closestAvailableSpotToCoord:[self targetLocation]];
+    if(parkMeNowSpot) {
+        [self openSpotViewControllerWithSpot:parkMeNowSpot.mID];
+    } else {
+        [[[iToast makeText:@"No closest available spot"] setGravity:iToastGravityBottom ] show];
+    }
+}
 @end

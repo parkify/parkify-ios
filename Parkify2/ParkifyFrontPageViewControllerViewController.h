@@ -8,6 +8,13 @@
 
 #import <UIKit/UIKit.h>
 
-@interface ParkifyFrontPageViewControllerViewController : UIViewController
+@interface ParkifyFrontPageViewControllerViewController : UIViewController <UITextFieldDelegate>
+@property (weak, nonatomic) IBOutlet UITextField *emailField;
+@property (weak, nonatomic) IBOutlet UITextField *passwordField;
+
+- (IBAction)loginButtonPressed:(UIButton *)sender;
+
+
+@property (weak, nonatomic) IBOutlet UILabel *errorLabel;
 
 @end
