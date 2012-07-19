@@ -14,6 +14,8 @@
 #import "ParkifySpotViewController.h"
 #import <QuartzCore/QuartzCore.h> 
 #import "iToast.h"
+#import "UIViewController+overView.h"
+#import "Api.h"
 
 typedef enum targetLocationType {
     TARGET_CURRENT_LOCATION = 0,
@@ -37,12 +39,17 @@ typedef enum targetLocationType {
 @synthesize targetSpot = _targetSpot;
 @synthesize lastSearchedLocation = _lastSearchedLocation;
 @synthesize targetType = _targetType;
+@synthesize vcToSwitch = _vcToSwitch;
 
 @synthesize annotations = _annotations;
 
 @synthesize parkingSpots = _parkingSpots;
 
 @synthesize forwardGeocoder = _forwardGeocoder;
+
+-(void)setNextViewControllerAs:(UIViewController *) toSwitch {
+    self.vcToSwitch = toSwitch;
+}
 
 - (BSForwardGeocoder*)forwardGeocoder {
     if(_forwardGeocoder == nil) {
@@ -133,6 +140,8 @@ typedef enum targetLocationType {
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+    
+    
 	// Do any additional setup after loading the view, typically from a nib.
         CAGradientLayer *gradient = [CAGradientLayer layer];
     gradient.frame = self.view.bounds;
@@ -161,12 +170,20 @@ typedef enum targetLocationType {
 
 - (void) viewWillDisappear:(BOOL)animated
 {
-    [self.navigationController setNavigationBarHidden:NO animated:animated];
+    //[self.navigationController setNavigationBarHidden:NO animated:animated];
+    [self stopPolling];
     [super viewWillDisappear:animated];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
     [self.navigationController setNavigationBarHidden:YES animated:animated];
+    
+    
+    if(self.vcToSwitch != nil) {
+        
+    }
+    
+    
     [super viewWillAppear:animated];
     CLLocationCoordinate2D targetLocation;
     targetLocation.latitude = 37.872679;
@@ -186,7 +203,7 @@ typedef enum targetLocationType {
     
     self.addressBar.delegate = self;
     
-    self.timerDuration = 3;
+    self.timerDuration = 10;
     [self refreshSpots];
     [self startPolling];
     
@@ -215,6 +232,12 @@ typedef enum targetLocationType {
 - (void)goToCoord:(CLLocationCoordinate2D)target{
     int curZoom = [self.mapView zoomLevel];
     [self.mapView setCenterCoordinate:target zoomLevel:curZoom animated:TRUE];
+}
+
+- (IBAction)settingsButtonTapped:(UIButton *)sender {
+    [Api authenticateModallyFrom:self withSuccess:^(NSDictionary * results) {
+        NSLog(@"%@", results);
+    }];
 }
 
 - (IBAction)myLocationTapped:(id)sender {
@@ -313,7 +336,16 @@ typedef enum targetLocationType {
 - (void)openSpotViewControllerWithSpot:(int)spotID {
     [self stopPolling];
     self.targetSpot = [self.parkingSpots parkingSpotForID:spotID];
+    self.navigationController.modalPresentationStyle = UIModalPresentationCurrentContext;
+    
+    //
+    //ParkifySpotViewController *sampleView = [[ParkifySpotViewController alloc] initWithNibName:@"SpotView" bundle:nil];
+    //sampleView.delegate = self;
+    //[self.navigationController presentModalViewController:sampleView animated:YES];
+    
     [self performSegueWithIdentifier:@"ViewSpot" sender:self];
+    //ParkifySpotViewController* spotView = [[ParkifySpotViewController alloc] init];
+    //[self.navigationController presentOverViewController:spotView animated:true];
 }
 
 - (IBAction)spotMoreInfo:(UIButton*)sender {
@@ -393,10 +425,12 @@ typedef enum targetLocationType {
 
 - (void)searchBarTextDidBeginEditing:(UISearchBar *)searchBar {
     searchBar.showsCancelButton = true;
+    self.mapView.userInteractionEnabled = false;
 }
 
 - (void)searchBarTextDidEndEditing:(UISearchBar *)searchBar {
     searchBar.showsCancelButton = false;
+    self.mapView.userInteractionEnabled = true;
     //[self handleSearch:searchBar];
 }
 
@@ -434,11 +468,16 @@ typedef enum targetLocationType {
 
 
 - (IBAction)parkMeNowButtonTapped:(UIButton *)sender {
+    //Testing modal stuff
+    
+    
+    
     ParkingSpot* parkMeNowSpot = [self.parkingSpots closestAvailableSpotToCoord:[self targetLocation]];
     if(parkMeNowSpot) {
         [self openSpotViewControllerWithSpot:parkMeNowSpot.mID];
     } else {
         [[[iToast makeText:@"No closest available spot"] setGravity:iToastGravityBottom ] show];
     }
+     
 }
 @end

@@ -143,7 +143,7 @@
     CGFloat offset = rect.origin.y;
     
     
-    if ( self.contentSize.height - offset < space ) {
+    if (false){// self.contentSize.height - offset < space ) {
         // Scroll to the bottom
         offset = self.contentSize.height - space;
     } else {

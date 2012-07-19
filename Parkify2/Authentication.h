@@ -8,17 +8,14 @@
 
 #import <Foundation/Foundation.h>
 
-@interface UserRegistrationRequest : NSObject
-
-@property (strong, nonatomic) NSString * email;
-@property (strong, nonatomic) NSString * password;
-@property (strong, nonatomic) NSString * password_confirmation;
-
-- (id)initWithEmail:(NSString *)email withPassword:(NSString *)password withPasswordConfirmation:(NSString *)passwordConfirmation;
-
-@end
-
 
 @interface Authentication : NSObject
++ (id)makeUserRegistrationRequest:(NSString *)email withPassword:(NSString *)password withPasswordConfirmation:(NSString *)passwordConfirmation withFirstName:(NSString *)firstName withLastName:(NSString*)lastName withLicensePlate:(NSString*)licensePlate;
+
++ (id) makeTokenRequestWithToken:(NSString*)token;
+
++ (id) makeTransactionRequestWithUserToken:(NSString*)token withSpotId:(int)spotID withStartTime:(double)startTime withEndTime:(double)endTime;
+
++ (id) makeUserLoginRequest:(NSString *)email withPassword:(NSString *)password;
 
 @end

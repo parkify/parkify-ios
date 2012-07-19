@@ -37,7 +37,7 @@
 }
 
 - (void)updateWithRequest:(id)Request {
-    NSURL *url = [NSURL URLWithString:@"http://swooplot.herokuapp.com/parking_spots"];
+    NSURL *url = [NSURL URLWithString:@"http://swooplot.herokuapp.com/parking_spots.json"];
     
     ASIHTTPRequest *_request = [ASIHTTPRequest requestWithURL:url];
     __weak ASIHTTPRequest *request = _request;
@@ -65,7 +65,7 @@
     
     for (NSDictionary * spot in root) {
         
-        int idIn = [[spot objectForKey:@"mID"] intValue];
+        int idIn = [[spot objectForKey:@"id"] intValue];
         double latIn = [[spot objectForKey:@"mLat"] doubleValue];
         double lngIn = [[spot objectForKey:@"mLong"] doubleValue];
         NSString * companyNameIn = [spot objectForKey:@"mCompanyName"];

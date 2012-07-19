@@ -9,5 +9,6 @@
 #import <UIKit/UIKit.h>
 
 @interface ParkifyConfirmationViewController : UIViewController
+- (IBAction)closeButtonTapped:(UIButton *)sender;
 
 @end

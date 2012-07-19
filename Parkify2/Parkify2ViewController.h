@@ -15,13 +15,20 @@
 
 #define METERS_PER_MILE 1609.344
 
-@interface Parkify2ViewController : UIViewController <MKMapViewDelegate, CLLocationManagerDelegate,ParkingSpotObserver, UISearchBarDelegate, BSForwardGeocoderDelegate>
+@protocol VCNavigationDelegate <NSObject>
+
+-(void)setNextViewControllerAs:(UIViewController *) toSwitch;
+
+@end
+
+@interface Parkify2ViewController : UIViewController <MKMapViewDelegate, CLLocationManagerDelegate,ParkingSpotObserver, UISearchBarDelegate, BSForwardGeocoderDelegate, VCNavigationDelegate>
 {
     CLLocationManager *_locationManager;
     double _currentLat;
     double _currentLong;
 }
-@property(nonatomic, retain)CLLocationManager *locationManager;
+@property (strong, nonatomic) UIViewController * vcToSwitch;
+@property (nonatomic, retain)CLLocationManager *locationManager;
 @property (weak, nonatomic) IBOutlet MKMapView *mapView;
 @property (strong, nonatomic) NSTimer *timerPolling;
 @property float timerDuration;
@@ -39,6 +46,7 @@
 - (IBAction)parkMeNowButtonTapped:(UIButton *)sender;
 
 - (IBAction)refreshTapped:(id)sender;
+- (IBAction)settingsButtonTapped:(UIButton *)sender;
 
 - (IBAction)myLocationTapped:(id)sender;
 

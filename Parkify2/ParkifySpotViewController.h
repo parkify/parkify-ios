@@ -22,12 +22,14 @@
 @property (weak, nonatomic) IBOutlet UIView *rangeBarContainer;
 - (IBAction)parkButtonTapped:(UIButton *)sender;
 
+@property (weak, nonatomic) IBOutlet UILabel *errorLabel;
 @property (strong, nonatomic) NSTimer *timerPolling;
 @property double timerDuration;
 @property (strong, nonatomic) RangeBar* rangeBar; //maybe should be weak?
 
+- (IBAction)closeButtonTapped:(UIButton *)sender;
 
-@property double startTime;
-@property double endTime;
+//@property double startTime;
+//@property double endTime;
 
 @end

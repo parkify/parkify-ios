@@ -1,19 +1,27 @@
 //
-//  ParkifyConfirmationViewController.m
+//  ModalSettingsController.m
 //  Parkify2
 //
-//  Created by Me on 7/9/12.
+//  Created by Me on 7/17/12.
 //  Copyright (c) 2012 __MyCompanyName__. All rights reserved.
 //
 
-#import "ParkifyConfirmationViewController.h"
-#import <QuartzCore/QuartzCore.h> 
+#import "ModalSettingsController.h"
 
-@interface ParkifyConfirmationViewController ()
+@interface ModalSettingsController ()
 
 @end
 
-@implementation ParkifyConfirmationViewController
+@implementation ModalSettingsController
+
+@synthesize successBlock = _successBlock;
+
+- (SuccessBlock)successBlock {
+    if(!_successBlock) {
+        _successBlock = ^(NSDictionary* results){};
+    }
+    return _successBlock;
+}
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -27,10 +35,6 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-        CAGradientLayer *gradient = [CAGradientLayer layer];
-    gradient.frame = self.view.bounds;
-    gradient.colors = [NSArray arrayWithObjects:(id)[[UIColor colorWithWhite:0 alpha:0.8] CGColor], (id)[[UIColor colorWithWhite:1 alpha:0.8] CGColor], nil];
-    [self.view.layer insertSublayer:gradient atIndex:0];
 	// Do any additional setup after loading the view.
 }
 
@@ -45,7 +49,9 @@
     return (interfaceOrientation == UIInterfaceOrientationPortrait);
 }
 
-- (IBAction)closeButtonTapped:(UIButton *)sender {
-    [self dismissViewControllerAnimated:true completion:^{}];
+- (void) exitWithResults:(NSDictionary *)results {
+    [self dismissViewControllerAnimated:true completion:^{ self.successBlock(results); }
+     ];
 }
+
 @end
