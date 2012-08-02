@@ -14,6 +14,8 @@
 #import "Persistance.h"
 #import "UITabBarController+Hide.h"
 #import "ModalSettingsController.h"
+#import "TextFormatter.h"
+
 
 @interface ParkifySignInPageViewController ()
 
@@ -56,16 +58,27 @@
     //[self registerForKeyboardNotifications];
 	// Do any additional setup after loading the view.
     
-    //UIView *view = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 320, 100)];
-    CAGradientLayer *gradient = [CAGradientLayer layer];
-    gradient.frame = self.view.bounds;
-    gradient.colors = [NSArray arrayWithObjects:(id)[[UIColor colorWithWhite:0 alpha:0.8] CGColor], (id)[[UIColor colorWithWhite:1 alpha:0.8] CGColor], nil];
-    [self.view.layer insertSublayer:gradient atIndex:0];
+    
     
     //Setup delegates
-    
     self.emailField.delegate = self;
     self.passwordField.delegate = self;
+    
+    [self setUpTextField:self.emailField];
+    [self setUpTextField:self.passwordField];
+}
+
+- (void)setUpTextField:(UITextField*) tf {
+    tf.layer.cornerRadius=8.0f;
+    tf.layer.masksToBounds=YES;
+    tf.layer.borderColor=[TEXTFIELD_BORDER_COLOR CGColor];
+    tf.layer.borderWidth=2.0f;
+    
+    /*
+    CGRect rect = tf.frame;
+    rect.size.height = TEXTFIELD_HEIGHT;
+    tf.frame = rect;
+    */
 }
 
 - (void)viewDidUnload

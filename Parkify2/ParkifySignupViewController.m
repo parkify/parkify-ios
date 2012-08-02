@@ -15,7 +15,7 @@
 #import "UITabBarController+Hide.h"
 #import "Stripe.h"
 #import "ModalSettingsController.h"
-
+#import "TextFormatter.h"
 
 
 @interface ParkifySignupViewController ()
@@ -34,9 +34,18 @@
 @synthesize keyboardAvoidingScrollView = _keyboardAvoidingScrollView;
 @synthesize errorLabel = _errorLabel;
 @synthesize signUpButton = _signUpButton;
+@synthesize nameLabel = _nameLabel;
+@synthesize emailLabel = _emailLabel;
+@synthesize passwordLabel = _passwordLabel;
+@synthesize cardNumberLabel = _cardNumberLabel;
+@synthesize securityNumberLabel = _securityNumberLabel;
+@synthesize zipLabel = _zipLabel;
+@synthesize expirationMonthLabel = _expirationMonthLabel;
+@synthesize expirationYearLabel = _expirationYearLabel;
+@synthesize licensePlateLabel = _licensePlateLabel;
+@synthesize zipField = _zipField;
 @synthesize emailField = _emailField;
 @synthesize passwordField = _passwordField;
-@synthesize passwordConfField = _passwordConfField;
 @synthesize firstNameField = _firstNameField;
 @synthesize lastNameField = _lastNameField;
 @synthesize cardNumberField = _cardNumberField;
@@ -60,17 +69,12 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    //UIView *view = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 320, 100)];
-    CAGradientLayer *gradient = [CAGradientLayer layer];
-    gradient.frame = self.view.bounds;
-    gradient.colors = [NSArray arrayWithObjects:(id)[[UIColor colorWithWhite:0 alpha:0.8] CGColor], (id)[[UIColor colorWithWhite:1 alpha:0.8] CGColor], nil];
-    [self.view.layer insertSublayer:gradient atIndex:0];
-
+    
     self.stripeConnection = [StripeConnection connectionWithPublishableKey:@"pk_GP95lUPyExWOy8e81qL5vIbwMH7G8"];
 
     self.emailField.delegate = self;
     self.passwordField.delegate = self;
-    self.passwordConfField.delegate = self;
+    self.zipField.delegate = self;
     self.firstNameField.delegate = self;
     self.lastNameField.delegate = self;
     self.cardNumberField.delegate = self;
@@ -80,6 +84,52 @@
     self.licensePlateField.delegate = self;
     
 	// Do any additional setup after loading the view.
+    
+    
+    [self setUpTextField:self.emailField];
+    [self setUpTextField:self.passwordField];
+    [self setUpTextField:self.zipField];
+    [self setUpTextField:self.firstNameField];
+    [self setUpTextField:self.lastNameField];
+    [self setUpTextField:self.cardNumberField];
+    [self setUpTextField:self.securityNumberField];
+    [self setUpTextField:self.expirationMonthField];
+    [self setUpTextField:self.expirationYearField];
+    [self setUpTextField:self.licensePlateField];
+    
+    [self setUpLabels:self.nameLabel];
+    [self setUpLabels:self.emailLabel];
+    [self setUpLabels:self.passwordLabel];
+    [self setUpLabels:self.cardNumberLabel];
+    [self setUpLabels:self.securityNumberLabel];
+    [self setUpLabels:self.zipLabel];
+    [self setUpLabels:self.expirationMonthLabel];
+    [self setUpLabels:self.expirationYearLabel];
+    [self setUpLabels:self.licensePlateLabel];
+    
+
+    
+    
+}
+
+- (void)setUpLabels:(UILabel*) label {
+    
+    CGAffineTransform squish = [TextFormatter transformForSignupViewText];
+    
+    label.transform = squish;
+}
+
+- (void)setUpTextField:(UITextField*) tf {
+    tf.layer.cornerRadius=8.0f;
+    tf.layer.masksToBounds=YES;
+    tf.layer.borderColor=[TEXTFIELD_BORDER_COLOR CGColor];
+    tf.layer.borderWidth=2.0f;
+    
+    CGRect rect = tf.frame;
+    rect.size.height = TEXTFIELD_HEIGHT;
+    tf.frame = rect;
+   
+    
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -98,6 +148,8 @@
     [self setErrorLabel:nil];
     [self setSignUpButton:nil];
     [self setKeyboardAvoidingScrollView:nil];
+    [self setZipField:nil];
+    [self setZipField:nil];
     [super viewDidUnload];
     // Release any retained subviews of the main view.
 }
@@ -134,6 +186,8 @@
         self.errorLabel.hidden = false;
     } else {
         /* Handle network error here */
+        self.errorLabel.text = @"Could not reach server";
+        self.errorLabel.hidden = false;
     }
 }
 
@@ -141,7 +195,7 @@
     self.signUpButton.enabled = false;
     [Api signUpWithEmail:self.emailField.text 
             withPassword:self.passwordField.text 
-withPasswordConfirmation:self.passwordConfField.text 
+withPasswordConfirmation:self.passwordField.text 
            withFirstName:self.firstNameField.text 
             withLastName:self.lastNameField.text 
     withCreditCardNumber:self.cardNumberField.text 
@@ -179,5 +233,6 @@ withPasswordConfirmation:self.passwordConfField.text
     [textField resignFirstResponder];
     return NO; // We do not want UITextField to insert line-breaks.
 }
+
 
 @end

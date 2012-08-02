@@ -7,8 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
-
-typedef NSString* (^Formatter)(double val);
+#import "ExtraTypes.h"
 
 @interface RangeBar : UIControl
 

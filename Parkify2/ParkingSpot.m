@@ -9,6 +9,8 @@
 #import "ParkingSpot.h"
 #import "SBJSON.h"
 #import "ASIHTTPRequest.h"
+#import "Api.h"
+#import "iToast.h"
 
 @interface ParkingSpotCollection()
 
@@ -37,27 +39,71 @@
 }
 
 - (void)updateWithRequest:(id)Request {
-    NSURL *url = [NSURL URLWithString:@"http://swooplot.herokuapp.com/parking_spots.json"];
     
-    ASIHTTPRequest *_request = [ASIHTTPRequest requestWithURL:url];
-    __weak ASIHTTPRequest *request = _request;
+    if(NO_SERVICE_DEBUG) {
+        [self updateFromJSONString:NO_SERVICE_DEBUG_SPOTS];
+    } else {
     
-    request.requestMethod = @"GET";    
+        NSURL *url = [NSURL URLWithString:@"http://swooplot.herokuapp.com/parking_spots.json"];
     
-    [request setDelegate:self];
-    [request setCompletionBlock:^{         
-        NSString *responseString = [request responseString];
-        [self updateFromJSONString:responseString];
-    }];
-    [request setFailedBlock:^{
-        NSError *error = [request error];
-        NSLog(@"Error: %@", error.localizedDescription);
-    }];
+        ASIHTTPRequest *_request = [ASIHTTPRequest requestWithURL:url];
+        __weak ASIHTTPRequest *request = _request;
+    
+        request.requestMethod = @"GET";    
+    
+        [request setDelegate:self];
+        [request setCompletionBlock:^{         
+            NSString *responseString = [request responseString];
+            [self updateFromJSONString:responseString];
+        }];
+        [request setFailedBlock:^{
+            NSError *error = [request error];
+            NSLog(@"Error: %@", error.localizedDescription);
+            [[[iToast makeText:@"Can't find server."] setGravity:iToastGravityBottom ] show];
+        }];
     
     // 6
-    [request startAsynchronous];
+        [request startAsynchronous];
+    }
 
 }
+
+/*
+- (void)debugPopulate {
+    #define NO_SERVICE_DEBUG_SPOTS @"[{\"mID\":\"3\",\"mLat\":37.872654\",\"mLong\":\"122.266812\",\"mCompanyName\":\"Mike\"s Bikes\",\"mLocalID\":\"3\",\"mPrice\":\"1.02\",\"mPhoneNumber\":\"408-421-1194\",\"mDesc\":\"A Fantastic Spot!\",\"mFree\":\"true\"}]"
+    
+    NSMutableDictionary *newParkingSpots = [[NSMutableDictionary alloc] init];
+
+        int idIn = 3;
+        double latIn = [[spot objectForKey:@"mLat"] doubleValue];
+        double lngIn = [[spot objectForKey:@"mLong"] doubleValue];
+        NSString * companyNameIn = [spot objectForKey:@"mCompanyName"];
+        int localIDIn = [[spot objectForKey:@"mLocalID"] intValue];
+        double priceIn = [[spot objectForKey:@"mPrice"] doubleValue];
+        NSString * phoneNumberIn = [spot objectForKey:@"mPhoneNumber"];
+        NSString * descIn = [spot objectForKey:@"mDesc"];
+        Boolean freeIn = [[spot objectForKey:@"mFree"] boolValue];
+        
+        ParkingSpot *spotActual = [[ParkingSpot alloc] initWithID:idIn 
+                                                              lat:latIn
+                                                              lng:lngIn 
+                                                      companyName:companyNameIn
+                                                          localID:localIDIn 
+                                                            price:priceIn
+                                                      phoneNumber:phoneNumberIn 
+                                                             desc:descIn
+                                                             free:freeIn];    
+        [newParkingSpots setObject:spotActual forKey:[[NSNumber alloc] initWithInt:idIn]];    
+    }
+    for (id key in [newParkingSpots allKeys]) {
+        ParkingSpot* pot = [newParkingSpots objectForKey:key];
+        //NSLog(@"key: %@, value: %@\n", key, pot);
+    }
+    
+    self.parkingSpots = [newParkingSpots copy];
+    if(self.observerDelegate)[self.observerDelegate spotsWereUpdated];
+}
+*/ 
 
 - (void)updateFromJSONString:(NSString*)strJson {
     NSMutableDictionary *newParkingSpots = [[NSMutableDictionary alloc] init];
@@ -216,3 +262,13 @@
 }
 
 @end
+
+
+
+@implementation LocationAnnotation
+
+@synthesize coordinate = _coordinate;
+
+@end
+
+

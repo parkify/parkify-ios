@@ -13,18 +13,24 @@
 #import "BSForwardGeocoder.h"
 #import "ParkifySpotViewController.h"
 #import <QuartzCore/QuartzCore.h> 
-#import "iToast.h"
-#import "UIViewController+overView.h"
+//#import "UIViewController+overView.h"
 #import "Api.h"
+#import "iToast.h"
+
+#define ANNOTATION_WIDTH 26
+#define ANNOTATION_HEIGHT 36
 
 typedef enum targetLocationType {
     TARGET_CURRENT_LOCATION = 0,
     TARGET_SEARCHED_LOCATION = 1,
 }targetLocationType;
 
+
 @interface Parkify2ViewController ()
 @property (nonatomic, strong) BSForwardGeocoder* forwardGeocoder;
 @property targetLocationType targetType;
+@property BOOL bAlreadyInit;
+@property (nonatomic, strong) LocationAnnotation*  targetLocationAnnotation;
 @end
 
 @implementation Parkify2ViewController
@@ -40,6 +46,7 @@ typedef enum targetLocationType {
 @synthesize lastSearchedLocation = _lastSearchedLocation;
 @synthesize targetType = _targetType;
 @synthesize vcToSwitch = _vcToSwitch;
+@synthesize bAlreadyInit = _bAlreadyInit;
 
 @synthesize annotations = _annotations;
 
@@ -47,8 +54,16 @@ typedef enum targetLocationType {
 
 @synthesize forwardGeocoder = _forwardGeocoder;
 
--(void)setNextViewControllerAs:(UIViewController *) toSwitch {
-    self.vcToSwitch = toSwitch;
+@synthesize targetLocationAnnotation = _targetLocationAnnotation;
+
+
+
+- (ParkingSpotCollection*)parkingSpots {
+    if(!_parkingSpots) {
+        _parkingSpots = [[ParkingSpotCollection alloc] init];
+    }
+    _parkingSpots.observerDelegate = self;
+    return _parkingSpots;
 }
 
 - (BSForwardGeocoder*)forwardGeocoder {
@@ -68,6 +83,338 @@ typedef enum targetLocationType {
     }
     return toRtn;
 }
+
+
+- (void)setMapView:(MKMapView *)mapView {
+    _mapView = mapView;
+    [self updateMapView];
+}
+
+- (void)setAnnotations:(NSArray *)annotations {
+    _annotations = annotations;
+    [self updateMapView];
+}
+
+
+- (void)viewDidLoad
+{
+    [super viewDidLoad];
+    
+    
+	// Do any additional setup after loading the view, typically from a nib.
+    
+    
+}
+
+- (void)viewDidUnload
+{
+    [self setMapView:nil];
+    [self setAddressBar:nil];
+    [self setMyLocationButton:nil];
+    [super viewDidUnload];
+    // Release any retained subviews of the main view.
+}
+
+- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
+{
+    if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
+        return (interfaceOrientation != UIInterfaceOrientationPortraitUpsideDown);
+    } else {
+        return YES;
+    }
+}
+
+- (void) viewWillDisappear:(BOOL)animated
+{
+    //[self.navigationController setNavigationBarHidden:NO animated:animated];
+    [self stopPolling];
+    [super viewWillDisappear:animated];
+}
+
+- (void)viewWillAppear:(BOOL)animated {
+    [self.navigationController setNavigationBarHidden:YES animated:animated];
+    
+    [super viewWillAppear:animated];
+    if(!self.bAlreadyInit) {
+        CLLocationCoordinate2D targetLocation;
+        targetLocation.latitude = 37.872679;
+        targetLocation.longitude = -122.266797;
+        self.targetType = TARGET_SEARCHED_LOCATION;
+        self.lastSearchedLocation = targetLocation;
+        MKCoordinateRegion viewRegion = MKCoordinateRegionMakeWithDistance(targetLocation, 0.5*METERS_PER_MILE, 0.5*METERS_PER_MILE);
+        MKCoordinateRegion adjustedRegion = [self.mapView regionThatFits:viewRegion];
+        [self.mapView setRegion:adjustedRegion animated:YES];
+    
+    
+        self.locationManager = [[CLLocationManager alloc] init];
+        self.locationManager.delegate = self;
+        self.locationManager.desiredAccuracy = kCLLocationAccuracyBest;
+        [self.locationManager startUpdatingLocation];
+        self.mapView.delegate = self;
+    
+    
+        self.addressBar.delegate = self;
+    
+        self.addressBar.showsSearchResultsButton = false;
+        
+        self.bAlreadyInit = true;
+        
+        self.targetLocationAnnotation = [[LocationAnnotation alloc] init];
+        self.targetLocationAnnotation.coordinate = targetLocation;
+        
+        [self.mapView addAnnotation:self.targetLocationAnnotation];
+        
+        /*
+        self.
+        self.mapView.alpha = .5;
+        */
+        [self.mapView setNeedsDisplay];
+        
+        //[UIView animateWithDuration:5
+          //               animations: ^{[self.mapView setAlpha:1];}
+            //             completion: ^(BOOL finished){}];
+
+        
+    }
+    
+    
+    //[[UISearchBar appearance]setSearchFieldBackgroundImage:[UIImage imageNamed:@"crosshair.png"] forState:UIControlStateNormal];
+    
+    /*
+    for (UIView *subview in self.addressBar.subviews) {
+        NSLog(@"%@", subview.class);
+        if ([subview isKindOfClass:NSClassFromString(@"UISearchBarBackground")]) {
+            [subview removeFromSuperview];
+            //break;
+        }
+    } */
+    /*
+    for (UIView *subview in self.addressBar.subviews) {
+        NSLog(@"%@", subview.class);
+        if (![subview isKindOfClass:NSClassFromString(@"UISearchBarTextField")]) {
+            [subview removeFromSuperview];
+            //break;
+        }
+    } */
+    
+    self.timerDuration = 10;
+    [self refreshSpots];
+    [self startPolling];
+    
+    
+    
+}
+
+- (void)locationManager:(CLLocationManager *)manager 
+    didUpdateToLocation:(CLLocation *)newLocation 
+           fromLocation:(CLLocation *)oldLocation {
+    
+    //self.myLocationButton.enabled = true;
+    self.currentLat = newLocation.coordinate.latitude;
+    self.currentLong = newLocation.coordinate.longitude;
+    
+    //NSLog(@"New latitude: %f", newLocation.coordinate.latitude);
+    //NSLog(@"New longitude: %f", newLocation.coordinate.longitude);
+}
+
+- (void)goToRegion:(MKCoordinateRegion)region {
+    //int curZoom = [self.mapView zoomLevel];
+    [self.mapView setRegion:region animated:TRUE];
+    //[self.mapView setCenterCoordinate:target zoomLevel:curZoom animated:TRUE];
+}
+
+- (void)goToCoord:(CLLocationCoordinate2D)target{
+    int curZoom = [self.mapView zoomLevel];
+    [self.mapView setCenterCoordinate:target zoomLevel:curZoom animated:TRUE];
+}
+
+- (IBAction)settingsButtonTapped:(UIButton *)sender {
+    /*
+    [Api settingsModallyFrom:self withSuccess:^(NSDictionary * results) {
+        NSLog(@"%@", results);
+    }];
+    */
+    
+    [Api authenticateModallyFrom:self withSuccess:^(NSDictionary * results) {
+        NSLog(@"%@", results);
+    }];
+     
+}
+
+- (IBAction)myLocationTapped:(id)sender {
+    if(![CLLocationManager headingAvailable]) {
+        //don't move!
+        [[[iToast makeText:@"Can't find current location."] setGravity:iToastGravityBottom ] show];
+        return;
+    }
+    
+    
+    
+    int curZoom = [self.mapView zoomLevel];
+    
+    CLLocationCoordinate2D myLocation;
+    myLocation.latitude = self.currentLat;
+    myLocation.longitude = self.currentLong;
+    
+    self.targetLocationAnnotation.coordinate = myLocation;
+    
+    self.targetType = TARGET_CURRENT_LOCATION;
+    
+    [self goToCoord:myLocation];
+}
+
+- (IBAction)AddressEntered:(UITextField*)sender {
+    NSLog(@"%@",sender.text);
+    [sender resignFirstResponder];
+}
+
+- (MKAnnotationView *)mapView:(MKMapView *)mapView viewForAnnotation:(id <MKAnnotation>)annotation {
+    
+    
+    static NSString *identifier; 
+    
+    
+    if ([annotation isKindOfClass:[ParkingSpotAnnotation class]]) {
+        
+        ParkingSpot* spot = ((ParkingSpotAnnotation*)annotation).spot;
+        
+        
+        if(spot.mPrice < LOW_PRICE_THRESHOLD)
+        {
+            identifier = @"spot_low_cost";
+        } else if (spot.mPrice < HIGH_PRICE_THRESHOLD) {
+            identifier = @"spot_mid_cost";
+        } else {
+            identifier = @"spot_high_cost";
+        }
+        
+        
+        MKAnnotationView *annotationView = (MKAnnotationView *) [_mapView dequeueReusableAnnotationViewWithIdentifier:identifier];
+        if (annotationView == nil) {
+            annotationView = [[MKAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:identifier];
+            annotationView.canShowCallout = YES;
+            annotationView.enabled = YES;
+            annotationView.leftCalloutAccessoryView = [[UIImageView alloc] initWithFrame:CGRectMake(0,0,30,30)];
+        }
+        
+        annotationView.annotation = annotation;
+        [(UIImageView*)annotationView.leftCalloutAccessoryView setImage:nil];
+        
+        UIImage* img;
+        if(spot.mPrice < LOW_PRICE_THRESHOLD)
+        {
+            img=[UIImage imageNamed:@"parking_icon_low_cost.png"];
+        } else if (spot.mPrice < HIGH_PRICE_THRESHOLD) {
+            img=[UIImage imageNamed:@"parking_icon_mid_cost.png"];
+        } else {
+            img=[UIImage imageNamed:@"parking_icon_high_cost.png"];
+        }
+        
+        annotationView.image=img;
+        
+        CGRect frame = annotationView.frame;
+        frame.size.width = ANNOTATION_WIDTH;
+        frame.size.height = ANNOTATION_HEIGHT;
+        annotationView.frame = frame;
+        
+        
+        //UIButton* btnViewVenue = [UIButton buttonWithType:UIButtonTypeDetailDisclosure];
+        UIButton* btnViewVenue = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+        btnViewVenue.frame = CGRectMake(0, 0,65, 25);
+        
+        //NSString *btnString = @"PARK!";
+        NSString *btnString = @"";
+        CGSize s = [btnString sizeWithFont:[UIFont fontWithName:@"Arial Rounded MT Bold" size:(12.0)] constrainedToSize:btnViewVenue.frame.size lineBreakMode:UILineBreakModeMiddleTruncation];
+        [btnViewVenue setBackgroundImage:[UIImage imageNamed:@"map_callout_park_button.png"]
+                            forState:UIControlStateNormal];
+
+        btnViewVenue.titleLabel.frame = CGRectMake(0,0,s.width,s.height);
+        [btnViewVenue setTitle:btnString forState:UIControlStateNormal];
+        
+        btnViewVenue.titleLabel.textColor = [UIColor blackColor];
+        btnViewVenue.titleLabel.font = [UIFont fontWithName:@"Arial Rounded MT Bold" size:(12.0)];
+        
+        
+        btnViewVenue.tag = spot.mID;
+        [btnViewVenue addTarget:self action:@selector(spotMoreInfo:) forControlEvents:UIControlEventTouchUpInside];
+        annotationView.rightCalloutAccessoryView = btnViewVenue;
+        
+        return annotationView;
+    } else if ([annotation isKindOfClass:[LocationAnnotation class]]) {
+        identifier = @"location";
+        
+        MKAnnotationView *annotationView = (MKAnnotationView *) [_mapView dequeueReusableAnnotationViewWithIdentifier:identifier];
+        if (annotationView == nil) {
+            annotationView = [[MKAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:identifier];
+            annotationView.enabled = YES;
+        }
+        annotationView.annotation = annotation;
+        annotationView.image=[UIImage imageNamed:@"location_icon.png"];
+        
+        CGRect frame = annotationView.frame;
+        frame.size.width = ANNOTATION_WIDTH;
+        frame.size.height = ANNOTATION_HEIGHT;
+        annotationView.frame = frame;
+        
+        return annotationView;
+    }
+    
+    return nil;    
+}
+
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+    if ([segue.identifier isEqualToString:@"ViewSpot"]) {
+        
+        ParkifySpotViewController *newController = segue.destinationViewController;
+        newController.parkingSpots = self.parkingSpots;
+        self.parkingSpots.observerDelegate = newController;
+        newController.spot = self.targetSpot;
+    }
+}
+
+- (void)openSpotViewControllerWithSpot:(int)spotID {
+    [self stopPolling];
+    self.targetSpot = [self.parkingSpots parkingSpotForID:spotID];
+    self.navigationController.modalPresentationStyle = UIModalPresentationCurrentContext;
+    //self.modalTransitionStyle = UIModalTransitionStyleCoverVertical;
+    //
+    //ParkifySpotViewController *sampleView = [[ParkifySpotViewController alloc] initWithNibName:@"SpotView" bundle:nil];
+    //sampleView.delegate = self;
+    //[self.navigationController presentModalViewController:sampleView animated:YES];
+    
+    [self performSegueWithIdentifier:@"ViewSpot" sender:self];
+    //ParkifySpotViewController* spotView = [[ParkifySpotViewController alloc] init];
+    //[self.navigationController presentOverViewController:spotView animated:true];
+}
+
+- (IBAction)spotMoreInfo:(UIButton*)sender {
+    [self openSpotViewControllerWithSpot:sender.tag];
+}
+//- calloutAccessoryControlTapped:
+
+
+//TODO: Change "little_man.png" to be thumbnail of parking spot image
+- (void)mapView:(MKMapView *)mapView didSelectAnnotationView:(MKAnnotationView *)view {
+    UIImage* image = [UIImage imageNamed:@"little_man.png"];
+    [(UIImageView*)view.leftCalloutAccessoryView setImage:image];
+}
+
+//TODO: Change make this happen based on the max zoom level, not just a hard-coded value.
+- (void)mapView:(MKMapView *)mapView regionDidChangeAnimated:(BOOL)animated {
+    //Temporarily removed because messes with the annotation images.
+    /*
+    NSLog(@"%d",[self.mapView zoomLevel]);
+    if([self.mapView zoomLevel]>17) {
+        [self.mapView setMapType:MKMapTypeSatellite];
+        //[mapView setCenterCoordinate:[mapView centerCoordinate] zoomLevel:10 animated:TRUE];
+    }
+    if([self.mapView zoomLevel]<=17) {
+        [self.mapView setMapType:MKMapTypeStandard];
+        //[mapView setCenterCoordinate:[mapView centerCoordinate] zoomLevel:10 animated:TRUE];
+    }
+     */
+}
+
 
 -(void)spotsWereUpdated 
 {
@@ -108,28 +455,10 @@ typedef enum targetLocationType {
     }
     
     [self.mapView removeAnnotations:annotationsToRemove];
-                   
+    
     //NSLog(@"After_m=%d, After_map=%d\n", [self.annotations count],[self.mapView.annotations count] );
     //if(self.mapView.annotations) [self.mapView removeAnnotations:self.mapView.annotations];
     //[self.mapView addAnnotations:self.annotations];
-}
-
-- (void)setMapView:(MKMapView *)mapView {
-    _mapView = mapView;
-    [self updateMapView];
-}
-
-- (void)setAnnotations:(NSArray *)annotations {
-    _annotations = annotations;
-    [self updateMapView];
-}
-
-- (ParkingSpotCollection*)parkingSpots {
-    if(!_parkingSpots) {
-        _parkingSpots = [[ParkingSpotCollection alloc] init];
-    }
-    _parkingSpots.observerDelegate = self;
-    return _parkingSpots;
 }
 
 - (void)refreshSpots
@@ -137,243 +466,8 @@ typedef enum targetLocationType {
     [self.parkingSpots updateWithRequest:nil];
 }
 
-- (void)viewDidLoad
-{
-    [super viewDidLoad];
-    
-    
-	// Do any additional setup after loading the view, typically from a nib.
-        CAGradientLayer *gradient = [CAGradientLayer layer];
-    gradient.frame = self.view.bounds;
-    gradient.colors = [NSArray arrayWithObjects:(id)[[UIColor colorWithWhite:0 alpha:0.8] CGColor], (id)[[UIColor colorWithWhite:1 alpha:0.8] CGColor], nil];
-    [self.view.layer insertSublayer:gradient atIndex:0];
-    
-}
-
-- (void)viewDidUnload
-{
-    [self setMapView:nil];
-    [self setAddressBar:nil];
-    [self setMyLocationButton:nil];
-    [super viewDidUnload];
-    // Release any retained subviews of the main view.
-}
-
-- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
-{
-    if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
-        return (interfaceOrientation != UIInterfaceOrientationPortraitUpsideDown);
-    } else {
-        return YES;
-    }
-}
-
-- (void) viewWillDisappear:(BOOL)animated
-{
-    //[self.navigationController setNavigationBarHidden:NO animated:animated];
-    [self stopPolling];
-    [super viewWillDisappear:animated];
-}
-
-- (void)viewWillAppear:(BOOL)animated {
-    [self.navigationController setNavigationBarHidden:YES animated:animated];
-    
-    
-    if(self.vcToSwitch != nil) {
-        
-    }
-    
-    
-    [super viewWillAppear:animated];
-    CLLocationCoordinate2D targetLocation;
-    targetLocation.latitude = 37.872679;
-    targetLocation.longitude = -122.266797;
-    self.targetType = TARGET_SEARCHED_LOCATION;
-    self.lastSearchedLocation = targetLocation;
-    MKCoordinateRegion viewRegion = MKCoordinateRegionMakeWithDistance(targetLocation, 0.5*METERS_PER_MILE, 0.5*METERS_PER_MILE);
-    MKCoordinateRegion adjustedRegion = [self.mapView regionThatFits:viewRegion];
-    [self.mapView setRegion:adjustedRegion animated:YES];
-    
-    
-    self.locationManager = [[CLLocationManager alloc] init];
-    self.locationManager.delegate = self;
-    self.locationManager.desiredAccuracy = kCLLocationAccuracyBest;
-    [self.locationManager startUpdatingLocation];
-    self.mapView.delegate = self;
-    
-    self.addressBar.delegate = self;
-    
-    self.timerDuration = 10;
-    [self refreshSpots];
-    [self startPolling];
-    
-    
-    
-}
-
-- (void)locationManager:(CLLocationManager *)manager 
-    didUpdateToLocation:(CLLocation *)newLocation 
-           fromLocation:(CLLocation *)oldLocation {
-    
-    //self.myLocationButton.enabled = true;
-    self.currentLat = newLocation.coordinate.latitude;
-    self.currentLong = newLocation.coordinate.longitude;
-    
-    //NSLog(@"New latitude: %f", newLocation.coordinate.latitude);
-    //NSLog(@"New longitude: %f", newLocation.coordinate.longitude);
-}
-
-- (void)goToRegion:(MKCoordinateRegion)region {
-    //int curZoom = [self.mapView zoomLevel];
-    [self.mapView setRegion:region animated:TRUE];
-    //[self.mapView setCenterCoordinate:target zoomLevel:curZoom animated:TRUE];
-}
-
-- (void)goToCoord:(CLLocationCoordinate2D)target{
-    int curZoom = [self.mapView zoomLevel];
-    [self.mapView setCenterCoordinate:target zoomLevel:curZoom animated:TRUE];
-}
-
-- (IBAction)settingsButtonTapped:(UIButton *)sender {
-    [Api authenticateModallyFrom:self withSuccess:^(NSDictionary * results) {
-        NSLog(@"%@", results);
-    }];
-}
-
-- (IBAction)myLocationTapped:(id)sender {
-    if(![CLLocationManager headingAvailable]) {
-        //don't move!
-        [[[iToast makeText:@"Can't find current location."] setGravity:iToastGravityBottom ] show];
-        return;
-    }
-    
-    
-    
-    int curZoom = [self.mapView zoomLevel];
-    
-    CLLocationCoordinate2D myLocation;
-    myLocation.latitude = self.currentLat;
-    myLocation.longitude = self.currentLong;
-    
-    self.targetType = TARGET_CURRENT_LOCATION;
-    
-    [self goToCoord:myLocation];
-}
-
-- (IBAction)AddressEntered:(UITextField*)sender {
-    NSLog(@"%@",sender.text);
-    [sender resignFirstResponder];
-}
-
-- (MKAnnotationView *)mapView:(MKMapView *)mapView viewForAnnotation:(id <MKAnnotation>)annotation {
-    
-    
-    static NSString *identifier; 
-    
-    
-    if ([annotation isKindOfClass:[ParkingSpotAnnotation class]]) {
-        
-        ParkingSpot* spot = ((ParkingSpotAnnotation*)annotation).spot;
-        
-        if([spot mFree])
-        {
-            identifier = @"ParkingSpot-Free";
-        } else {
-            identifier = @"ParkingSpot-Taken";
-        }
-        
-        
-        MKPinAnnotationView *annotationView = (MKPinAnnotationView *) [_mapView dequeueReusableAnnotationViewWithIdentifier:identifier];
-        if (annotationView == nil) {
-            annotationView = [[MKPinAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:identifier];
-            annotationView.canShowCallout = YES;
-            annotationView.enabled = YES;
-            annotationView.leftCalloutAccessoryView = [[UIImageView alloc] initWithFrame:CGRectMake(0,0,30,30)];
-        }
-        
-        annotationView.annotation = annotation;
-        [(UIImageView*)annotationView.leftCalloutAccessoryView setImage:nil];
-        if([spot mFree])
-        {
-            annotationView.image=[UIImage imageNamed:@"parking_icon_free.png"];//here we use a nice image instead of the default pins
-        } else {
-            annotationView.image=[UIImage imageNamed:@"parking_icon_taken.png"];
-        }
-        
-        //UIButton* btnViewVenue = [UIButton buttonWithType:UIButtonTypeDetailDisclosure];
-        UIButton* btnViewVenue = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-        btnViewVenue.frame = CGRectMake(0, 0,65, 25);
-        
-        NSString *btnString = @"PARK!";
-        CGSize s = [btnString sizeWithFont:[UIFont fontWithName:@"Arial Rounded MT Bold" size:(12.0)] constrainedToSize:btnViewVenue.frame.size lineBreakMode:UILineBreakModeMiddleTruncation];
-
-        btnViewVenue.titleLabel.frame = CGRectMake(0,0,s.width,s.height);
-        [btnViewVenue setTitle:btnString forState:UIControlStateNormal];
-        
-        btnViewVenue.titleLabel.textColor = [UIColor blackColor];
-        btnViewVenue.titleLabel.font = [UIFont fontWithName:@"Arial Rounded MT Bold" size:(12.0)];
-        
-        
-        btnViewVenue.tag = spot.mID;
-        [btnViewVenue addTarget:self action:@selector(spotMoreInfo:) forControlEvents:UIControlEventTouchUpInside];
-        annotationView.rightCalloutAccessoryView = btnViewVenue;
-        
-        return annotationView;
-    }
-    
-    return nil;    
-}
-
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    if ([segue.identifier isEqualToString:@"ViewSpot"]) {
-        ParkifySpotViewController *newController = segue.destinationViewController;
-        newController.parkingSpots = self.parkingSpots;
-        self.parkingSpots.observerDelegate = newController;
-        newController.spot = self.targetSpot;
-    }
-}
-
-- (void)openSpotViewControllerWithSpot:(int)spotID {
-    [self stopPolling];
-    self.targetSpot = [self.parkingSpots parkingSpotForID:spotID];
-    self.navigationController.modalPresentationStyle = UIModalPresentationCurrentContext;
-    
-    //
-    //ParkifySpotViewController *sampleView = [[ParkifySpotViewController alloc] initWithNibName:@"SpotView" bundle:nil];
-    //sampleView.delegate = self;
-    //[self.navigationController presentModalViewController:sampleView animated:YES];
-    
-    [self performSegueWithIdentifier:@"ViewSpot" sender:self];
-    //ParkifySpotViewController* spotView = [[ParkifySpotViewController alloc] init];
-    //[self.navigationController presentOverViewController:spotView animated:true];
-}
-
-- (IBAction)spotMoreInfo:(UIButton*)sender {
-    [self openSpotViewControllerWithSpot:sender.tag];
-}
-//- calloutAccessoryControlTapped:
 
 
-- (void)mapView:(MKMapView *)mapView didSelectAnnotationView:(MKAnnotationView *)view {
-    UIImage* image = [UIImage imageNamed:@"crosshair.png"];
-    [(UIImageView*)view.leftCalloutAccessoryView setImage:image];
-}
-
-//TODO: Change make this happen based on the max zoom level, not just a hard-coded value.
-- (void)mapView:(MKMapView *)mapView regionDidChangeAnimated:(BOOL)animated {
-    //Temporarily removed because messes with the annotation images.
-    /*
-    NSLog(@"%d",[self.mapView zoomLevel]);
-    if([self.mapView zoomLevel]>17) {
-        [self.mapView setMapType:MKMapTypeSatellite];
-        //[mapView setCenterCoordinate:[mapView centerCoordinate] zoomLevel:10 animated:TRUE];
-    }
-    if([self.mapView zoomLevel]<=17) {
-        [self.mapView setMapType:MKMapTypeStandard];
-        //[mapView setCenterCoordinate:[mapView centerCoordinate] zoomLevel:10 animated:TRUE];
-    }
-     */
-}
 
 //Starts polling if not already. Otherwise continues polling.
 -(void)startPolling {
@@ -402,6 +496,13 @@ typedef enum targetLocationType {
     //do smth
     
     [self refreshSpots];
+    
+    
+    for(NSObject<MKAnnotation>* pin in self.mapView.annotations)
+    {
+        NSLog(@"IMG FOR %@ is %@", pin, [self.mapView viewForAnnotation:pin].image);
+    }
+    
     
     self.timerPolling = [NSTimer scheduledTimerWithTimeInterval: self.timerDuration
                                                          target: self
@@ -445,6 +546,7 @@ typedef enum targetLocationType {
         
         self.targetType = TARGET_SEARCHED_LOCATION;
         self.lastSearchedLocation = place.coordinate;
+        self.targetLocationAnnotation.coordinate = place.coordinate;
         NSString* toastText = [NSString stringWithFormat:@"Found place: %@", place.address];
         
         [[[iToast makeText:toastText] setGravity:iToastGravityBottom ] show];

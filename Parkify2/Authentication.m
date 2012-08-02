@@ -21,6 +21,16 @@
                               nil];
     return request;
 }
++ (id)makeUserRegistrationRequest:(NSString *)email withPassword:(NSString *)password withPasswordConfirmation:(NSString *)passwordConfirmation withFirstName:(NSString *)firstName withLastName:(NSString*)lastName {
+    NSDictionary *request =  [NSDictionary dictionaryWithObjectsAndKeys:
+                              email, @"email", 
+                              password, @"password", 
+                              passwordConfirmation, @"password_confirmation",
+                              firstName, @"first_name",
+                              lastName, @"last_name",
+                              nil];
+    return request;
+}
 
 + (id) makeTokenRequestWithToken:(NSString*)token {
     return token;

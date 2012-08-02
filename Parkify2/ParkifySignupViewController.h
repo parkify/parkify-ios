@@ -16,17 +16,30 @@
 @interface ParkifySignupViewController : UIViewController <UITextFieldDelegate>
 @property (weak, nonatomic) IBOutlet UITextField *emailField;
 @property (weak, nonatomic) IBOutlet UITextField *passwordField;
-@property (weak, nonatomic) IBOutlet UITextField *passwordConfField;
 @property (weak, nonatomic) IBOutlet UITextField *firstNameField;
 @property (weak, nonatomic) IBOutlet UITextField *lastNameField;
 @property (weak, nonatomic) IBOutlet UITextField *cardNumberField;
 @property (weak, nonatomic) IBOutlet UITextField *securityNumberField;
+@property (weak, nonatomic) IBOutlet UITextField *zipField;
 @property (weak, nonatomic) IBOutlet UITextField *expirationMonthField;
 @property (weak, nonatomic) IBOutlet UITextField *expirationYearField;
 @property (weak, nonatomic) IBOutlet UITextField *licensePlateField;
 - (IBAction)signUpTapped:(id)sender;
 @property (weak, nonatomic) IBOutlet UILabel *errorLabel;
 @property (weak, nonatomic) IBOutlet UIButton *signUpButton;
+
+@property (weak, nonatomic) IBOutlet UILabel *nameLabel;
+@property (weak, nonatomic) IBOutlet UILabel *emailLabel;
+@property (weak, nonatomic) IBOutlet UILabel *passwordLabel;
+@property (weak, nonatomic) IBOutlet UILabel *cardNumberLabel;
+@property (weak, nonatomic) IBOutlet UILabel *securityNumberLabel;
+@property (weak, nonatomic) IBOutlet UILabel *zipLabel;
+@property (weak, nonatomic) IBOutlet UILabel *expirationMonthLabel;
+@property (weak, nonatomic) IBOutlet UILabel *expirationYearLabel;
+@property (weak, nonatomic) IBOutlet UILabel *licensePlateLabel;
+
+
+
 
 @property (weak, nonatomic) id<CollapsingSegueProtocol> segueParent;
 - (IBAction)cancelButtonPressed:(UIBarButtonItem *)sender;

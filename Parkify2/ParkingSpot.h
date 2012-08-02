@@ -72,3 +72,9 @@
 - (BOOL)updateAnnotationWith:(id)annotation onlyifIDsAreSame:(BOOL)boolIDsSame;
 
 @end
+
+
+@interface LocationAnnotation : NSObject <MKAnnotation> 
+
+@property (nonatomic) CLLocationCoordinate2D coordinate;
+@end

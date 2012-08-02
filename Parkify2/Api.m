@@ -13,6 +13,8 @@
 #import "Authentication.h"
 #import "ModalSettingsController.h"
 
+#define TESTING_V1 false
+
 @interface Api()
 + (void)signUpStripeSuccessWithCard:(NSString*)token
                           withEmail:(NSString*)email 
@@ -101,7 +103,72 @@ withPasswordConfirmation:(NSString*)passwordConfirmation
                    withLicensePlate:(NSString*)licensePlate
                         withSuccess:(SuccessBlock)successBlock
                         withFailure:(FailureBlock)failureBlock {
-
+    
+    if(TESTING_V1) {
+        
+        id userRequest = [Authentication makeUserRegistrationRequest:email
+                                                        withPassword:password
+                                            withPasswordConfirmation:passwordConfirmation
+                                                       withFirstName:firstName
+                                                        withLastName:lastName];
+        id tokenRequest = [Authentication makeTokenRequestWithToken:token];
+        
+        NSURL *url = [NSURL URLWithString:@"http://parkify-rails.herokuapp.com/api/v1/users.json"];
+        NSLog(@"%@", [userRequest JSONRepresentation]);
+        
+        ASIFormDataRequest *request = [ASIFormDataRequest requestWithURL:url];
+        [request addPostValue:[userRequest JSONRepresentation] forKey:@"user"];
+        [request addPostValue:tokenRequest forKey:@"stripe_token_id"];
+        [request addPostValue:licensePlate forKey:@"license_plate_number"];
+        
+        [request addRequestHeader:@"User-Agent" value:@"ASIFormDataRequest"]; 
+        [request addRequestHeader:@"Content-Type" value:@"application/json"];
+        [request  setRequestMethod:@"POST"];
+        
+        [request setCompletionBlock:^{
+            [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+            
+            NSString *responseString = [request responseString];
+            NSDictionary * root = [responseString JSONValue];
+            BOOL success = [[root objectForKey:@"success"] boolValue];
+            
+            if(success) {
+                successBlock(root);
+            } else {
+                NSString* message = @"";
+                
+                NSDictionary* errorDescription = [root objectForKey:@"error"];
+                
+                for( NSString* key in errorDescription.allKeys) {
+                    for( NSString* val in [errorDescription objectForKey:key]) {
+                        message = [NSString stringWithFormat:@"%@%@ %@\n", message, key, val] ;
+                    }
+                    //NSString* object = [[NSString stringWithFormat:@"%@",[errorDescription objectForKey:key]]stringByReplacingOccurrencesOfString:@"\n" withString:@""];
+                }
+                
+                NSDictionary* userInfo;
+                if(![message isEqualToString:@""]) {
+                    userInfo = [NSDictionary dictionaryWithObjectsAndKeys:message,@"message", nil];
+                }
+                else {
+                    NSLog(@"WARNING: Error from server not handled well: %@", responseString);
+                    userInfo = [NSDictionary dictionaryWithObjectsAndKeys:@"error from server not formatted correctly",@"message", nil];
+                }
+                NSError* error = [NSError errorWithDomain:@"UserRegistration" code:0 userInfo:userInfo];
+                failureBlock(error);
+            }
+        }];
+        
+        [request setFailedBlock:^{
+            [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+            failureBlock([request error]);
+        }];
+        
+        [request startAsynchronous];
+        
+        
+    } else {
+ 
     id userRequest = [Authentication makeUserRegistrationRequest:email
                                                 withPassword:password
                                     withPasswordConfirmation:passwordConfirmation
@@ -161,6 +228,7 @@ withPasswordConfirmation:(NSString*)passwordConfirmation
     }];
 
     [request startAsynchronous];
+    }
 }
 
 
@@ -172,7 +240,12 @@ withPasswordConfirmation:(NSString*)passwordConfirmation
     
     [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
     
-    NSURL *url = [NSURL URLWithString:@"http://swooplot.herokuapp.com/api/users/sign_in.json"];
+    NSURL *url;
+    if(TESTING_V1) {
+        url = [NSURL URLWithString:@"http://parkify-rails.herokuapp.com/api/v1/users/sign_in.json"];
+    } else {
+        url = [NSURL URLWithString:@"http://swooplot.herokuapp.com/api/users/sign_in.json"];
+    }
     //NSLog(@"%@", [userRequest JSONRepresentation]);
     
     id loginRequest = [Authentication makeUserLoginRequest:email withPassword:password];
@@ -231,8 +304,26 @@ withPasswordConfirmation:(NSString*)passwordConfirmation
     
     ModalSettingsController* controller = [mainStoryboard instantiateViewControllerWithIdentifier: @"AuthenticateVC"];
     controller.successBlock = successBlock;
+    UIModalTransitionStyle style = parent.modalTransitionStyle;
+    //parent.modalTransitionStyle = UIModalTransitionStyleCrossDissolve;
     [parent presentViewController:controller animated:true completion:^{}];
+    parent.modalTransitionStyle = style;
 }
+
+
++ (void)settingsModallyFrom:(UIViewController*)parent withSuccess:(SuccessBlock)successBlock {
+    UIStoryboard *mainStoryboard = [UIStoryboard storyboardWithName:@"MainStoryboard_iPhone"
+                                                             bundle: nil];
+    
+    ModalSettingsController* controller = [mainStoryboard instantiateViewControllerWithIdentifier: @"SettingsVC"];
+    controller.successBlock = successBlock;
+    
+    UIModalTransitionStyle style = parent.modalTransitionStyle;
+    //parent.modalTransitionStyle = UIModalTransitionStyleCrossDissolve;
+    [parent presentViewController:controller animated:true completion:^{}];
+    parent.modalTransitionStyle = style;
+}
+
 
 @end
 

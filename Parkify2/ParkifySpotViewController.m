@@ -13,12 +13,16 @@
 #import "ASIFormDataRequest.h"
 #import "SBJson.h"
 #import "Api.h"
+#import "TextFormatter.h"
+#import "ParkifyConfirmationViewController.h"
 
 @interface ParkifySpotViewController ()
 
 @end
 
 @implementation ParkifySpotViewController
+@synthesize taxLabel = _taxLabel;
+@synthesize titleLable = _titleLable;
 
 @synthesize parkingSpots = _parkingSpots;
 @synthesize spot = _spot;
@@ -72,26 +76,8 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    /*
-        CAGradientLayer *gradient = [CAGradientLayer layer];
-    gradient.frame = self.view.bounds;
-    gradient.colors = [NSArray arrayWithObjects:(id)[[UIColor colorWithWhite:0 alpha:0.8] CGColor], (id)[[UIColor colorWithWhite:1 alpha:0.8] CGColor], nil];
-    [self.view.layer insertSublayer:gradient atIndex:0];
-	*/
-     // Do any additional setup after loading the view.
-    /*
-    RangeSlider *slider = [[RangeSlider alloc] initWithFrame:CGRectMake(0,0,100,20)];
-    slider.minimumValue = 1;
-    slider.selectedMinimumValue = 2;
-    slider.maximumValue = 10;
-    slider.selectedMaximumValue = 8;
-    slider.minimumRange = 2;
-    [slider addTarget:self action:@selector(updateRangeLabel:) forControlEvents:UIControlEventValueChanged];
     
-    [self.view addSubview:slider];
-     */
     
-    //It's time to duel!
     NSDate* currentDate = [NSDate date];
     
     double currentTime = [currentDate timeIntervalSince1970];
@@ -132,6 +118,8 @@
     [self setPriceLabel:nil];
     [self setRangeBarContainer:nil];
     [self setErrorLabel:nil];
+    [self setTitleLable:nil];
+    [self setTaxLabel:nil];
     [super viewDidUnload];
     // Release any retained subviews of the main view.
 }
@@ -157,34 +145,80 @@
 
 -(void)updateInfo {
     //Info box
-    NSString* infoHeader;
+    NSString* infoTitle;
+    NSString* infoBody;
+    NSString* timeString;
+    NSString* priceString;
+    
     if(self.spot == nil) {
-        infoHeader = @"Spot not found";
+        infoTitle = @"Spot not found";
+        infoBody = @"";
+        timeString = @"";
+        priceString = @"";
+
     }
-    infoHeader = [NSString stringWithFormat:@"%@ Spot #%d | Price: %0.2f/hr\nCALL %@ to Book Now!", 
-                            self.spot.mCompanyName, self.spot.mLocalID, self.spot.mPrice, self.spot.mPhoneNumber];
-    [self.infoBox setText:infoHeader];
+    else {
+        infoTitle = [NSString stringWithFormat:@"%@ Spot #%d", 
+                     self.spot.mCompanyName, self.spot.mLocalID];
+        infoBody = self.spot.mDesc; 
+        
+        //Time text
+        Formatter formatter = ^(double val) {
+            NSDate* time = [[NSDate alloc] initWithTimeIntervalSince1970:val];
+            NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+            [dateFormatter setDateFormat:@"h:mm a"];
+            return [dateFormatter stringFromDate:time]; };
+        
+        timeString = [NSString stringWithFormat:@"Time Booked: %@ - %@", formatter(self.rangeBar.selectedMinimumValue), formatter(self.rangeBar.selectedMaximumValue)];
+        
+        //Price text
+        double durationInHours = (self.rangeBar.selectedMaximumValue - self.rangeBar.selectedMinimumValue)/3600;
+        double totalPrice = self.spot.mPrice * durationInHours;
+        priceString = [NSString stringWithFormat:@"Total Price: $%0.2f", totalPrice];
+        
+    }
+    CGAffineTransform squish = [TextFormatter transformForSpotViewText];
+    self.taxLabel.transform = squish;
+    self.titleLable.text = infoTitle;
+    [self.infoBox setText:infoBody];
+    self.timeLabel.text = timeString;
+    self.timeLabel.transform = squish;
+    self.priceLabel.text = priceString;
+    self.priceLabel.transform = squish;
     
-    //Time text
-    Formatter formatter = ^(double val) {
-        NSDate* time = [[NSDate alloc] initWithTimeIntervalSince1970:val];
-        NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-        [dateFormatter setDateFormat:@"h:mm a"];
-        return [dateFormatter stringFromDate:time]; };
-    
-    [self.timeLabel setText:[NSString stringWithFormat:@"%@ - %@", formatter(self.rangeBar.selectedMinimumValue), formatter(self.rangeBar.selectedMaximumValue)]];
-    
-    //Price text
-    double durationInHours = (self.rangeBar.selectedMaximumValue - self.rangeBar.selectedMinimumValue)/3600;
-    double totalPrice = self.spot.mPrice * durationInHours;
-    [self.priceLabel setText:[NSString stringWithFormat:@"Total Price: $%0.2f", totalPrice]];
 }
 
 - (IBAction)parkButtonTapped:(UIButton *)sender {
     [self attemptMakeTransaction];
 }
 
+- (void) switchToConfirmation {
+    [self stopPolling];    
+    self.navigationController.modalPresentationStyle = UIModalPresentationCurrentContext;
+    
+    UIViewController* parent = [self presentingViewController];
+    [self dismissViewControllerAnimated:true completion:^{
+        UIStoryboard *mainStoryboard = [UIStoryboard storyboardWithName:@"MainStoryboard_iPhone"
+                                                                 bundle: nil];
+        
+        ParkifyConfirmationViewController* controller = [mainStoryboard instantiateViewControllerWithIdentifier: @"ConfirmationVC"];
+        
+        controller.spot = self.spot;
+        controller.startTime = self.rangeBar.selectedMinimumValue;
+        controller.endTime = self.rangeBar.selectedMaximumValue;
+        
+        parent.modalTransitionStyle = UIModalTransitionStyleCoverVertical;
+        [parent presentViewController:controller animated:true completion:^{}];
+    }
+     ];
+}
+
 - (void) attemptMakeTransaction {
+    if (NO_SERVICE_DEBUG) {
+        [self switchToConfirmation];
+        return;
+    }
+    
     id transactionRequest = [Authentication makeTransactionRequestWithUserToken:[Persistance retrieveAuthToken] withSpotId:self.spot.mID withStartTime:self.rangeBar.selectedMinimumValue withEndTime:self.rangeBar.selectedMaximumValue];
     
     
@@ -208,19 +242,7 @@
         NSDictionary * root = [responseString JSONValue];
         if([root objectForKey:@"success"]) {
             //Needs to happen on success
-            [self stopPolling];    
-            self.navigationController.modalPresentationStyle = UIModalPresentationCurrentContext;
-            
-            UIViewController* parent = [self presentingViewController];
-            [self dismissViewControllerAnimated:true completion:^{
-                UIStoryboard *mainStoryboard = [UIStoryboard storyboardWithName:@"MainStoryboard_iPhone"
-                                                                         bundle: nil];
-                
-                UIViewController* controller = [mainStoryboard instantiateViewControllerWithIdentifier: @"ConfirmationVC"];
-
-                [parent presentViewController:controller animated:true completion:^{}];
-                }
-             ];
+            [self switchToConfirmation];
             
             //[self performSegueWithIdentifier:@"ViewConfirmation" sender:self];
             //NSLog(@"TEST");
@@ -240,6 +262,10 @@
         NSLog(@"Error: %@", error.localizedDescription);
         if(request.responseStatusCode == 401) {
             [Api authenticateModallyFrom:self withSuccess:^(NSDictionary * result){}];
+        }
+        else {
+            self.errorLabel.text = @"Could not contact server";
+            self.errorLabel.hidden = false;
         }
         
     }];
@@ -288,54 +314,6 @@
     [self.parkingSpots updateWithRequest:nil];
 }
 
-
-- (void)buySpot {
-    //http://swooplot.herokuapp.com/api/transactions
-    
-    
-}
-/*
-- (void)signUp {
-    //UserRegistrationRequest* user = [[UserRegistrationRequest alloc] initWithEmail:self.emailField.text withPassword:self.passwordField.text withPasswordConfirmation:self.passwordField.text];
-    id user = [Authentication makeUserRegistrationRequest:self.emailField.text
-                                             withPassword:self.passwordField.text
-                                 withPasswordConfirmation:self.passwordConfField.text
-                                            withFirstName:self.firstNameField.text
-                                             withLastName:self.lastNameField.text
-                                                  withCCN:self.cardNumberField.text
-                                                  withCVC:self.securityNumberField.text
-                                              withCCMonth:self.expirationMonthField.text
-                                               withCCYear:self.expirationYearField.text 
-                                         withLicensePlate:self.licensePlateField.text];    
-    
-    NSURL *url = [NSURL URLWithString:@"http://swooplot.herokuapp.com/api/users"];
-    NSLog(@"%@", [user JSONRepresentation]);
-    ASIFormDataRequest *request = [ASIFormDataRequest requestWithURL:url];
-    [request addPostValue:[user JSONRepresentation] forKey:@"user"];
-    [request addRequestHeader:@"User-Agent" value:@"ASIFormDataRequest"]; 
-    [request addRequestHeader:@"Content-Type" value:@"application/json"];
-    [request  setRequestMethod:@"POST"];
-    [request setCompletionBlock:^{
-        NSString *responseString = [request responseString];
-        NSDictionary * root = [responseString JSONValue];
-        if([root objectForKey:@"success"]) {
-            self.errorLabel.text = [NSString stringWithFormat:@"User created! Awesomesauce! Token is: %@", [root objectForKey:@"auth_token"]];
-            [Persistance saveAuthToken:[root objectForKey:@"auth_token"]];
-            
-        } else {
-            self.errorLabel.text = [root objectForKey:@"error"];
-        }
-        self.errorLabel.hidden = false;
-        NSLog(@"Response: %@", responseString);
-    }];
-    [request setFailedBlock:^{
-        NSError *error = [request error];
-        NSLog(@"Error: %@", error.localizedDescription);
-    }];
-    
-    [request startAsynchronous];
-}
-*/
 - (IBAction)closeButtonTapped:(UIButton *)sender {
     [self dismissViewControllerAnimated:true completion:^{}];
 }

@@ -13,6 +13,9 @@ typedef void(^CompletionBlock)(void);
 typedef void(^SuccessBlock)(NSDictionary*);
 typedef void(^FailureBlock)(NSError*);
 
+typedef NSString* (^Formatter)(double val);
+
+
 
 
 #endif

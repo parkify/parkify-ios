@@ -26,8 +26,10 @@
 @property (strong, nonatomic) NSTimer *timerPolling;
 @property double timerDuration;
 @property (strong, nonatomic) RangeBar* rangeBar; //maybe should be weak?
+@property (weak, nonatomic) IBOutlet UILabel *titleLable;
 
 - (IBAction)closeButtonTapped:(UIButton *)sender;
+@property (weak, nonatomic) IBOutlet UILabel *taxLabel;
 
 //@property double startTime;
 //@property double endTime;
