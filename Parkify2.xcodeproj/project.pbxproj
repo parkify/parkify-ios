@@ -65,6 +65,9 @@
 		8C8626A015D13D1E00F97308 /* slider_red_background.png in Resources */ = {isa = PBXBuildFile; fileRef = 8C86269D15D13D1D00F97308 /* slider_red_background.png */; };
 		8C8626A115D13D1E00F97308 /* slider_white_background.png in Resources */ = {isa = PBXBuildFile; fileRef = 8C86269E15D13D1D00F97308 /* slider_white_background.png */; };
 		8C8626A515D1DF8000F97308 /* UIImage+Resize.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C8626A415D1DF8000F97308 /* UIImage+Resize.m */; };
+		8C8626A915D2447400F97308 /* icon_lowres.png in Resources */ = {isa = PBXBuildFile; fileRef = 8C8626A715D2447400F97308 /* icon_lowres.png */; };
+		8C8626AD15D2459100F97308 /* icon_highres.png in Resources */ = {isa = PBXBuildFile; fileRef = 8C8626AC15D2459000F97308 /* icon_highres.png */; };
+		8C8626AF15D245C400F97308 /* icon_highres.png in Resources */ = {isa = PBXBuildFile; fileRef = 8C8626AE15D245C300F97308 /* icon_highres.png */; };
 		8C862BEB15B5188300769F43 /* Api.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C862BEA15B5188300769F43 /* Api.m */; };
 		8C8A48A115B65833006E411E /* UITabBarController+Hide.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C8A48A015B65833006E411E /* UITabBarController+Hide.m */; };
 		8C900FD115B66B2100B44AA5 /* ModalSettingsController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C900FD015B66B2100B44AA5 /* ModalSettingsController.m */; };
@@ -193,6 +196,10 @@
 		8C86269E15D13D1D00F97308 /* slider_white_background.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = slider_white_background.png; sourceTree = "<group>"; };
 		8C8626A315D1DF8000F97308 /* UIImage+Resize.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+Resize.h"; sourceTree = "<group>"; };
 		8C8626A415D1DF8000F97308 /* UIImage+Resize.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImage+Resize.m"; sourceTree = "<group>"; };
+		8C8626A715D2447400F97308 /* icon_lowres.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = icon_lowres.png; sourceTree = "<group>"; };
+		8C8626AA15D244E400F97308 /* Default@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default@2x.png"; sourceTree = "<group>"; };
+		8C8626AC15D2459000F97308 /* icon_highres.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = icon_highres.png; path = "../../../../Designs/Design 7/icon_highres.png"; sourceTree = "<group>"; };
+		8C8626AE15D245C300F97308 /* icon_highres.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = icon_highres.png; sourceTree = "<group>"; };
 		8C862BE915B5188300769F43 /* Api.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Api.h; sourceTree = "<group>"; };
 		8C862BEA15B5188300769F43 /* Api.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Api.m; sourceTree = "<group>"; };
 		8C8A489F15B65833006E411E /* UITabBarController+Hide.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UITabBarController+Hide.h"; sourceTree = "<group>"; };
@@ -496,6 +503,8 @@
 		8C86266915D116BB00F97308 /* Design 7 */ = {
 			isa = PBXGroup;
 			children = (
+				8C8626AC15D2459000F97308 /* icon_highres.png */,
+				8C8626A715D2447400F97308 /* icon_lowres.png */,
 				8C86269A15D12AF400F97308 /* black_spot_marker_cool.png */,
 				8C86266A15D116BB00F97308 /* black_spot_marker.png */,
 				8C86266B15D116BB00F97308 /* blue_big_button.png */,
@@ -564,6 +573,8 @@
 		8CA7A1D115A3DC980051567D = {
 			isa = PBXGroup;
 			children = (
+				8C8626AE15D245C300F97308 /* icon_highres.png */,
+				8C8626AA15D244E400F97308 /* Default@2x.png */,
 				8C86260115D1156600F97308 /* Res */,
 				8C8625F115C4BDED00F97308 /* Vendor */,
 				8CA7A1DF15A3DC980051567D /* Frameworks */,
@@ -897,6 +908,9 @@
 				8C86269F15D13D1E00F97308 /* slider_blue_background.png in Resources */,
 				8C8626A015D13D1E00F97308 /* slider_red_background.png in Resources */,
 				8C8626A115D13D1E00F97308 /* slider_white_background.png in Resources */,
+				8C8626A915D2447400F97308 /* icon_lowres.png in Resources */,
+				8C8626AD15D2459100F97308 /* icon_highres.png in Resources */,
+				8C8626AF15D245C400F97308 /* icon_highres.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1013,7 +1027,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 5.1;
 				SDKROOT = iphoneos;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
 		};
@@ -1033,7 +1047,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 5.1;
 				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
 				SDKROOT = iphoneos;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
