@@ -9,7 +9,7 @@
 #import <Foundation/Foundation.h>
 
 #define TEXTFIELD_BORDER_COLOR [UIColor colorWithRed:48.0/255 green:95.0/255 blue:230.0/255 alpha:1]
-#define TEXTFIELD_HEIGHT 21
+#define TEXTFIELD_HEIGHT 25
 
 @interface TextFormatter : NSObject
 + (CGAffineTransform) transformForSpotViewText;

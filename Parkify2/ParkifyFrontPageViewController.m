@@ -55,7 +55,7 @@
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
     if ([segue.identifier isEqualToString:@"ViewMainFromFront"]) {
-        sleep(1.5);
+        sleep(1.0);
     }
 }
 

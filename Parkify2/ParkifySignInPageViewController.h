@@ -19,4 +19,5 @@
 - (IBAction)signUpButtonPressed:(UIButton *)sender;
 - (IBAction)cancelButtonPressed:(UIBarButtonItem *)sender;
 
+- (IBAction)logoutButtonPressed:(UIButton *)sender;
 @end

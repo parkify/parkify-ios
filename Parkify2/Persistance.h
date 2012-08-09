@@ -9,8 +9,13 @@
 #import <Foundation/Foundation.h>
 
 @interface Persistance : NSObject
-+(void)saveUser:(NSDictionary*)myString;
++(void)saveUser:(NSDictionary*)user;
 +(NSDictionary*)retrieveUser;
-+(void)saveAuthToken:(NSString*)myString;
++(void)saveAuthToken:(NSString*)token;
 +(NSString*)retrieveAuthToken;
+
+/*
++(NSString*)retrieveShadowLastFourDigits;
++(NSString*)retrieveShadowLicensePlate;
+ */
 @end

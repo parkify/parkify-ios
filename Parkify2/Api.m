@@ -12,6 +12,7 @@
 #import "ASIFormDataRequest.h"
 #import "Authentication.h"
 #import "ModalSettingsController.h"
+#import "Persistance.h"
 
 #define TESTING_V1 false
 
@@ -324,6 +325,71 @@ withPasswordConfirmation:(NSString*)passwordConfirmation
     parent.modalTransitionStyle = style;
 }
 
+//Called to get particular info from the logged in user
+/*
++ (void)getUserInfo:(NSArray*)requestedInfo
+                 withSuccess:(SuccessBlock)successBlock
+                 withFailure:(FailureBlock)failureBlock {
+    [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
+    
+    NSURL *url;
+    if(TESTING_V1) {
+        url = [NSURL URLWithString:@"http://parkify-rails.herokuapp.com/api/v1/users/info.json"];
+    } else {
+        url = [NSURL URLWithString:@"http://swooplot.herokuapp.com/api/users/info.json"];
+    }
+    //NSLog(@"%@", [userRequest JSONRepresentation]);
+    
+    
+    
+    ASIFormDataRequest *request = [ASIFormDataRequest requestWithURL:url];
+    [request addPostValue:requestedInfo forKey:@"requested_info"];
+    [request addPostValue:[Persistance retrieveAuthToken] forKey:@"authentication_token"];
+    [request addRequestHeader:@"User-Agent" value:@"ASIFormDataRequest"]; 
+    [request addRequestHeader:@"Content-Type" value:@"application/json"];
+    [request  setRequestMethod:@"POST"];
+    
+    [request setCompletionBlock:^{
+        [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+        
+        NSString *responseString = [request responseString];
+        NSDictionary * root = [responseString JSONValue];
+        BOOL success = [[root objectForKey:@"success"] boolValue];
+        
+        if(success) {
+            successBlock(root);
+        } else {
+            NSString* message = @"";
+            
+            NSDictionary* errorDescription = [root objectForKey:@"error"];
+            
+            for( NSString* key in errorDescription.allKeys) {
+                for( NSString* val in [errorDescription objectForKey:key]) {
+                    message = [NSString stringWithFormat:@"%@%@ %@\n", message, key, val] ;
+                }
+                //NSString* object = [[NSString stringWithFormat:@"%@",[errorDescription objectForKey:key]]stringByReplacingOccurrencesOfString:@"\n" withString:@""];
+            }
+            NSDictionary* userInfo;
+            if(![message isEqualToString:@""]) {
+                userInfo = [NSDictionary dictionaryWithObjectsAndKeys:message,@"message", nil];
+            }
+            else {
+                NSLog(@"WARNING: Error from server not handled well: %@", responseString);
+                userInfo = [NSDictionary dictionaryWithObjectsAndKeys:@"error from server not formatted correctly",@"message", nil];
+            }
+            NSError* error = [NSError errorWithDomain:@"UserLogin" code:0 userInfo:userInfo];
+            failureBlock(error);
+        }
+    }];
+    
+    [request setFailedBlock:^{
+        [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+        failureBlock([request error]);
+    }];
+    
+    [request startAsynchronous];
+}
+*/
 
 @end
 

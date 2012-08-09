@@ -5,35 +5,58 @@
 //  Created by Me on 7/12/12.
 //  Copyright (c) 2012 __MyCompanyName__. All rights reserved.
 //
-
 #import "Persistance.h"
+
+@interface  Persistance()
++ (void) saveRecord:(id)record withName:(NSString*)name;
++ (id) retrieveRecordwithName:(NSString*)name;
+
+@end
 
 @implementation Persistance
 
-+(void)saveUser:(NSDictionary*)myString { 
++ (void) saveRecord:(id)record withName:(NSString*)name {
     NSUserDefaults* standardUserDefaults = [NSUserDefaults standardUserDefaults];
     if (standardUserDefaults) { 
-        [standardUserDefaults setObject:myString forKey:@"User"]; 
-        [standardUserDefaults synchronize]; }
+        [standardUserDefaults setObject:record forKey:name]; 
+        [standardUserDefaults synchronize]; } 
+}
++ (id) retrieveRecordwithName:(NSString*)name {
+    NSUserDefaults* standardUserDefaults = [NSUserDefaults standardUserDefaults];
+    id val = nil;
+    if (standardUserDefaults) val = [standardUserDefaults objectForKey:name];
+    return val; 
+}
+
+
++(void)saveUser:(NSDictionary*)user { 
+    [Persistance saveRecord:user withName:@"User"];
 }
 +(NSDictionary*)retrieveUser { 
-    NSUserDefaults* standardUserDefaults = [NSUserDefaults standardUserDefaults];
-    NSDictionary* val = nil;
-    if (standardUserDefaults) val = [standardUserDefaults objectForKey:@"User"];
-    return val; 
+    return [Persistance retrieveRecordwithName:@"User"];
 }
 
-+(void)saveAuthToken:(NSString*)myString { 
-    NSUserDefaults* standardUserDefaults = [NSUserDefaults standardUserDefaults];
-    if (standardUserDefaults) { 
-        [standardUserDefaults setObject:myString forKey:@"User"]; 
-        [standardUserDefaults synchronize]; }
+
+
++(void)saveAuthToken:(NSString*)token { 
+    [Persistance saveRecord:token withName:@"AuthToken"];
 }
 +(NSString*)retrieveAuthToken { 
-    NSUserDefaults* standardUserDefaults = [NSUserDefaults standardUserDefaults];
-    NSString* val = nil;
-    if (standardUserDefaults) val = [standardUserDefaults objectForKey:@"User"];
-    return val; 
+    return [Persistance retrieveRecordwithName:@"AuthToken"];
 }
 
+/*
++(void)saveShadowLastFourDigits:(NSString*)token { 
+    [Persistance saveRecord:token withName:@"ShadowLastFourDigits"];
+}
++(NSString*)retrieveShadowLastFourDigits { 
+    return [Persistance retrieveRecordwithName:@"ShadowLastFourDigits"];
+}
+
+
++(NSString*)retrieve {
+    
+}
++(NSString*)retrieveShadowLicensePlate;
+*/
 @end

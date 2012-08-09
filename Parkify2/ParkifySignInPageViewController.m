@@ -181,4 +181,9 @@
     NSDictionary* results = [NSDictionary dictionaryWithObjectsAndKeys:@"cancel",@"exit", nil];
     [((ModalSettingsController*)self.tabBarController) exitWithResults:results]; 
 }
+
+- (IBAction)logoutButtonPressed:(UIButton *)sender {
+    /** TODO: also tell server to logout if can **/
+    [Persistance saveAuthToken:nil];
+}
 @end

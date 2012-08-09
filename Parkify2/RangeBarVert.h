@@ -9,7 +9,7 @@
 #import <UIKit/UIKit.h>
 #import "ExtraTypes.h"
 
-@interface RangeBar : UIControl
+@interface RangeBarVert : UIControl
 
 @property(nonatomic) double minimumValue;
 @property(nonatomic) double maximumValue;
@@ -19,6 +19,6 @@
 
 @property (nonatomic, strong) Formatter labelFormatter;
 
-- (RangeBar*)initWithFrame:(CGRect)frame minVal:(double)minVal maxVal:(double)maxVal minRange:(double)minRange selectedMaxVal:(double)selectedMaxVal withValueFormatter:(Formatter)formatter;
+- (RangeBarVert*)initWithFrame:(CGRect)frame minVal:(double)minVal maxVal:(double)maxVal minRange:(double)minRange withValueFormatter:(Formatter)formatter;
 
 @end

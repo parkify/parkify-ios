@@ -15,17 +15,25 @@
 #import "Api.h"
 #import "TextFormatter.h"
 #import "ParkifyConfirmationViewController.h"
+#import "WaitingMask.h"
 
 @interface ParkifySpotViewController ()
+
+@property (strong, nonatomic) WaitingMask* waitingMask;
 
 @end
 
 @implementation ParkifySpotViewController
+@synthesize waitingMask = _waitingMask;
+
 @synthesize taxLabel = _taxLabel;
 @synthesize titleLable = _titleLable;
 
 @synthesize parkingSpots = _parkingSpots;
 @synthesize spot = _spot;
+@synthesize infoScrollView = _infoScrollView;
+@synthesize infoWebView = _infoWebView;
+@synthesize timeDurationLabel = _timeDurationLabel;
 @synthesize infoBox = _infoBox;
 @synthesize timeLabel = _timeLabel;
 @synthesize priceLabel = _priceLabel;
@@ -82,7 +90,7 @@
     
     double currentTime = [currentDate timeIntervalSince1970];
     
-    currentTime = currentTime - fmod(currentTime,1800); 
+    //currentTime = currentTime - fmod(currentTime,1800); 
     
     Formatter formatter = ^(double val) {
         NSDate* time = [[NSDate alloc] initWithTimeIntervalSince1970:val];
@@ -90,13 +98,15 @@
         [dateFormatter setDateFormat:@"h:mm a"];
         return [dateFormatter stringFromDate:time]; };
     
-    self.rangeBar = [[RangeBar alloc] initWithFrame:[self.rangeBarContainer bounds] minVal:currentTime maxVal:currentTime + 6*30*60 minRange:30*60 withValueFormatter:formatter];    
+    self.rangeBar = [[RangeBar alloc] initWithFrame:[self.rangeBarContainer bounds] minVal:currentTime maxVal:currentTime + 9*60*60 minRange:30*60 selectedMaxVal:currentTime + 6.25*60*60 withValueFormatter:formatter];    
     //^(double val){return [@"Foo";}
     
     [self.rangeBar addTarget:self action:@selector(timeIntervalChanged) forControlEvents:UIControlEventValueChanged];
     [self.rangeBarContainer addSubview:self.rangeBar];
     
     [self updateInfo];
+    
+    [self fillInfoWebView];
     
     self.timerDuration = 20;
     [self startPolling];
@@ -120,6 +130,9 @@
     [self setErrorLabel:nil];
     [self setTitleLable:nil];
     [self setTaxLabel:nil];
+    [self setTimeDurationLabel:nil];
+    [self setInfoWebView:nil];
+    [self setInfoScrollView:nil];
     [super viewDidUnload];
     // Release any retained subviews of the main view.
 }
@@ -143,19 +156,59 @@
  }
  */
 
+/** TODO: Make this javascript-enabled to update it **/
+-(void)fillInfoWebView {
+    NSString* infoWebViewString;
+    NSString* styleString = @"<style type=\"text/css\">"
+    //"body { background-color:transparent; font-family:Marker Felt; font-size:12; color:white}"
+    "body { background-color:transparent; font-family:\"Arial Rounded MT Bold\"; font-size:12; color:white}"
+    "</style>";
+    if(self.spot == nil) {
+        infoWebViewString = [NSString stringWithFormat:@"<html>%@<body>Spot Not Available.</body></html>", styleString];
+    }
+    else {
+        //Info web view text
+        infoWebViewString = [NSString stringWithFormat:@"<html>%@<body>"
+                             "<p>SpotID: %@<br/>"
+                             "Distance Away: %0.2f miles</br>"
+                             "Difficulty: %@</br>"
+                             "Covered: %@</br>"
+                             "Current Rate: $%0.2f/hr</p>"
+                             "</body></html>",
+                             styleString,
+                             @"blah",
+                             0.25,
+                             @"HARD",
+                             @"Yes",
+                             self.spot.mPrice];
+    }
+    [self.infoWebView loadHTMLString:infoWebViewString baseURL:nil];
+    
+    CGRect frame = self.infoWebView.frame;
+    frame.size.height = 1;
+    self.infoWebView.frame = frame;
+    CGSize fittingSize = [self.infoWebView sizeThatFits:CGSizeZero];
+    frame.size = fittingSize;
+    self.infoWebView.frame = frame;
+    self.infoScrollView.contentSize = frame.size;
+        
+}
+
 -(void)updateInfo {
     //Info box
     NSString* infoTitle;
     NSString* infoBody;
     NSString* timeString;
     NSString* priceString;
+    NSString* timeDurationString;
+    
     
     if(self.spot == nil) {
         infoTitle = @"Spot not found";
         infoBody = @"";
         timeString = @"";
         priceString = @"";
-
+        timeDurationString = @"";
     }
     else {
         infoTitle = [NSString stringWithFormat:@"%@ Spot #%d", 
@@ -176,20 +229,54 @@
         double totalPrice = self.spot.mPrice * durationInHours;
         priceString = [NSString stringWithFormat:@"Total Price: $%0.2f", totalPrice];
         
+        //TimeDuration text
+        timeDurationString = [NSString stringWithFormat:@"%0.1f hr", durationInHours];
+        
     }
+    
     CGAffineTransform squish = [TextFormatter transformForSpotViewText];
     self.taxLabel.transform = squish;
-    self.titleLable.text = infoTitle;
+    self.titleLable.text = infoTitle;  
     [self.infoBox setText:infoBody];
     self.timeLabel.text = timeString;
     self.timeLabel.transform = squish;
     self.priceLabel.text = priceString;
     self.priceLabel.transform = squish;
-    
+    self.timeDurationLabel.text = timeDurationString;
 }
 
 - (IBAction)parkButtonTapped:(UIButton *)sender {
-    [self attemptMakeTransaction];
+    if (NO_SERVICE_DEBUG) {
+        [self switchToConfirmation];
+        return;
+    }
+    
+    if ([Persistance retrieveAuthToken] == nil) {
+        [Api authenticateModallyFrom:self withSuccess:^(NSDictionary * result){}];
+        return;
+    } else {
+        UIAlertView* areYouSure = [[UIAlertView alloc] initWithTitle:@"Are you sure?"
+                                                          message:@"Amount of ** will be charged to credit card ending in *** for this purchase."
+                                                         delegate:self
+                                                cancelButtonTitle:@"Cancel"
+                                                otherButtonTitles:@"Yes", nil];
+        [areYouSure show];
+    }
+}
+
+- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
+{
+    NSString *title = [alertView buttonTitleAtIndex:buttonIndex];
+    
+    if([title isEqualToString:@"Cancel"])
+    {
+        //NSLog(@"Button 1 was selected.");
+    }
+    else if([title isEqualToString:@"Yes"])
+    {
+        //NSLog(@"Button 2 was selected.");
+        [self attemptMakeTransaction];
+    }
 }
 
 - (void) switchToConfirmation {
@@ -214,10 +301,7 @@
 }
 
 - (void) attemptMakeTransaction {
-    if (NO_SERVICE_DEBUG) {
-        [self switchToConfirmation];
-        return;
-    }
+    
     
     id transactionRequest = [Authentication makeTransactionRequestWithUserToken:[Persistance retrieveAuthToken] withSpotId:self.spot.mID withStartTime:self.rangeBar.selectedMinimumValue withEndTime:self.rangeBar.selectedMaximumValue];
     
@@ -269,6 +353,13 @@
         }
         
     }];
+    
+    CGRect waitingMaskFrame = self.view.frame;
+    waitingMaskFrame.origin.x = 0;
+    waitingMaskFrame.origin.y = 0;
+    
+    self.waitingMask = [[WaitingMask alloc] initWithFrame:waitingMaskFrame];
+    [self.view addSubview:self.waitingMask];
     
     [request startAsynchronous];
 

@@ -120,16 +120,14 @@
 }
 
 - (void)setUpTextField:(UITextField*) tf {
-    tf.layer.cornerRadius=8.0f;
+    tf.layer.cornerRadius=12.5f;
     tf.layer.masksToBounds=YES;
     tf.layer.borderColor=[TEXTFIELD_BORDER_COLOR CGColor];
-    tf.layer.borderWidth=2.0f;
+    tf.layer.borderWidth=1.0f;
     
     CGRect rect = tf.frame;
     rect.size.height = TEXTFIELD_HEIGHT;
     tf.frame = rect;
-   
-    
 }
 
 - (void)viewWillAppear:(BOOL)animated {

@@ -39,7 +39,14 @@ withPasswordConfirmation:(NSString*)passwordConfirmation
 //Called to bring up AuthenticationVC modally
 + (void)authenticateModallyFrom:(UIViewController*)parent withSuccess:(SuccessBlock)successBlock;
 
+//Called to bring up SettingsVC modally
 + (void)settingsModallyFrom:(UIViewController*)parent withSuccess:(SuccessBlock)successBlock;
 
+//Called to get particular info from the logged in user
+/*
++ (void)getUserInfo:(NSArray*)requestedInfo
+                 withSuccess:(SuccessBlock)successBlock
+                 withFailure:(FailureBlock)failureBlock;
+ */
 
 @end

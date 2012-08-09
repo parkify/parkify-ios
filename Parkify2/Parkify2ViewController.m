@@ -16,9 +16,15 @@
 //#import "UIViewController+overView.h"
 #import "Api.h"
 #import "iToast.h"
+#import "WaitingMask.h"
 
-#define ANNOTATION_WIDTH 26
-#define ANNOTATION_HEIGHT 36
+#define ORIG_ANNOTATION_WIDTH 54
+#define ORIG_ANNOTATION_HEIGHT 89
+
+#define ANNOTATION_WIDTH (ORIG_ANNOTATION_WIDTH*0.5)
+#define ANNOTATION_HEIGHT (ORIG_ANNOTATION_HEIGHT*0.5)
+
+#define INIT_VIEW_WIDTH_IN_MILES 1.0
 
 typedef enum targetLocationType {
     TARGET_CURRENT_LOCATION = 0,
@@ -31,6 +37,8 @@ typedef enum targetLocationType {
 @property targetLocationType targetType;
 @property BOOL bAlreadyInit;
 @property (nonatomic, strong) LocationAnnotation*  targetLocationAnnotation;
+
+@property (nonatomic, strong) WaitingMask* waitingMask;
 @end
 
 @implementation Parkify2ViewController
@@ -56,6 +64,8 @@ typedef enum targetLocationType {
 
 @synthesize targetLocationAnnotation = _targetLocationAnnotation;
 
+@synthesize waitingMask = _waitingMask;
+
 
 
 - (ParkingSpotCollection*)parkingSpots {
@@ -75,12 +85,16 @@ typedef enum targetLocationType {
 
 -(CLLocationCoordinate2D)targetLocation {
     CLLocationCoordinate2D toRtn;
+    toRtn.latitude = self.currentLat;
+    toRtn.longitude = self.currentLong;
+    /*
     if(self.targetType == TARGET_CURRENT_LOCATION) {
         toRtn.latitude = self.currentLat;
         toRtn.longitude = self.currentLong;
     } else if (self.targetType == TARGET_SEARCHED_LOCATION) {
         toRtn = self.lastSearchedLocation;
     }
+     */
     return toRtn;
 }
 
@@ -136,23 +150,42 @@ typedef enum targetLocationType {
     
     [super viewWillAppear:animated];
     if(!self.bAlreadyInit) {
-        CLLocationCoordinate2D targetLocation;
-        targetLocation.latitude = 37.872679;
-        targetLocation.longitude = -122.266797;
-        self.targetType = TARGET_SEARCHED_LOCATION;
-        self.lastSearchedLocation = targetLocation;
-        MKCoordinateRegion viewRegion = MKCoordinateRegionMakeWithDistance(targetLocation, 0.5*METERS_PER_MILE, 0.5*METERS_PER_MILE);
-        MKCoordinateRegion adjustedRegion = [self.mapView regionThatFits:viewRegion];
-        [self.mapView setRegion:adjustedRegion animated:YES];
-    
-    
+        
+        //** Set up waitingMask **//
+        CGRect waitingMaskFrame = self.view.frame;
+        waitingMaskFrame.origin.x = 0;
+        waitingMaskFrame.origin.y = 0;
+        
+        self.waitingMask = [[WaitingMask alloc] initWithFrame:waitingMaskFrame];
+        [self.view addSubview:self.waitingMask];
+        //**  **//
+        
+        self.currentLat = 37.872679;
+        self.currentLong = -122.266797;
+        
         self.locationManager = [[CLLocationManager alloc] init];
         self.locationManager.delegate = self;
         self.locationManager.desiredAccuracy = kCLLocationAccuracyBest;
         [self.locationManager startUpdatingLocation];
         self.mapView.delegate = self;
-    
-    
+        
+        if(self.locationManager.location != nil) {
+            self.currentLat = self.locationManager.location.coordinate.latitude;
+            self.currentLong = self.locationManager.location.coordinate.longitude;
+        }
+        CLLocationCoordinate2D initCoord;
+        initCoord.latitude = self.currentLat;
+        initCoord.longitude = self.currentLong;
+        
+        /*
+        self.targetType = TARGET_SEARCHED_LOCATION;
+        self.lastSearchedLocation = targetLocation;
+        */
+        MKCoordinateRegion viewRegion = MKCoordinateRegionMakeWithDistance(initCoord, INIT_VIEW_WIDTH_IN_MILES*METERS_PER_MILE, INIT_VIEW_WIDTH_IN_MILES*METERS_PER_MILE);
+        MKCoordinateRegion adjustedRegion = [self.mapView regionThatFits:viewRegion];
+        [self.mapView setRegion:adjustedRegion animated:YES];
+        
+        
         self.addressBar.delegate = self;
     
         self.addressBar.showsSearchResultsButton = false;
@@ -160,9 +193,9 @@ typedef enum targetLocationType {
         self.bAlreadyInit = true;
         
         self.targetLocationAnnotation = [[LocationAnnotation alloc] init];
-        self.targetLocationAnnotation.coordinate = targetLocation;
+        self.targetLocationAnnotation.coordinate = initCoord;
         
-        [self.mapView addAnnotation:self.targetLocationAnnotation];
+        //[self.mapView addAnnotation:self.targetLocationAnnotation];
         
         /*
         self.
@@ -202,6 +235,21 @@ typedef enum targetLocationType {
     [self startPolling];
     
     
+    
+}
+
+
+- (void)showTargetPin:(BOOL)bShow {
+    if(bShow) {
+        if (![self.mapView.annotations containsObject:self.targetLocationAnnotation])
+        {
+            [self.mapView addAnnotation:self.targetLocationAnnotation];
+        }
+    } else {
+        if ([self.mapView.annotations containsObject:self.targetLocationAnnotation]) {
+            [self.mapView removeAnnotation:self.targetLocationAnnotation];
+        }
+    }
     
 }
 
@@ -248,15 +296,13 @@ typedef enum targetLocationType {
         return;
     }
     
-    
-    
-    int curZoom = [self.mapView zoomLevel];
+    [self showTargetPin:false];
     
     CLLocationCoordinate2D myLocation;
     myLocation.latitude = self.currentLat;
     myLocation.longitude = self.currentLong;
     
-    self.targetLocationAnnotation.coordinate = myLocation;
+    
     
     self.targetType = TARGET_CURRENT_LOCATION;
     
@@ -303,11 +349,11 @@ typedef enum targetLocationType {
         UIImage* img;
         if(spot.mPrice < LOW_PRICE_THRESHOLD)
         {
-            img=[UIImage imageNamed:@"parking_icon_low_cost.png"];
+            img=[UIImage imageNamed:@"blue_spot_marker.png"];
         } else if (spot.mPrice < HIGH_PRICE_THRESHOLD) {
-            img=[UIImage imageNamed:@"parking_icon_mid_cost.png"];
+            img=[UIImage imageNamed:@"black_spot_marker.png"];
         } else {
-            img=[UIImage imageNamed:@"parking_icon_high_cost.png"];
+            img=[UIImage imageNamed:@"black_spot_marker_cool.png"];
         }
         
         annotationView.image=img;
@@ -317,22 +363,24 @@ typedef enum targetLocationType {
         frame.size.height = ANNOTATION_HEIGHT;
         annotationView.frame = frame;
         
+        //annotationView.center = CGPointMake(frame.size.width/2, frame.size.height);
+        
         
         //UIButton* btnViewVenue = [UIButton buttonWithType:UIButtonTypeDetailDisclosure];
-        UIButton* btnViewVenue = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+        UIButton* btnViewVenue = [UIButton buttonWithType:UIButtonTypeCustom];
         btnViewVenue.frame = CGRectMake(0, 0,65, 25);
         
         //NSString *btnString = @"PARK!";
-        NSString *btnString = @"";
-        CGSize s = [btnString sizeWithFont:[UIFont fontWithName:@"Arial Rounded MT Bold" size:(12.0)] constrainedToSize:btnViewVenue.frame.size lineBreakMode:UILineBreakModeMiddleTruncation];
-        [btnViewVenue setBackgroundImage:[UIImage imageNamed:@"map_callout_park_button.png"]
+        NSString *btnString = @"Park";
+        CGSize s = [btnString sizeWithFont:[UIFont fontWithName:@"Arial Rounded MT Bold" size:(14.0)] constrainedToSize:btnViewVenue.frame.size lineBreakMode:UILineBreakModeMiddleTruncation];
+        [btnViewVenue setBackgroundImage:[UIImage imageNamed:@"blue_small_button.png"]
                             forState:UIControlStateNormal];
 
         btnViewVenue.titleLabel.frame = CGRectMake(0,0,s.width,s.height);
         [btnViewVenue setTitle:btnString forState:UIControlStateNormal];
         
-        btnViewVenue.titleLabel.textColor = [UIColor blackColor];
-        btnViewVenue.titleLabel.font = [UIFont fontWithName:@"Arial Rounded MT Bold" size:(12.0)];
+        btnViewVenue.titleLabel.textColor = [UIColor whiteColor];
+        btnViewVenue.titleLabel.font = [UIFont fontWithName:@"Arial Rounded MT Bold" size:(14.0)];
         
         
         btnViewVenue.tag = spot.mID;
@@ -343,18 +391,22 @@ typedef enum targetLocationType {
     } else if ([annotation isKindOfClass:[LocationAnnotation class]]) {
         identifier = @"location";
         
-        MKAnnotationView *annotationView = (MKAnnotationView *) [_mapView dequeueReusableAnnotationViewWithIdentifier:identifier];
+        MKPinAnnotationView *annotationView = (MKPinAnnotationView *) [_mapView dequeueReusableAnnotationViewWithIdentifier:identifier];
         if (annotationView == nil) {
-            annotationView = [[MKAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:identifier];
+            annotationView = [[MKPinAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:identifier];
             annotationView.enabled = YES;
         }
         annotationView.annotation = annotation;
-        annotationView.image=[UIImage imageNamed:@"location_icon.png"];
         
+        //We want default pin
+        //annotationView.image=[UIImage imageNamed:@"location_icon.png"];
+        
+        /*
         CGRect frame = annotationView.frame;
         frame.size.width = ANNOTATION_WIDTH;
         frame.size.height = ANNOTATION_HEIGHT;
         annotationView.frame = frame;
+        */
         
         return annotationView;
     }
@@ -427,6 +479,12 @@ typedef enum targetLocationType {
 
 - (void)updateMapView {
     //Terrible, must be some better way to update.
+    
+    if(self.waitingMask) {
+        [self.waitingMask removeFromSuperview];
+        self.waitingMask = nil;
+    }
+    
     BOOL bChanged = false;
     NSMutableArray* annotationsToRemove = [[NSMutableArray alloc] init];
     NSMutableArray* annotationsAdded = [[NSMutableArray alloc] init];
@@ -547,6 +605,8 @@ typedef enum targetLocationType {
         self.targetType = TARGET_SEARCHED_LOCATION;
         self.lastSearchedLocation = place.coordinate;
         self.targetLocationAnnotation.coordinate = place.coordinate;
+        [self showTargetPin:true];
+        
         NSString* toastText = [NSString stringWithFormat:@"Found place: %@", place.address];
         
         [[[iToast makeText:toastText] setGravity:iToastGravityBottom ] show];
@@ -571,8 +631,6 @@ typedef enum targetLocationType {
 
 - (IBAction)parkMeNowButtonTapped:(UIButton *)sender {
     //Testing modal stuff
-    
-    
     
     ParkingSpot* parkMeNowSpot = [self.parkingSpots closestAvailableSpotToCoord:[self targetLocation]];
     if(parkMeNowSpot) {

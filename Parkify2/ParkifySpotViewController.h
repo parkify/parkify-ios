@@ -10,12 +10,15 @@
 #import "ParkingSpot.h"
 #import "RangeBar.h"
 
-@interface ParkifySpotViewController : UIViewController <ParkingSpotObserver>
+@interface ParkifySpotViewController : UIViewController <ParkingSpotObserver, UIAlertViewDelegate>
 
 @property (nonatomic, strong) ParkingSpotCollection* parkingSpots;
 
 @property (strong, nonatomic) ParkingSpot* spot;
 
+@property (weak, nonatomic) IBOutlet UIScrollView *infoScrollView;
+@property (weak, nonatomic) IBOutlet UIWebView *infoWebView;
+@property (weak, nonatomic) IBOutlet UILabel *timeDurationLabel;
 @property (weak, nonatomic) IBOutlet UITextView *infoBox;
 @property (weak, nonatomic) IBOutlet UILabel *timeLabel;
 @property (weak, nonatomic) IBOutlet UILabel *priceLabel;
