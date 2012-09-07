@@ -11,6 +11,7 @@
 #import "MKMapView+ZoomLevel.h"
 #import <CoreLocation/CoreLocation.h>
 #import "ParkingSpot.h"
+#import "ParkingSpotCollection.h"
 #import "BSForwardGeocoder.h"
 
 #define METERS_PER_MILE 1609.344
@@ -54,5 +55,7 @@
 
 - (BOOL)textFieldShouldReturn:(UITextField *)textField;
 
+- (IBAction)confirmationButtonTapped:(id)sender;
+@property (weak, nonatomic) IBOutlet UIButton *confirmationButton;
 
 @end

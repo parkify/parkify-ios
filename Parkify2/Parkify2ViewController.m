@@ -17,6 +17,10 @@
 #import "Api.h"
 #import "iToast.h"
 #import "WaitingMask.h"
+#import "TextFormatter.h"
+#import "ParkingSpotCollection.h"
+#import "ParkifyConfirmationViewController.h"
+#import "Persistance.h"
 
 #define ORIG_ANNOTATION_WIDTH 54
 #define ORIG_ANNOTATION_HEIGHT 89
@@ -26,22 +30,40 @@
 
 #define INIT_VIEW_WIDTH_IN_MILES 1.0
 
+#define ZOOM_LEVEL_STREET 15
+
 typedef enum targetLocationType {
+    TARGET_NONE = -1,
     TARGET_CURRENT_LOCATION = 0,
     TARGET_SEARCHED_LOCATION = 1,
 }targetLocationType;
 
+typedef struct STargetLocation {
+    targetLocationType type;
+    CLLocationCoordinate2D location;
+} STargetLocation;
 
 @interface Parkify2ViewController ()
 @property (nonatomic, strong) BSForwardGeocoder* forwardGeocoder;
 @property targetLocationType targetType;
 @property BOOL bAlreadyInit;
 @property (nonatomic, strong) LocationAnnotation*  targetLocationAnnotation;
-
+@property (weak, nonatomic) IBOutlet UIButton *settingsButton;
 @property (nonatomic, strong) WaitingMask* waitingMask;
+@property (weak, nonatomic) IBOutlet UIButton *currentLocationButton;
+@property STargetLocation targetLocation;
+
+@property CGRect addressBarOrigFrame;
+
+@property (weak, nonatomic) IBOutlet UIView *bottomBarView;
+@property (weak, nonatomic) IBOutlet UILabel *bottomBarLabel;
+
+@property (strong, nonatomic) CompletionBlock spotsWereUpdatedCallback;
+
 @end
 
 @implementation Parkify2ViewController
+@synthesize confirmationButton = _confirmationButton;
 @synthesize mapView = _mapView;
 @synthesize timerPolling = _timerPolling;
 @synthesize timerDuration = _timerDuration;
@@ -64,8 +86,17 @@ typedef enum targetLocationType {
 
 @synthesize targetLocationAnnotation = _targetLocationAnnotation;
 
-@synthesize waitingMask = _waitingMask;
+@synthesize targetLocation = _targetLocation;
+@synthesize settingsButton = _settingsButton;
 
+@synthesize waitingMask = _waitingMask;
+@synthesize currentLocationButton = _currentLocationButton;
+
+@synthesize addressBarOrigFrame = _addressBarOrigFrame;
+@synthesize bottomBarView = _bottomBarView;
+@synthesize bottomBarLabel = _bottomBarLabel;
+
+@synthesize spotsWereUpdatedCallback = _spotsWereUpdatedCallback;
 
 
 - (ParkingSpotCollection*)parkingSpots {
@@ -83,10 +114,56 @@ typedef enum targetLocationType {
     return _forwardGeocoder;
 }
 
--(CLLocationCoordinate2D)targetLocation {
-    CLLocationCoordinate2D toRtn;
-    toRtn.latitude = self.currentLat;
-    toRtn.longitude = self.currentLong;
+-(void) setTargetLocation:(STargetLocation)targetLocation {
+    _targetLocation = targetLocation;
+    if(targetLocation.type != TARGET_NONE) {
+        self.targetLocationAnnotation.coordinate = targetLocation.location;
+        [self showTargetPin:true];
+    } else {
+        [self showTargetPin:false];
+    }
+    [self updateBottomBar];
+}
+
+-(void)updateBottomBar {
+    
+    double startTime = [Persistance retrieveCurrentStartTime];
+    double endTime = [Persistance retrieveCurrentEndTime];
+    ParkingSpot* currentSpot = [Persistance retrieveCurrentSpot];
+    
+    double currentTime = [[NSDate date] timeIntervalSince1970];
+    BOOL bInInterval = (currentTime >= startTime) && (currentTime <= endTime);
+    
+    
+    
+    if(bInInterval) {
+        Formatter formatter = ^(double val) {
+            NSDate* time = [[NSDate alloc] initWithTimeIntervalSince1970:val];
+            NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+            [dateFormatter setDateFormat:@"h:mm a"];
+            return [dateFormatter stringFromDate:time]; };
+        
+        
+        self.bottomBarLabel.text = [NSString stringWithFormat:@"Reservation ends at %@ | details ", formatter(endTime)];
+        
+        [self.confirmationButton setHidden:false];
+        
+    } else {
+        [self.confirmationButton setHidden:true];
+    if(self.targetLocation.type != TARGET_NONE) {
+        double distanceToSpot = [self.parkingSpots distanceToClosestAvailableSpotToCoord:self.targetLocation.location];
+        if(distanceToSpot < 5) {
+            self.bottomBarLabel.text = [NSString stringWithFormat:@"Closest spot is %@ away.", [TextFormatter formatDistanceClose:distanceToSpot]];
+        } else {
+            self.bottomBarLabel.text = @"No spots within 5 miles... Yet!";
+        }
+    } else {
+        self.bottomBarLabel.text = @"";
+    }
+    }
+}
+
+-(STargetLocation)targetLocation {
     /*
     if(self.targetType == TARGET_CURRENT_LOCATION) {
         toRtn.latitude = self.currentLat;
@@ -95,7 +172,7 @@ typedef enum targetLocationType {
         toRtn = self.lastSearchedLocation;
     }
      */
-    return toRtn;
+    return _targetLocation;
 }
 
 
@@ -125,17 +202,25 @@ typedef enum targetLocationType {
     [self setMapView:nil];
     [self setAddressBar:nil];
     [self setMyLocationButton:nil];
+    [self setCurrentLocationButton:nil];
+    [self setSettingsButton:nil];
+    [self setBottomBarLabel:nil];
+    [self setBottomBarView:nil];
+    [self setConfirmationButton:nil];
     [super viewDidUnload];
     // Release any retained subviews of the main view.
 }
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
 {
+    return interfaceOrientation == UIInterfaceOrientationPortrait;
+    /*
     if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
         return (interfaceOrientation != UIInterfaceOrientationPortraitUpsideDown);
     } else {
         return YES;
     }
+     */
 }
 
 - (void) viewWillDisappear:(BOOL)animated
@@ -146,7 +231,7 @@ typedef enum targetLocationType {
 }
 
 - (void)viewWillAppear:(BOOL)animated {
-    [self.navigationController setNavigationBarHidden:YES animated:animated];
+    [self.navigationController setNavigationBarHidden:NO animated:animated];
     
     [super viewWillAppear:animated];
     if(!self.bAlreadyInit) {
@@ -169,14 +254,29 @@ typedef enum targetLocationType {
         [self.locationManager startUpdatingLocation];
         self.mapView.delegate = self;
         
+        STargetLocation initTarget;
+        
+        
+        initTarget.type = TARGET_NONE;
+        
         if(self.locationManager.location != nil) {
             self.currentLat = self.locationManager.location.coordinate.latitude;
             self.currentLong = self.locationManager.location.coordinate.longitude;
+            initTarget.type = TARGET_CURRENT_LOCATION;
         }
+        
+        
+        
+        
         CLLocationCoordinate2D initCoord;
         initCoord.latitude = self.currentLat;
         initCoord.longitude = self.currentLong;
         
+        self.targetLocationAnnotation = [[LocationAnnotation alloc] init];
+        self.targetLocationAnnotation.coordinate = initCoord;
+        
+        initTarget.location = CLLocationCoordinate2DMake(self.currentLat, self.currentLong);
+        self.targetLocation = initTarget;
         /*
         self.targetType = TARGET_SEARCHED_LOCATION;
         self.lastSearchedLocation = targetLocation;
@@ -190,10 +290,11 @@ typedef enum targetLocationType {
     
         self.addressBar.showsSearchResultsButton = false;
         
+        self.addressBarOrigFrame = self.addressBar.frame;
+        
         self.bAlreadyInit = true;
         
-        self.targetLocationAnnotation = [[LocationAnnotation alloc] init];
-        self.targetLocationAnnotation.coordinate = initCoord;
+        
         
         //[self.mapView addAnnotation:self.targetLocationAnnotation];
         
@@ -201,6 +302,7 @@ typedef enum targetLocationType {
         self.
         self.mapView.alpha = .5;
         */
+        [self updateBottomBar];
         [self.mapView setNeedsDisplay];
         
         //[UIView animateWithDuration:5
@@ -261,6 +363,13 @@ typedef enum targetLocationType {
     self.currentLat = newLocation.coordinate.latitude;
     self.currentLong = newLocation.coordinate.longitude;
     
+    if (self.targetLocation.type == TARGET_CURRENT_LOCATION) {
+        STargetLocation target;
+        target.type = TARGET_CURRENT_LOCATION;
+        target.location = newLocation.coordinate;
+        self.targetLocation = target;
+    }
+    
     //NSLog(@"New latitude: %f", newLocation.coordinate.latitude);
     //NSLog(@"New longitude: %f", newLocation.coordinate.longitude);
 }
@@ -271,22 +380,30 @@ typedef enum targetLocationType {
     //[self.mapView setCenterCoordinate:target zoomLevel:curZoom animated:TRUE];
 }
 
-- (void)goToCoord:(CLLocationCoordinate2D)target{
-    int curZoom = [self.mapView zoomLevel];
-    [self.mapView setCenterCoordinate:target zoomLevel:curZoom animated:TRUE];
+/*december*/
+- (void)goToCoord:(CLLocationCoordinate2D)target handleZoom:(BOOL)bHandleZoom {
+    [self.mapView selectAnnotation:nil animated:true];
+    for (id selectedAnnotation in self.mapView.selectedAnnotations) {
+        [self.mapView deselectAnnotation:selectedAnnotation animated:false];
+    }
+    int zoomLevel = [self.mapView zoomLevel];
+    if( bHandleZoom ) {
+        zoomLevel = ZOOM_LEVEL_STREET;
+    }
+    [self.mapView setCenterCoordinate:target zoomLevel:zoomLevel animated:TRUE];
 }
 
 - (IBAction)settingsButtonTapped:(UIButton *)sender {
-    /*
+    
     [Api settingsModallyFrom:self withSuccess:^(NSDictionary * results) {
         NSLog(@"%@", results);
     }];
-    */
+    /*
     
     [Api authenticateModallyFrom:self withSuccess:^(NSDictionary * results) {
         NSLog(@"%@", results);
     }];
-     
+     */
 }
 
 - (IBAction)myLocationTapped:(id)sender {
@@ -296,21 +413,73 @@ typedef enum targetLocationType {
         return;
     }
     
-    [self showTargetPin:false];
+    //[self showTargetPin:false];
     
     CLLocationCoordinate2D myLocation;
     myLocation.latitude = self.currentLat;
     myLocation.longitude = self.currentLong;
     
+    STargetLocation target;
+    target.type = TARGET_CURRENT_LOCATION;
+    target.location = myLocation;
+    self.targetLocation = target;
     
+    //self.targetType = TARGET_CURRENT_LOCATION;
     
-    self.targetType = TARGET_CURRENT_LOCATION;
-    
-    [self goToCoord:myLocation];
+    [self goToCoord:myLocation handleZoom:true];
+}
+
+- (void)expandAddressBar:(BOOL)bExpand {
+    if(bExpand) {
+        CGRect newFrame = self.addressBarOrigFrame;
+        newFrame.size.width = self.view.frame.size.width;
+        newFrame.origin.x = 0;
+        [UIView animateWithDuration:.1 animations:^{
+            CGRect newSettingsButtonFrame = self.settingsButton.frame;
+            newSettingsButtonFrame.origin.y = self.addressBar.frame.origin.y + self.addressBar.frame.size.height-1;
+            self.settingsButton.frame = newSettingsButtonFrame;
+            CGRect newCurrentLocationButtonFrame = self.currentLocationButton.frame;
+            newCurrentLocationButtonFrame.origin.y = self.addressBar.frame.origin.y + self.addressBar.frame.size.height-1;
+            self.currentLocationButton.frame = newCurrentLocationButtonFrame;
+        } completion:^(BOOL finished) {
+            if (finished) {
+                [UIView animateWithDuration:.1
+                                 animations: ^{
+                                     self.addressBar.frame = newFrame;
+                                     [self.addressBar layoutSubviews];
+                                 }
+                                 completion: ^(BOOL finished){}];
+            }
+        }];
+
+    } else {
+        [UIView animateWithDuration:.1
+                         animations: ^{
+                             self.addressBar.frame = self.addressBarOrigFrame;
+                            [self.addressBar layoutSubviews];
+                         }
+                         completion: ^(BOOL finished){
+                             if(finished) {
+                                 [UIView animateWithDuration:.1
+                                              animations: ^{
+                                                  
+                                                  CGRect newSettingsButtonFrame = self.settingsButton.frame;
+                                                  newSettingsButtonFrame.origin.y = self.addressBar.frame.origin.y-1;
+                                                  self.settingsButton.frame = newSettingsButtonFrame;
+                                                  CGRect newCurrentLocationButtonFrame = self.currentLocationButton.frame;
+                                                  newCurrentLocationButtonFrame.origin.y = self.addressBar.frame.origin.y-1;
+                                                  self.currentLocationButton.frame = newCurrentLocationButtonFrame;
+                                              
+                                              }];
+                             }
+                         }
+         ];
+    }
 }
 
 - (IBAction)AddressEntered:(UITextField*)sender {
     NSLog(@"%@",sender.text);
+    [self expandAddressBar:false];
     [sender resignFirstResponder];
 }
 
@@ -325,13 +494,13 @@ typedef enum targetLocationType {
         ParkingSpot* spot = ((ParkingSpotAnnotation*)annotation).spot;
         
         
-        if(spot.mPrice < LOW_PRICE_THRESHOLD)
+        if([spot.mSpotType isEqualToString: @"premium"])
         {
-            identifier = @"spot_low_cost";
-        } else if (spot.mPrice < HIGH_PRICE_THRESHOLD) {
-            identifier = @"spot_mid_cost";
+            identifier = @"premium";
+        } else if ([spot.mSpotType isEqualToString: @"charging"]) {
+            identifier = @"charging";
         } else {
-            identifier = @"spot_high_cost";
+            identifier = @"economy";
         }
         
         
@@ -340,18 +509,18 @@ typedef enum targetLocationType {
             annotationView = [[MKAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:identifier];
             annotationView.canShowCallout = YES;
             annotationView.enabled = YES;
-            annotationView.leftCalloutAccessoryView = [[UIImageView alloc] initWithFrame:CGRectMake(0,0,30,30)];
+            //annotationView.leftCalloutAccessoryView = [[UIImageView alloc] initWithFrame:CGRectMake(0,0,30,30)];
         }
         
         annotationView.annotation = annotation;
-        [(UIImageView*)annotationView.leftCalloutAccessoryView setImage:nil];
+        //[(UIImageView*)annotationView.leftCalloutAccessoryView setImage:nil];
         
         UIImage* img;
-        if(spot.mPrice < LOW_PRICE_THRESHOLD)
+        if([spot.mSpotType isEqualToString: @"premium"])
         {
-            img=[UIImage imageNamed:@"blue_spot_marker.png"];
-        } else if (spot.mPrice < HIGH_PRICE_THRESHOLD) {
-            img=[UIImage imageNamed:@"black_spot_marker.png"];
+            img=[UIImage imageNamed:@"black_spot_marker_cool.png"];
+        } else if ([spot.mSpotType isEqualToString: @"charging"]) {
+            img=[UIImage imageNamed:@"black_spot_marker_cool.png"];
         } else {
             img=[UIImage imageNamed:@"black_spot_marker_cool.png"];
         }
@@ -368,19 +537,19 @@ typedef enum targetLocationType {
         
         //UIButton* btnViewVenue = [UIButton buttonWithType:UIButtonTypeDetailDisclosure];
         UIButton* btnViewVenue = [UIButton buttonWithType:UIButtonTypeCustom];
-        btnViewVenue.frame = CGRectMake(0, 0,65, 25);
+        btnViewVenue.frame = CGRectMake(0, 0,70, 32);
         
         //NSString *btnString = @"PARK!";
         NSString *btnString = @"Park";
-        CGSize s = [btnString sizeWithFont:[UIFont fontWithName:@"Arial Rounded MT Bold" size:(14.0)] constrainedToSize:btnViewVenue.frame.size lineBreakMode:UILineBreakModeMiddleTruncation];
-        [btnViewVenue setBackgroundImage:[UIImage imageNamed:@"blue_small_button.png"]
+        CGSize s = [btnString sizeWithFont:[UIFont fontWithName:@"Arial Rounded MT Bold" size:(16.0)] constrainedToSize:btnViewVenue.frame.size lineBreakMode:UILineBreakModeMiddleTruncation];
+        [btnViewVenue setBackgroundImage:[UIImage imageNamed:@"blue_big_button.png"]
                             forState:UIControlStateNormal];
 
         btnViewVenue.titleLabel.frame = CGRectMake(0,0,s.width,s.height);
         [btnViewVenue setTitle:btnString forState:UIControlStateNormal];
         
         btnViewVenue.titleLabel.textColor = [UIColor whiteColor];
-        btnViewVenue.titleLabel.font = [UIFont fontWithName:@"Arial Rounded MT Bold" size:(14.0)];
+        btnViewVenue.titleLabel.font = [UIFont fontWithName:@"Arial Rounded MT Bold" size:(16.0)];
         
         
         btnViewVenue.tag = spot.mID;
@@ -414,29 +583,122 @@ typedef enum targetLocationType {
     return nil;    
 }
 
+- (void)mapView:(MKMapView *)mapView didAddAnnotationViews:(NSArray *)views {
+    MKAnnotationView *aV;
+    for (aV in views) {
+        
+        CGRect endFrame = aV.frame;
+        
+        aV.frame = CGRectMake(aV.frame.origin.x+aV.frame.size.width/2, aV.frame.origin.y+aV.frame.size.height, 1, 1);
+        
+        [UIView beginAnimations:nil context:NULL];
+        [UIView setAnimationDuration:0.45];
+        [UIView setAnimationCurve: UIViewAnimationCurveEaseInOut];
+        [aV setFrame:endFrame];
+        [UIView commitAnimations];
+        
+    }
+}
+
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
     if ([segue.identifier isEqualToString:@"ViewSpot"]) {
+        
+        double distanceToSpot = [self.parkingSpots distanceToClosestAvailableSpotToCoord:self.targetLocation.location];
+        
         
         ParkifySpotViewController *newController = segue.destinationViewController;
         newController.parkingSpots = self.parkingSpots;
         self.parkingSpots.observerDelegate = newController;
         newController.spot = self.targetSpot;
+        newController.currentLat = self.currentLat;
+        newController.currentLong = self.currentLong;
+        newController.distanceString = [TextFormatter formatDistanceClose:distanceToSpot];
+        
+        [newController.spot updateAsynchronouslyWithLevelOfDetail:@"all"];
+        
+        if(self.waitingMask) {
+            [self.waitingMask removeFromSuperview];
+            self.waitingMask = nil;
+        }
     }
 }
 
+
+- (void)openSpotConirmationViewWithSpot:(int)spotID {
+    [self stopPolling];
+    //** Set up waitingMask **//
+    
+    
+    
+    CGRect waitingMaskFrame = self.view.frame;
+    waitingMaskFrame.origin.x = 0;
+    waitingMaskFrame.origin.y = 0;
+    
+    self.waitingMask = [[WaitingMask alloc] initWithFrame:waitingMaskFrame];
+    [self.view addSubview:self.waitingMask];
+    //**  **//
+    
+    
+    self.targetSpot = [self.parkingSpots parkingSpotForID:spotID];
+    if(!self.targetSpot) {
+        self.targetSpot = [[ParkingSpot alloc]init];
+        self.targetSpot.mID = spotID;
+    }
+    self.targetSpot.parentCollection = self.parkingSpots;
+    self.spotsWereUpdatedCallback = ^(void){
+        /*
+        self.targetSpot = [self.parkingSpots parkingSpotForID:spotID];
+        if(self.targetSpot) {
+            self.navigationController.modalPresentationStyle = UIModalPresentationCurrentContext;
+            [self performSegueWithIdentifier:@"ViewSpot" sender:self];
+        } else {
+            [self startPolling];
+            if(self.waitingMask) {
+                [self.waitingMask removeFromSuperview];
+                self.waitingMask = nil;
+            }
+        }
+         */
+        
+        [self switchToConfirmation];
+        self.spotsWereUpdatedCallback = nil;
+    };
+    
+    [self.targetSpot updateAsynchronouslyWithLevelOfDetail:@"all"];
+}
+
+
+
+
+
 - (void)openSpotViewControllerWithSpot:(int)spotID {
     [self stopPolling];
-    self.targetSpot = [self.parkingSpots parkingSpotForID:spotID];
-    self.navigationController.modalPresentationStyle = UIModalPresentationCurrentContext;
-    //self.modalTransitionStyle = UIModalTransitionStyleCoverVertical;
-    //
-    //ParkifySpotViewController *sampleView = [[ParkifySpotViewController alloc] initWithNibName:@"SpotView" bundle:nil];
-    //sampleView.delegate = self;
-    //[self.navigationController presentModalViewController:sampleView animated:YES];
+    //** Set up waitingMask **//
+    CGRect waitingMaskFrame = self.view.frame;
+    waitingMaskFrame.origin.x = 0;
+    waitingMaskFrame.origin.y = 0;
     
-    [self performSegueWithIdentifier:@"ViewSpot" sender:self];
-    //ParkifySpotViewController* spotView = [[ParkifySpotViewController alloc] init];
-    //[self.navigationController presentOverViewController:spotView animated:true];
+    self.waitingMask = [[WaitingMask alloc] initWithFrame:waitingMaskFrame];
+    [self.view addSubview:self.waitingMask];
+    //**  **//
+        
+    self.targetSpot = [self.parkingSpots parkingSpotForID:spotID];
+    self.spotsWereUpdatedCallback = ^(void){
+        self.targetSpot = [self.parkingSpots parkingSpotForID:spotID];
+        if(self.targetSpot) {
+            self.navigationController.modalPresentationStyle = UIModalPresentationCurrentContext;
+            [self performSegueWithIdentifier:@"ViewSpot" sender:self];
+        } else {
+            [self startPolling];
+            if(self.waitingMask) {
+                [self.waitingMask removeFromSuperview];
+                self.waitingMask = nil;
+            }
+        }
+        self.spotsWereUpdatedCallback = nil;
+    };
+    
+    [self.targetSpot updateAsynchronouslyWithLevelOfDetail:@"all"];
 }
 
 - (IBAction)spotMoreInfo:(UIButton*)sender {
@@ -447,8 +709,8 @@ typedef enum targetLocationType {
 
 //TODO: Change "little_man.png" to be thumbnail of parking spot image
 - (void)mapView:(MKMapView *)mapView didSelectAnnotationView:(MKAnnotationView *)view {
-    UIImage* image = [UIImage imageNamed:@"little_man.png"];
-    [(UIImageView*)view.leftCalloutAccessoryView setImage:image];
+    //UIImage* image = [UIImage imageNamed:@"little_man.png"];
+    //[(UIImageView*)view.leftCalloutAccessoryView setImage:image];
 }
 
 //TODO: Change make this happen based on the max zoom level, not just a hard-coded value.
@@ -468,13 +730,20 @@ typedef enum targetLocationType {
 }
 
 
--(void)spotsWereUpdated 
+-(void)spotsWereUpdatedWithCount:(NSString *)count withLevelOfDetail:(NSString*)lod withSpot:(int)spotID
 {
     NSMutableArray* annotations = [[NSMutableArray alloc] init ];
     for (ParkingSpot* spot in [self.parkingSpots.parkingSpots allValues]) {
         [annotations addObject:[ParkingSpotAnnotation annotationForSpot:spot]];
     }
     self.annotations = annotations;
+    
+    if([lod isEqualToString:@"all"]) {
+        if([count isEqualToString:@"all"] || ([count isEqualToString:@"one"] && spotID == self.targetSpot.mID)) {
+            if(self.spotsWereUpdatedCallback) self.spotsWereUpdatedCallback();
+        }
+    }
+    
 }
 
 - (void)updateMapView {
@@ -521,7 +790,7 @@ typedef enum targetLocationType {
 
 - (void)refreshSpots
 {
-    [self.parkingSpots updateWithRequest:nil];
+    [self.parkingSpots updateWithRequest:[NSDictionary dictionaryWithObject:@"low" forKey:@"level_of_detail"]];
 }
 
 
@@ -570,48 +839,76 @@ typedef enum targetLocationType {
 }
 
 // --ADDRESS BAR-- //
-/*
+
 - (BOOL)textFieldShouldReturn:(UITextField *)textField {
     //NSLog(@"%@",textField.text);
+    [self expandAddressBar:false];
     [textField resignFirstResponder];
     return NO;
 }
-*/
+
+- (IBAction)confirmationButtonTapped:(id)sender {
+    [self switchToConfirmation];
+    //[self openSpotConirmationViewWithSpot:[Persistance retrieveCurrentSpotId]];
+}
+
 
 - (void)searchBarSearchButtonClicked:(UISearchBar *)searchBar {
     [self handleSearch:searchBar];
 }
 
 - (void)searchBarTextDidBeginEditing:(UISearchBar *)searchBar {
-    searchBar.showsCancelButton = true;
+    [self expandAddressBar:true];
+    //searchBar.showsCancelButton = true;
     self.mapView.userInteractionEnabled = false;
 }
 
 - (void)searchBarTextDidEndEditing:(UISearchBar *)searchBar {
-    searchBar.showsCancelButton = false;
+    //searchBar.showsCancelButton = false;
+    [self expandAddressBar:false];
     self.mapView.userInteractionEnabled = true;
     //[self handleSearch:searchBar];
 }
 
 - (void)handleSearch:(UISearchBar *)searchBar {
+    
+    CLLocationCoordinate2D southwest, northeast;
+    CLLocationCoordinate2D center = self.mapView.centerCoordinate;
+    
+    southwest.latitude = center.latitude - 3;
+    southwest.longitude = center.longitude - 3;
+    northeast.latitude = center.latitude + 3;
+    northeast.longitude = center.longitude +3;
+    BSForwardGeocoderCoordinateBounds *bounds = [BSForwardGeocoderCoordinateBounds boundsWithSouthWest:southwest northEast:northeast];
+
+    
     NSLog(@"Searching for: %@", searchBar.text);
-    [self.forwardGeocoder forwardGeocodeWithQuery:searchBar.text regionBiasing:nil];
+    [self.forwardGeocoder forwardGeocodeWithQuery:searchBar.text regionBiasing:nil viewportBiasing:bounds];
+    [self expandAddressBar:false];
     [searchBar resignFirstResponder]; //close the keyboard
 }
 - (void)forwardGeocodingDidSucceed:(BSForwardGeocoder*)geocoder withResults:(NSArray *)results{
     if([results count] >= 1) {
         BSKmlResult* place = [results objectAtIndex:0];
         
-        self.targetType = TARGET_SEARCHED_LOCATION;
+        STargetLocation target;
+        target.type = TARGET_SEARCHED_LOCATION;
+        target.location = place.coordinate;
+        
+        self.targetLocation = target;
+        
         self.lastSearchedLocation = place.coordinate;
-        self.targetLocationAnnotation.coordinate = place.coordinate;
+        
+        
         [self showTargetPin:true];
         
         NSString* toastText = [NSString stringWithFormat:@"Found place: %@", place.address];
         
         [[[iToast makeText:toastText] setGravity:iToastGravityBottom ] show];
         
-        [self goToCoord:place.coordinate];
+        
+        
+        [self goToCoord:place.coordinate handleZoom:true];
         
         //[self goToRegion:place.coordinateRegion];
     }
@@ -623,6 +920,7 @@ typedef enum targetLocationType {
 }
 
 - (void)searchBarCancelButtonClicked:(UISearchBar *)searchBar {
+    [self expandAddressBar:false];
     [searchBar resignFirstResponder]; //close the keyboard
 }
 
@@ -632,12 +930,34 @@ typedef enum targetLocationType {
 - (IBAction)parkMeNowButtonTapped:(UIButton *)sender {
     //Testing modal stuff
     
-    ParkingSpot* parkMeNowSpot = [self.parkingSpots closestAvailableSpotToCoord:[self targetLocation]];
+    ParkingSpot* parkMeNowSpot = [self.parkingSpots closestAvailableSpotToCoord:self.targetLocation.location];
     if(parkMeNowSpot) {
         [self openSpotViewControllerWithSpot:parkMeNowSpot.mID];
     } else {
         [[[iToast makeText:@"No closest available spot"] setGravity:iToastGravityBottom ] show];
     }
      
+}
+
+
+- (void) switchToConfirmation {
+    [self stopPolling];
+    self.navigationController.modalPresentationStyle = UIModalPresentationCurrentContext;
+    
+        UIStoryboard *mainStoryboard = [UIStoryboard storyboardWithName:@"MainStoryboard_iPhone"
+                                                                 bundle: nil];
+        
+        ParkifyConfirmationViewController* controller = [mainStoryboard instantiateViewControllerWithIdentifier: @"ConfirmationVC"];
+        
+    controller.spot = [Persistance retrieveCurrentSpot];
+        
+        controller.startTime = [Persistance retrieveCurrentStartTime];
+        controller.endTime = [Persistance retrieveCurrentEndTime];
+        
+        controller.currentLat = self.currentLat;
+        controller.currentLong = self.currentLong;
+        
+        self.modalTransitionStyle = UIModalTransitionStyleCoverVertical;
+        [self presentViewController:controller animated:true completion:^{}];
 }
 @end

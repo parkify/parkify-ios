@@ -11,213 +11,254 @@
 #import "ASIHTTPRequest.h"
 #import "Api.h"
 #import "iToast.h"
+#import "ParkingSpotCollection.h"
 
-@interface ParkingSpotCollection()
-
-@end
-
-@implementation ParkingSpotCollection
-
-
-@synthesize parkingSpots = _parkingSpots;
-@synthesize observerDelegate = _observerDelegate;
-
-- (NSDictionary*)parkingSpots {
-    if(!_parkingSpots) _parkingSpots = [[NSDictionary alloc] init];
-    return _parkingSpots;
-}
-
-- (ParkingSpot*)parkingSpotForID:(int)key {
-    return [self.parkingSpots objectForKey:[[NSNumber alloc] initWithInt:key]];
-}
-
-- (id)initFromJSONString:(NSString*)strJson {
-    if ((self = [super init])) {
-        [self updateFromJSONString:strJson];
-    }
-    return self;
-}
-
-- (void)updateWithRequest:(id)Request {
-    
-    if(NO_SERVICE_DEBUG) {
-        [self updateFromJSONString:NO_SERVICE_DEBUG_SPOTS];
-    } else {
-    
-        NSURL *url = [NSURL URLWithString:@"http://swooplot.herokuapp.com/parking_spots.json"];
-    
-        ASIHTTPRequest *_request = [ASIHTTPRequest requestWithURL:url];
-        __weak ASIHTTPRequest *request = _request;
-    
-        request.requestMethod = @"GET";    
-    
-        [request setDelegate:self];
-        [request setCompletionBlock:^{         
-            NSString *responseString = [request responseString];
-            [self updateFromJSONString:responseString];
-        }];
-        [request setFailedBlock:^{
-            NSError *error = [request error];
-            NSLog(@"Error: %@", error.localizedDescription);
-            [[[iToast makeText:@"Can't find server."] setGravity:iToastGravityBottom ] show];
-        }];
-    
-    // 6
-        [request startAsynchronous];
-    }
-
-}
-
-/*
-- (void)debugPopulate {
-    #define NO_SERVICE_DEBUG_SPOTS @"[{\"mID\":\"3\",\"mLat\":37.872654\",\"mLong\":\"122.266812\",\"mCompanyName\":\"Mike\"s Bikes\",\"mLocalID\":\"3\",\"mPrice\":\"1.02\",\"mPhoneNumber\":\"408-421-1194\",\"mDesc\":\"A Fantastic Spot!\",\"mFree\":\"true\"}]"
-    
-    NSMutableDictionary *newParkingSpots = [[NSMutableDictionary alloc] init];
-
-        int idIn = 3;
-        double latIn = [[spot objectForKey:@"mLat"] doubleValue];
-        double lngIn = [[spot objectForKey:@"mLong"] doubleValue];
-        NSString * companyNameIn = [spot objectForKey:@"mCompanyName"];
-        int localIDIn = [[spot objectForKey:@"mLocalID"] intValue];
-        double priceIn = [[spot objectForKey:@"mPrice"] doubleValue];
-        NSString * phoneNumberIn = [spot objectForKey:@"mPhoneNumber"];
-        NSString * descIn = [spot objectForKey:@"mDesc"];
-        Boolean freeIn = [[spot objectForKey:@"mFree"] boolValue];
-        
-        ParkingSpot *spotActual = [[ParkingSpot alloc] initWithID:idIn 
-                                                              lat:latIn
-                                                              lng:lngIn 
-                                                      companyName:companyNameIn
-                                                          localID:localIDIn 
-                                                            price:priceIn
-                                                      phoneNumber:phoneNumberIn 
-                                                             desc:descIn
-                                                             free:freeIn];    
-        [newParkingSpots setObject:spotActual forKey:[[NSNumber alloc] initWithInt:idIn]];    
-    }
-    for (id key in [newParkingSpots allKeys]) {
-        ParkingSpot* pot = [newParkingSpots objectForKey:key];
-        //NSLog(@"key: %@, value: %@\n", key, pot);
-    }
-    
-    self.parkingSpots = [newParkingSpots copy];
-    if(self.observerDelegate)[self.observerDelegate spotsWereUpdated];
-}
-*/ 
-
-- (void)updateFromJSONString:(NSString*)strJson {
-    NSMutableDictionary *newParkingSpots = [[NSMutableDictionary alloc] init];
-    NSDictionary * root = [strJson JSONValue];
-    
-    for (NSDictionary * spot in root) {
-        
-        int idIn = [[spot objectForKey:@"id"] intValue];
-        double latIn = [[spot objectForKey:@"mLat"] doubleValue];
-        double lngIn = [[spot objectForKey:@"mLong"] doubleValue];
-        NSString * companyNameIn = [spot objectForKey:@"mCompanyName"];
-        int localIDIn = [[spot objectForKey:@"mLocalID"] intValue];
-        double priceIn = [[spot objectForKey:@"mPrice"] doubleValue];
-        NSString * phoneNumberIn = [spot objectForKey:@"mPhoneNumber"];
-        NSString * descIn = [spot objectForKey:@"mDesc"];
-        Boolean freeIn = [[spot objectForKey:@"mFree"] boolValue];
-        
-        ParkingSpot *spotActual = [[ParkingSpot alloc] initWithID:idIn 
-                                                              lat:latIn
-                                                              lng:lngIn 
-                                                      companyName:companyNameIn
-                                                          localID:localIDIn 
-                                                            price:priceIn
-                                                      phoneNumber:phoneNumberIn 
-                                                             desc:descIn
-                                                             free:freeIn];    
-        [newParkingSpots setObject:spotActual forKey:[[NSNumber alloc] initWithInt:idIn]];    
-    }
-    for (id key in [newParkingSpots allKeys]) {
-        ParkingSpot* pot = [newParkingSpots objectForKey:key];
-        //NSLog(@"key: %@, value: %@\n", key, pot);
-    }
-    
-    self.parkingSpots = [newParkingSpots copy];
-    if(self.observerDelegate)[self.observerDelegate spotsWereUpdated];
-}
-
--(CLLocation*) locFromCoord:(CLLocationCoordinate2D)coord {
-    return [[CLLocation alloc] initWithLatitude:coord.latitude longitude:coord.longitude];
-}
-
--(double) distFromA:(CLLocationCoordinate2D)a toB:(CLLocationCoordinate2D)b {
-    return [[self locFromCoord:a] distanceFromLocation:[self locFromCoord:b]];
-}
-
-- (ParkingSpot*)closestAvailableSpotToCoord:(CLLocationCoordinate2D)coord {
-    ParkingSpot* bestSpotYet = nil;
-    double bestDistYet = 1000000000000;
-    for ( ParkingSpot* spot in [self.parkingSpots allValues]) {
-        if (spot.mFree) {
-            CLLocationCoordinate2D spotCoord;
-            spotCoord.latitude = spot.mLat;
-            spotCoord.longitude = spot.mLong;
-        
-            double thisDist = [self distFromA:spotCoord toB:coord];
-            if (thisDist < bestDistYet) {
-                bestDistYet = thisDist;
-                bestSpotYet = spot;
-            }
-        }
-    }
-    return bestSpotYet;
-}
-
-
-
-@end
-
-
-@interface ParkingSpot()
-
-- (id)initWithID:(int)idIn lat:(double)latIn
-             lng:(double)lngIn companyName:(NSString*)companyNameIn
-         localID:(int)localIDIn price:(double)priceIn
-     phoneNumber:(NSString*)phoneNumberIn desc:(NSString*)descIn
-            free:(Boolean)freeIn;
-
-
-@end
 
 @implementation ParkingSpot
+
+@synthesize parentCollection = _parentCollection;
+
 @synthesize mID = _mID;
 @synthesize mLat = _mLat;
 @synthesize mLong = _mLong;
-@synthesize mCompanyName = _mCompanyName;
-@synthesize mLocalID = _mLocalID;
-@synthesize mPrice = _mPrice;
-@synthesize mPhoneNumber= _mPhoneNumber;
+
+@synthesize mLocationName = _mLocationName;
+@synthesize mSpotName = _mSpotName;
+
+@synthesize imageIDs = _imageIDs;
+
 @synthesize mDesc = _mDesc;
 @synthesize mFree = _mFree;
 @synthesize mRemove = _mRemove;
 
+@synthesize mSpotLayout = _mSpotLayout;
+@synthesize mSpotDifficulty = _mSpotDifficulty;
+@synthesize mSpotCoverage = _mSpotCoverage;
+@synthesize mSpotSignage = _mSpotSignage;
+@synthesize mSpotType = _mSpotType;
+
+@synthesize mAddress = _mAddress;
+@synthesize mDirections = _mDirections;
+
+@synthesize offers = _offers;
+
 - (id)initWithID:(int)idIn lat:(double)latIn
-             lng:(double)lngIn companyName:(NSString*)companyNameIn
-         localID:(int)localIDIn price:(double)priceIn
-     phoneNumber:(NSString*)phoneNumberIn desc:(NSString*)descIn
-            free:(Boolean)freeIn {	
+             lng:(double)lngIn locationName:(NSString*)locationNameIn
+        spotName:(NSString*)spotNameIn
+            free:(Boolean)freeIn
+        spotType:(NSString*)spotTypeIn
+       imageIDs:(NSArray*)imageIDsIn
+
+      spotLayout:(NSString*)spotLayoutIn
+  spotDifficulty:(NSString*)spotDifficultyIn
+    spotCoverage:(NSString*)spotCoverageIn
+     spotSignage:(NSString*)spotSignageIn {
+    
+    
     if ((self = [super init])) {
         self.mID = idIn;
         self.mLat = latIn;
         self.mLong = lngIn;
-        self.mCompanyName = [companyNameIn copy];
-        self.mLocalID = localIDIn;
-        self.mPrice = priceIn;
-        self.mPhoneNumber = [phoneNumberIn copy];
-        self.mDesc = [descIn copy];
+        self.mLocationName = [locationNameIn copy];
+        self.mSpotName = [spotNameIn copy];
         self.mFree = freeIn;
         self.mRemove = false;
-        //_coordinate.latitude = latIn;
-        //_coordinate.longitude = lngIn;
+        self.imageIDs = [imageIDsIn copy];
+        self.mSpotLayout = [spotLayoutIn copy];
+        self.mSpotDifficulty = [spotDifficultyIn copy];
+        self.mSpotCoverage = [spotCoverageIn copy];
+        self.mSpotSignage = [spotSignageIn copy];
+        self.mSpotType = [spotTypeIn copy];
+        
     }
     return self;
 }
+
+- (id)initWithID:(int)idIn lat:(double)latIn
+             lng:(double)lngIn locationName:(NSString*)locationNameIn
+        spotName:(NSString*)spotNameIn
+            free:(Boolean)freeIn
+        spotType:(NSString*)spotTypeIn
+       numImages:(NSArray*)imageIDsIn
+
+      spotLayout:(NSString*)spotLayoutIn
+  spotDifficulty:(NSString*)spotDifficultyIn
+    spotCoverage:(NSString*)spotCoverageIn
+     spotSignage:(NSString*)spotSignageIn
+
+            desc:(NSString*)descIn
+          offers:(NSArray*)offersIn
+         address:(NSString*)addrIn
+      directions:(NSString*)dirIn{
+    
+    
+    if ((self = [super init])) {
+        self.mID = idIn;
+        self.mLat = latIn;
+        self.mLong = lngIn;
+        self.mLocationName = [locationNameIn copy];
+        self.mSpotName = [spotNameIn copy];
+        self.mFree = freeIn;
+        self.mRemove = false;
+        self.imageIDs = [imageIDsIn copy];
+        self.mSpotLayout = [spotLayoutIn copy];
+        self.mSpotDifficulty = [spotDifficultyIn copy];
+        self.mSpotCoverage = [spotCoverageIn copy];
+        self.mSpotSignage = [spotSignageIn copy];
+        self.mSpotType = [spotTypeIn copy];
+        
+        self.mDesc = [descIn copy];
+        self.offers = offersIn;
+        
+        self.mAddress = [addrIn copy];
+        self.mDirections = [dirIn copy];
+    }
+    return self;
+}
+
+
+- (double) currentPrice {
+    if(self.offers && self.offers.count > 0) {
+        Offer* currentOffer = [self.offers objectAtIndex:0];
+        if( currentOffer && currentOffer.priceList && currentOffer.priceList.count > 0) {
+            PriceInterval* priceInterval = [currentOffer.priceList objectAtIndex:0];
+            if (priceInterval) {
+                return priceInterval.pricePerHour;
+            }
+        }
+    }
+    return 0;
+}
+
+- (double) endTime {
+    Offer* lastOffer = [self.offers objectAtIndex:self.offers.count-1];
+    return lastOffer.endTime;
+}
+
+- (double) priceFromNowForDurationInSeconds:(double)duration {
+    NSDate* currentDate = [NSDate date];
+    double currentTime = [currentDate timeIntervalSince1970];
+    //now for each offer, find cost.
+    double toRtn = 0;
+    
+    for (Offer* iterOffer in self.offers) {
+        double startTime = MAX(currentTime, iterOffer.startTime);
+        double endTime = MIN(currentTime+duration, iterOffer.endTime);
+        if (endTime - startTime > 0) {
+            toRtn += [iterOffer findCostWithStartTime:startTime endTime:endTime];
+        }
+    }
+    return toRtn;
+}
+
+- (void) updateAsynchronouslyWithLevelOfDetail:(NSString*)lod {
+    [self.parentCollection updateWithRequest:[NSDictionary dictionaryWithObjectsAndKeys:@"one",@"count",[NSNumber numberWithInt:self.mID], @"id", lod, @"level_of_detail", nil]];
+}
+
+
+- (NSDictionary*) asDictionary {
+    NSMutableDictionary* dictOut = [[NSMutableDictionary alloc]init];
+    [dictOut setObject:[NSNumber numberWithInt:self.mID] forKey:@"id"];
+    [dictOut setObject:[NSNumber numberWithBool:self.mFree] forKey:@"free"];
+    [dictOut setObject:self.mSpotName forKey:@"title"];
+    [dictOut setObject:self.mDesc forKey:@"description"];
+    [dictOut setObject:self.imageIDs forKey:@"imageIDs"];
+    
+    NSMutableDictionary* location = [[NSMutableDictionary alloc]init];
+    [location setObject:[NSNumber numberWithDouble:self.mLat] forKey:@"latitude"];
+    [location setObject:[NSNumber numberWithDouble:self.mLong] forKey:@"longitude"];
+    [location setObject:self.mLocationName forKey:@"location_name"];
+    [location setObject:self.mAddress forKey:@"location_address"];
+    [location setObject:self.mDirections forKey:@"directions"];
+    
+    [dictOut setObject:location forKey:@"location"];
+    
+    NSMutableDictionary* qp = [[NSMutableDictionary alloc]init];
+    [qp setObject:self.mSpotLayout forKey:@"spot_layout"];
+    [qp setObject:self.mSpotDifficulty forKey:@"spot_difficulty"];
+    [qp setObject:self.mSpotCoverage forKey:@"spot_coverage"];
+    [qp setObject:self.mSpotSignage forKey:@"spot_signage"];
+    [qp setObject:self.mSpotType forKey:@"spot_type"];
+    
+    [dictOut setObject:qp forKey:@"quick_properties"];
+    
+    [dictOut setObject:[[NSDictionary alloc] init] forKey:@"offers"];
+    
+    return dictOut;
+    
+}
+
+- (BOOL) updateFromDictionary:(NSDictionary*)spot withLevelOfDetail:(NSString*)levelOfDetail {
+    
+        
+    //ID
+    int idIn = [[spot objectForKey:@"id"] intValue];
+    self.mID = idIn;
+    
+    Boolean freeIn = [[spot objectForKey:@"free"] boolValue];
+    self.mFree = freeIn;
+    if(!freeIn) {
+        return false;
+    }
+    
+    //Latitutde and Longitude
+    self.mLat = [[[spot objectForKey:@"location"] objectForKey:@"latitude" ] doubleValue];
+    self.mLong = [[[spot objectForKey:@"location"] objectForKey:@"longitude" ] doubleValue];
+    
+    //Location and Spot Name
+    self.mLocationName = [[spot objectForKey:@"location"] objectForKey:@"location_name" ];
+    self.mSpotName = [spot objectForKey:@"title"];
+    
+    
+    NSDictionary* quickPropertiesIn = [spot objectForKey:@"quick_properties"];
+    
+    self.mSpotLayout = @"";
+    self.mSpotDifficulty = @"";
+    self.mSpotCoverage = @"";
+    self.mSpotSignage = @"";
+    self.mSpotType = @"";
+    
+    if ([quickPropertiesIn objectForKey:@"spot_layout"]) {
+        self.mSpotLayout = [quickPropertiesIn objectForKey:@"spot_layout"];
+    }
+    if ([quickPropertiesIn objectForKey:@"spot_difficulty"]) {
+        self.mSpotDifficulty = [quickPropertiesIn objectForKey:@"spot_difficulty"];
+    }
+    if ([quickPropertiesIn objectForKey:@"spot_coverage"]) {
+        self.mSpotCoverage = [quickPropertiesIn objectForKey:@"spot_coverage"];
+    }
+    if ([quickPropertiesIn objectForKey:@"spot_signage"]) {
+        self.mSpotSignage = [quickPropertiesIn objectForKey:@"spot_signage"];
+    }
+    if ([quickPropertiesIn objectForKey:@"spot_type"]) {
+        self.mSpotType = [quickPropertiesIn objectForKey:@"spot_type"];
+    }
+    
+    
+    NSMutableArray* imageIds = [[NSMutableArray alloc] init];
+    for (id imageId in [spot objectForKey:@"imageIDs"]) {
+        [imageIds addObject:imageId];
+    }
+    self.imageIDs = [imageIds copy];
+        
+    
+    if ([levelOfDetail isEqualToString:@"all"]) {
+        self.mDesc = [spot objectForKey:@"description"];
+        NSMutableArray* offersIn = [[NSMutableArray alloc] init];
+        
+        for (NSDictionary* offer in [spot objectForKey:@"offers"]) {
+            [offersIn addObject:[[Offer alloc] initFromDictionary:offer]];
+        }
+        self.offers = offersIn;
+        
+        self.mAddress = [[spot objectForKey:@"location"] objectForKey:@"location_address"];
+        self.mDirections = [[spot objectForKey:@"location"] objectForKey:@"directions"];
+    }
+    return true;
+}
+
 @end
+
 
 @implementation ParkingSpotAnnotation
 
@@ -236,11 +277,10 @@
     return coordToRtn;
 }
 - (NSString *)title {
-    return [NSString stringWithFormat:@"%@ %d | %0.2f/hr", 
-            self.spot.mCompanyName, self.spot.mLocalID, self.spot.mPrice];
+    return [NSString stringWithFormat:@"%@ Spot", self.spot.mSpotType];
 }
 - (NSString *)subtitle {
-    return [NSString stringWithFormat:@"%@ to Book", self.spot.mPhoneNumber];
+    return [NSString stringWithFormat:@"%@", self.spot.mLocationName];
 }
 
 - (BOOL)updateAnnotationWith:(id)annotation onlyifIDsAreSame:(BOOL)boolIDsSame

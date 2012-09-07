@@ -70,7 +70,7 @@
 {
     [super viewDidLoad];
     
-    self.stripeConnection = [StripeConnection connectionWithPublishableKey:@"pk_GP95lUPyExWOy8e81qL5vIbwMH7G8"];
+    self.stripeConnection = [StripeConnection connectionWithPublishableKey:@"pk_XeTF5KrqXMeSyyqApBF4q9qDzniMn"];
 
     self.emailField.delegate = self;
     self.passwordField.delegate = self;
@@ -120,7 +120,7 @@
 }
 
 - (void)setUpTextField:(UITextField*) tf {
-    tf.layer.cornerRadius=12.5f;
+    tf.layer.cornerRadius=5.0f;
     tf.layer.masksToBounds=YES;
     tf.layer.borderColor=[TEXTFIELD_BORDER_COLOR CGColor];
     tf.layer.borderWidth=1.0f;

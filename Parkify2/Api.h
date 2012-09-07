@@ -10,7 +10,7 @@
 #import "ExtraTypes.h"
 
 #define NO_SERVICE_DEBUG false
-#define NO_SERVICE_DEBUG_SPOTS @"[{\"id\":\"3\",\"mLat\":\"37.872654\",\"mLong\":\"-122.266812\",\"mCompanyName\":\"Mikes Bikes\",\"mLocalID\":\"3\",\"mPrice\":\"1.02\",\"mPhoneNumber\":\"408-421-1194\",\"mDesc\":\"A Fantastic Spot!\",\"mFree\":\"true\"}]"
+#define NO_SERVICE_DEBUG_SPOTS @"[spots:({\"id\":\"3\",\"location":{\"latitude\":\"37.872654\",\"longitude\":\"-122.266812\"},\"location_name\":\"Mikes Bikes\",\"mLocalID\":\"3\",\"mPrice\":\"1.02\",\"mPhoneNumber\":\"408-421-1194\",\"mDesc\":\"A Fantastic Spot!\",\"mFree\":\"true\"})]"
 #define LOW_PRICE_THRESHOLD 5.01
 #define HIGH_PRICE_THRESHOLD 5.02
 
@@ -42,11 +42,24 @@ withPasswordConfirmation:(NSString*)passwordConfirmation
 //Called to bring up SettingsVC modally
 + (void)settingsModallyFrom:(UIViewController*)parent withSuccess:(SuccessBlock)successBlock;
 
++ (void)getParkingSpotWithID:(int)spotID
+           withLevelofDetail:(NSString*)lod
+                             withSuccess:(SuccessBlock)successBlock
+                             withFailure:(FailureBlock)failureBlock;
+
++ (void)getParkingSpotsWithLevelofDetail:(NSString*)lod
+                             withSuccess:(SuccessBlock)successBlock
+                             withFailure:(FailureBlock)failureBlock;
 //Called to get particular info from the logged in user
 /*
 + (void)getUserInfo:(NSArray*)requestedInfo
                  withSuccess:(SuccessBlock)successBlock
                  withFailure:(FailureBlock)failureBlock;
  */
+
+//Downloads an image from the server and passes the image through
++ (void)downloadImageDataAsynchronouslyWithId:(int)imageID withStyle:(NSString*)style
+                              withSuccess:(SuccessBlock)successBlock
+                              withFailure:(FailureBlock)failureBlock;
 
 @end

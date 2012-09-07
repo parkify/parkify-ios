@@ -32,4 +32,18 @@
     return squish;
 }
 
++ (NSString*) formatDistanceClose:(double)distanceInMiles {
+    if(distanceInMiles < 0.25) {
+        return [NSString stringWithFormat:@"%0.0f feet", distanceInMiles*5280.0];
+    } else {
+        return [NSString stringWithFormat:@"%0.1f miles", distanceInMiles];
+    }
+}
+
++ (NSString*) formatIdString:(int)idIn {
+    return [[NSString stringWithFormat:@"%d", idIn + 10000] capitalizedString];
+    //return [[NSString stringWithFormat:@"%x", idIn + 10000] capitalizedString];
+}
+
+
 @end

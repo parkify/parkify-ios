@@ -13,8 +13,9 @@
 #import "Authentication.h"
 #import "ModalSettingsController.h"
 #import "Persistance.h"
+#import "iToast.h"
 
-#define TESTING_V1 false
+#define TESTING_V1 true
 
 @interface Api()
 + (void)signUpStripeSuccessWithCard:(NSString*)token
@@ -54,7 +55,7 @@ withPasswordConfirmation:(NSString*)passwordConfirmation
     
     
     [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
-    StripeConnection* stripeConnection = [StripeConnection connectionWithPublishableKey:@"pk_GP95lUPyExWOy8e81qL5vIbwMH7G8"];
+    StripeConnection* stripeConnection = [StripeConnection connectionWithPublishableKey:@"pk_XeTF5KrqXMeSyyqApBF4q9qDzniMn"];
     
     [stripeConnection performRequestWithCard:card 
                                      success:^(StripeResponse *response) 
@@ -114,7 +115,7 @@ withPasswordConfirmation:(NSString*)passwordConfirmation
                                                         withLastName:lastName];
         id tokenRequest = [Authentication makeTokenRequestWithToken:token];
         
-        NSURL *url = [NSURL URLWithString:@"http://parkify-rails.herokuapp.com/api/v1/users.json"];
+        NSURL *url = [NSURL URLWithString:@"https://parkify-rails.herokuapp.com/api/v1/users.json"];
         NSLog(@"%@", [userRequest JSONRepresentation]);
         
         ASIFormDataRequest *request = [ASIFormDataRequest requestWithURL:url];
@@ -134,6 +135,8 @@ withPasswordConfirmation:(NSString*)passwordConfirmation
             BOOL success = [[root objectForKey:@"success"] boolValue];
             
             if(success) {
+                [Persistance saveLicensePlateNumber:[root objectForKey:@"license_plate_number"]];
+                [Persistance saveLastFourDigits:[root objectForKey:@"last_four_digits"]];
                 successBlock(root);
             } else {
                 NSString* message = @"";
@@ -178,7 +181,7 @@ withPasswordConfirmation:(NSString*)passwordConfirmation
                                                 withLicensePlate:licensePlate];
     id tokenRequest = [Authentication makeTokenRequestWithToken:token];
 
-    NSURL *url = [NSURL URLWithString:@"http://swooplot.herokuapp.com/api/users.json"];
+    NSURL *url = [NSURL URLWithString:@"https://swooplot.herokuapp.com/api/users.json"];
     NSLog(@"%@", [userRequest JSONRepresentation]);
     
     ASIFormDataRequest *request = [ASIFormDataRequest requestWithURL:url];
@@ -243,9 +246,9 @@ withPasswordConfirmation:(NSString*)passwordConfirmation
     
     NSURL *url;
     if(TESTING_V1) {
-        url = [NSURL URLWithString:@"http://parkify-rails.herokuapp.com/api/v1/users/sign_in.json"];
+        url = [NSURL URLWithString:@"https://parkify-rails.herokuapp.com/api/v1/users/sign_in.json"];
     } else {
-        url = [NSURL URLWithString:@"http://swooplot.herokuapp.com/api/users/sign_in.json"];
+        url = [NSURL URLWithString:@"https://swooplot.herokuapp.com/api/users/sign_in.json"];
     }
     //NSLog(@"%@", [userRequest JSONRepresentation]);
     
@@ -265,6 +268,8 @@ withPasswordConfirmation:(NSString*)passwordConfirmation
         BOOL success = [[root objectForKey:@"success"] boolValue];
         
         if(success) {
+            [Persistance saveLicensePlateNumber:[root objectForKey:@"license_plate_number"]];
+            [Persistance saveLastFourDigits:[root objectForKey:@"last_four_digits"]];
             successBlock(root);
         } else {
             NSString* message = @"";
@@ -323,6 +328,76 @@ withPasswordConfirmation:(NSString*)passwordConfirmation
     //parent.modalTransitionStyle = UIModalTransitionStyleCrossDissolve;
     [parent presentViewController:controller animated:true completion:^{}];
     parent.modalTransitionStyle = style;
+}
+
+
++ (void)getParkingSpotWithID:(int)spotID
+           withLevelofDetail:(NSString*)lod
+                  withSuccess:(SuccessBlock)successBlock
+                  withFailure:(FailureBlock)failureBlock {
+    NSString* strUrl;
+    if([lod isEqualToString: @"low"]) {
+        strUrl = [NSString stringWithFormat:@"http://parkify-rails.herokuapp.com/api/v1/resources/%d.json?level_of_detail=%@", spotID, @"low"];
+    } else {
+        strUrl = [NSString stringWithFormat:@"http://parkify-rails.herokuapp.com/api/v1/resources/%d.json?level_of_detail=%@", spotID, @"all"];
+    }
+    
+    NSURL *url = [NSURL URLWithString:strUrl];
+    
+    
+    ASIHTTPRequest *_request = [ASIHTTPRequest requestWithURL:url];
+    __weak ASIHTTPRequest *request = _request;
+    
+    request.requestMethod = @"GET";
+    
+    [request setDelegate:self];
+    [request setCompletionBlock:^{
+        NSString *responseString = [request responseString];
+        NSDictionary * root = [responseString JSONValue];
+        successBlock(root);
+    }];
+    [request setFailedBlock:^{
+        failureBlock([request error]);
+    }];
+    
+    [request startAsynchronous];
+    
+}
+
+
++ (void)getParkingSpotsWithLevelofDetail:(NSString*)lod
+                             withSuccess:(SuccessBlock)successBlock
+                             withFailure:(FailureBlock)failureBlock {
+    
+    
+    
+    NSString* strUrl;
+    if([lod isEqualToString: @"low"]) {
+        strUrl = [NSString stringWithFormat:@"http://parkify-rails.herokuapp.com/api/v1/resources.json?level_of_detail=%@", @"low"];
+    } else {
+        strUrl = [NSString stringWithFormat:@"http://parkify-rails.herokuapp.com/api/v1/resources.json?level_of_detail=%@", @"all"];
+    }
+            
+    NSURL *url = [NSURL URLWithString:strUrl];
+        
+    
+    ASIHTTPRequest *_request = [ASIHTTPRequest requestWithURL:url];
+    __weak ASIHTTPRequest *request = _request;
+    
+    request.requestMethod = @"GET";
+    
+    [request setDelegate:self];
+    [request setCompletionBlock:^{
+        NSString *responseString = [request responseString];
+        NSDictionary * root = [responseString JSONValue];
+        successBlock(root);
+    }];
+    [request setFailedBlock:^{
+        failureBlock([request error]);
+    }];
+
+    [request startAsynchronous];
+
 }
 
 //Called to get particular info from the logged in user
@@ -390,6 +465,39 @@ withPasswordConfirmation:(NSString*)passwordConfirmation
     [request startAsynchronous];
 }
 */
+
+//Downloads an image from the server and passes the image through
++ (void)downloadImageDataAsynchronouslyWithId:(int)imageID withStyle:(NSString*)style
+                              withSuccess:(SuccessBlock)successBlock
+                              withFailure:(FailureBlock)failureBlock {
+    NSString* strUrl = [NSString stringWithFormat:@"http://parkify-rails.herokuapp.com/images/%d?image_attachment=true&style=%@", imageID, style];
+    
+    NSURL *url = [NSURL URLWithString:strUrl];
+    
+    
+    ASIHTTPRequest *_request = [ASIHTTPRequest requestWithURL:url];
+    __weak ASIHTTPRequest *request = _request;
+    
+    request.requestMethod = @"GET";
+    
+    
+    
+    [request setDelegate:self];
+    [request setCompletionBlock:^{
+        /*NSString *responseString = [request responseString];
+         NSMutableDictionary * root = [(NSDictionary*)[responseString JSONValue] mutableCopy];
+         [root setObject:image forKey:@"image"];*/
+        NSData* image = [request rawResponseData];
+        NSMutableDictionary * root = [NSMutableDictionary dictionaryWithObject:image forKey:@"image"];
+        successBlock(root);
+    }];
+    [request setFailedBlock:^{
+        failureBlock([request error]);
+    }];
+    
+    [request startAsynchronous];
+
+}
 
 @end
 

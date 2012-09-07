@@ -27,8 +27,10 @@
 @synthesize waitingMask = _waitingMask;
 
 @synthesize taxLabel = _taxLabel;
+@synthesize imageView = _imageView;
 @synthesize titleLable = _titleLable;
 
+@synthesize flashingSign = _flashingSign;
 @synthesize parkingSpots = _parkingSpots;
 @synthesize spot = _spot;
 @synthesize infoScrollView = _infoScrollView;
@@ -38,6 +40,11 @@
 @synthesize timeLabel = _timeLabel;
 @synthesize priceLabel = _priceLabel;
 @synthesize rangeBarContainer = _rangeBarContainer;
+
+@synthesize currentLat = _currentLat;
+@synthesize currentLong = _currentLong;
+
+@synthesize distanceString = _distanceString;
 
 //@synthesize startTime = _startTime;
 //@synthesize endTime = _endTime;
@@ -84,13 +91,19 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+    [self addPicture];
     
     
     NSDate* currentDate = [NSDate date];
     
     double currentTime = [currentDate timeIntervalSince1970];
     
-    //currentTime = currentTime - fmod(currentTime,1800); 
+    //currentTime = currentTime - fmod(currentTime,1800);
+    
+    double timeLeft = [self.spot endTime] - currentTime;
+    
+    timeLeft = timeLeft - fmod(timeLeft,1800);
+    timeLeft = MIN(timeLeft, 9*60*60);
     
     Formatter formatter = ^(double val) {
         NSDate* time = [[NSDate alloc] initWithTimeIntervalSince1970:val];
@@ -98,7 +111,7 @@
         [dateFormatter setDateFormat:@"h:mm a"];
         return [dateFormatter stringFromDate:time]; };
     
-    self.rangeBar = [[RangeBar alloc] initWithFrame:[self.rangeBarContainer bounds] minVal:currentTime maxVal:currentTime + 9*60*60 minRange:30*60 selectedMaxVal:currentTime + 6.25*60*60 withValueFormatter:formatter];    
+    self.rangeBar = [[RangeBar alloc] initWithFrame:[self.rangeBarContainer bounds] minVal:currentTime maxVal:currentTime + 9*60*60 minRange:30*60 selectedMaxVal:currentTime + timeLeft withValueFormatter:formatter];
     //^(double val){return [@"Foo";}
     
     [self.rangeBar addTarget:self action:@selector(timeIntervalChanged) forControlEvents:UIControlEventValueChanged];
@@ -118,6 +131,9 @@
 }
 
 - (void)timeIntervalChanged{
+    [UIView animateWithDuration:1.2 animations:^{
+        self.flashingSign.alpha = 0;
+    }];
     [self updateInfo];
 }
 
@@ -133,6 +149,8 @@
     [self setTimeDurationLabel:nil];
     [self setInfoWebView:nil];
     [self setInfoScrollView:nil];
+    [self setFlashingSign:nil];
+    [self setImageView:nil];
     [super viewDidUnload];
     // Release any retained subviews of the main view.
 }
@@ -142,7 +160,7 @@
     return (interfaceOrientation == UIInterfaceOrientationPortrait);
 }
 
-- (void)spotsWereUpdated {
+- (void)spotsWereUpdatedWithCount:(NSString *)count withLevelOfDetail:(NSString *)lod withSpot:(int)spotID {
     self.spot = [self.parkingSpots parkingSpotForID:self.spot.mID];
 }
 
@@ -161,7 +179,9 @@
     NSString* infoWebViewString;
     NSString* styleString = @"<style type=\"text/css\">"
     //"body { background-color:transparent; font-family:Marker Felt; font-size:12; color:white}"
-    "body { background-color:transparent; font-family:\"Arial Rounded MT Bold\"; font-size:12; color:white}"
+    ".top { background-color:transparent; font-family:\"Arial Rounded MT Bold\"; font-size:14; color:black }"
+    ".mid { background-color:transparent; font-family:\"Arial Rounded MT Bold\"; font-size:10; color:#A9A9A9 }"
+    ".bottom { background-color:transparent; font-family:\"Arial Rounded MT Bold\"; font-size:16; color:black }"
     "</style>";
     if(self.spot == nil) {
         infoWebViewString = [NSString stringWithFormat:@"<html>%@<body>Spot Not Available.</body></html>", styleString];
@@ -169,18 +189,18 @@
     else {
         //Info web view text
         infoWebViewString = [NSString stringWithFormat:@"<html>%@<body>"
-                             "<p>SpotID: %@<br/>"
-                             "Distance Away: %0.2f miles</br>"
-                             "Difficulty: %@</br>"
-                             "Covered: %@</br>"
-                             "Current Rate: $%0.2f/hr</p>"
+                             "<span class=top>Distance Away: %@</span></br>"
+                             "<span class=mid>%@</span></br>"
+                             "<span class=mid>Difficulty: %@</span></br>"
+                             "<span class=mid>Covered: %@</span></br>"
+                             "<span class=bottom>Current Rate: $%0.2f/hr</span><hr/></p>"
                              "</body></html>",
                              styleString,
-                             @"blah",
-                             0.25,
-                             @"HARD",
-                             @"Yes",
-                             self.spot.mPrice];
+                             self.distanceString,
+                             self.spot.mAddress,
+                             self.spot.mSpotDifficulty,
+                             self.spot.mSpotCoverage,
+                             [self.spot currentPrice]];
     }
     [self.infoWebView loadHTMLString:infoWebViewString baseURL:nil];
     
@@ -211,8 +231,7 @@
         timeDurationString = @"";
     }
     else {
-        infoTitle = [NSString stringWithFormat:@"%@ Spot #%d", 
-                     self.spot.mCompanyName, self.spot.mLocalID];
+        infoTitle = [NSString stringWithFormat:@"Parkify Spot"];
         infoBody = self.spot.mDesc; 
         
         //Time text
@@ -225,18 +244,21 @@
         timeString = [NSString stringWithFormat:@"Time Booked: %@ - %@", formatter(self.rangeBar.selectedMinimumValue), formatter(self.rangeBar.selectedMaximumValue)];
         
         //Price text
-        double durationInHours = (self.rangeBar.selectedMaximumValue - self.rangeBar.selectedMinimumValue)/3600;
-        double totalPrice = self.spot.mPrice * durationInHours;
-        priceString = [NSString stringWithFormat:@"Total Price: $%0.2f", totalPrice];
+        double durationInSeconds = (self.rangeBar.selectedMaximumValue - self.rangeBar.selectedMinimumValue);
+        ParkingSpot* spot = self.spot;
+        double totalPrice = [spot priceFromNowForDurationInSeconds:durationInSeconds];
+        
+        priceString = [NSString stringWithFormat:@"$%0.2f", totalPrice];
         
         //TimeDuration text
-        timeDurationString = [NSString stringWithFormat:@"%0.1f hr", durationInHours];
+        timeDurationString = [NSString stringWithFormat:@"%0.1f", durationInSeconds/3600];
         
     }
     
     CGAffineTransform squish = [TextFormatter transformForSpotViewText];
     self.taxLabel.transform = squish;
-    self.titleLable.text = infoTitle;  
+    self.titleLable.text = infoTitle;
+    [self setTitle:infoTitle];
     [self.infoBox setText:infoBody];
     self.timeLabel.text = timeString;
     self.timeLabel.transform = squish;
@@ -246,7 +268,8 @@
 }
 
 - (IBAction)parkButtonTapped:(UIButton *)sender {
-    if (NO_SERVICE_DEBUG) {
+    BOOL notransactiondebug = false;
+    if (notransactiondebug) {
         [self switchToConfirmation];
         return;
     }
@@ -255,8 +278,11 @@
         [Api authenticateModallyFrom:self withSuccess:^(NSDictionary * result){}];
         return;
     } else {
+        double durationInSeconds = (self.rangeBar.selectedMaximumValue - self.rangeBar.selectedMinimumValue);
+        double totalPrice = [self.spot priceFromNowForDurationInSeconds:durationInSeconds];
+        NSString* lastfourdigits = [Persistance retrieveLastFourDigits];
         UIAlertView* areYouSure = [[UIAlertView alloc] initWithTitle:@"Are you sure?"
-                                                          message:@"Amount of ** will be charged to credit card ending in *** for this purchase."
+                                                          message:[NSString stringWithFormat:@"Amount of %0.2f will be charged to credit card ending in %@ for this purchase.", totalPrice,lastfourdigits]
                                                          delegate:self
                                                 cancelButtonTitle:@"Cancel"
                                                 otherButtonTitles:@"Yes", nil];
@@ -291,8 +317,16 @@
         ParkifyConfirmationViewController* controller = [mainStoryboard instantiateViewControllerWithIdentifier: @"ConfirmationVC"];
         
         controller.spot = self.spot;
-        controller.startTime = self.rangeBar.selectedMinimumValue;
+        [Persistance saveCurrentSpotId:self.spot.mID];
+        controller.startTime = self.rangeBar. selectedMinimumValue;
+        [Persistance saveCurrentStartTime:controller.startTime];
         controller.endTime = self.rangeBar.selectedMaximumValue;
+        [Persistance saveCurrentEndTime:controller.endTime];
+        
+        controller.currentLat = self.currentLat;
+        controller.currentLong = self.currentLong;
+        
+        [Persistance saveCurrentSpot:self.spot];
         
         parent.modalTransitionStyle = UIModalTransitionStyleCoverVertical;
         [parent presentViewController:controller animated:true completion:^{}];
@@ -302,11 +336,15 @@
 
 - (void) attemptMakeTransaction {
     
+    NSMutableArray* offerIds = [[NSMutableArray alloc] init];
+    for (Offer* offer in self.spot.offers) {
+        if ([offer overlapsWithStartTime:self.rangeBar.selectedMinimumValue endTime:self.rangeBar.selectedMaximumValue])
+        [offerIds addObject:[NSNumber numberWithInt:offer.mId]];
+    }
     
-    id transactionRequest = [Authentication makeTransactionRequestWithUserToken:[Persistance retrieveAuthToken] withSpotId:self.spot.mID withStartTime:self.rangeBar.selectedMinimumValue withEndTime:self.rangeBar.selectedMaximumValue];
+    id transactionRequest = [Authentication makeTransactionRequestWithUserToken:[Persistance retrieveAuthToken] withSpotId:self.spot.mID withStartTime:self.rangeBar.selectedMinimumValue withEndTime:self.rangeBar.selectedMaximumValue withOfferIds:offerIds];
     
-    
-    NSString* urlString = [[NSString alloc] initWithFormat:@"http://swooplot.herokuapp.com/api/transactions.json?auth_token=%@", [Persistance retrieveAuthToken]];
+    NSString* urlString = [[NSString alloc] initWithFormat:@"https://parkify-rails.herokuapp.com/api/v1/acceptances.json?auth_token=%@", [Persistance retrieveAuthToken]];
     NSURL *url = [NSURL URLWithString:urlString];
     
     
@@ -333,6 +371,8 @@
         } else {
             self.errorLabel.text = [root objectForKey:@"error"];
             self.errorLabel.hidden = false;
+            [self.waitingMask removeFromSuperview];
+            self.waitingMask = nil;
         }
         
         NSLog(@"Response: %@", responseString);
@@ -340,7 +380,8 @@
         
     }];
     [request setFailedBlock:^{
-        
+        [self.waitingMask removeFromSuperview];
+        self.waitingMask = nil;
         //[UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
         NSError *error = [request error];
         NSLog(@"Error: %@", error.localizedDescription);
@@ -402,10 +443,24 @@
 
 - (void)refreshSpots
 {
-    [self.parkingSpots updateWithRequest:nil];
+    [self.parkingSpots updateWithRequest:[NSDictionary dictionaryWithObject:@"all" forKey:@"level_of_detail"]];
 }
 
-- (IBAction)closeButtonTapped:(UIButton *)sender {
+
+- (IBAction)closeButtonTapped:(id)sender {
     [self dismissViewControllerAnimated:true completion:^{}];
 }
+
+
+-  (void)addPicture {
+    if (self.spot.imageIDs != NULL && [self.spot.imageIDs count] != 0) {
+        int imageID = [[self.spot.imageIDs objectAtIndex:0] intValue];
+        [Api downloadImageDataAsynchronouslyWithId:imageID withStyle:@"original" withSuccess:^(NSDictionary * result) {
+            self.imageView.image = [UIImage imageWithData:[result objectForKey:@"image"]];
+        } withFailure:^(NSError * err) {
+            ;
+        }];
+    }
+}
+
 @end

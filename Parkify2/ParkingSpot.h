@@ -8,59 +8,95 @@
 
 #import <Foundation/Foundation.h>
 #import <MapKit/MapKit.h>
+#import "Offer.h"
 
-@class ParkingSpot;
+@class ParkingSpotCollection;
 
 @protocol ParkingSpotObserver <NSObject>
 
--(void)spotsWereUpdated;
+-(void)spotsWereUpdatedWithCount:(NSString*)count withLevelOfDetail:(NSString*)lod withSpot:(int)spotID;
 
 @end
 
-@interface ParkingSpotCollection : NSObject
-- (ParkingSpot*)parkingSpotForID:(int)key;
-- (id)initFromJSONString:(NSString*)strJson;
-- (void)updateFromJSONString:(NSString*)strJson;
-- (void)updateWithRequest:(id)Request;
-@property (nonatomic, strong) NSDictionary* parkingSpots;
-@property (nonatomic, weak) id <ParkingSpotObserver> observerDelegate;
-- (ParkingSpot*)closestAvailableSpotToCoord:(CLLocationCoordinate2D)coord;
-@end
 
-@interface ParkingSpot : NSObject {
-    int _mID;
-    double _mLat;
-    double _mLong;
-    NSString *_mCompanyName;
-    int _mLocalID;
-    double _mPrice;
-    NSString *_mPhoneNumber;
-    NSString *_mDesc;
-    Boolean _mFree;
-    
-    Boolean _mRemove;
-}
+@interface ParkingSpot : NSObject
 
+@property (strong, nonatomic) ParkingSpotCollection* parentCollection;
 
 
 @property int mID;
 @property double mLat;
 @property double mLong;
-@property (copy) NSString *mCompanyName;
-@property int mLocalID;
-@property double mPrice;
-@property (copy) NSString *mPhoneNumber;
-@property (copy) NSString *mDesc;
+
+@property (strong, nonatomic) NSString* mLocationName;
+@property (strong, nonatomic) NSString* mSpotName;
+
+
+
+@property (strong, nonatomic) NSString *mDesc;
 @property Boolean mFree;
 @property Boolean mRemove;
+@property (strong, nonatomic) NSArray* offers;
+
+@property (strong, nonatomic) NSString* mSpotLayout;
+@property (strong, nonatomic) NSString* mSpotDifficulty;
+@property (strong, nonatomic) NSString* mSpotCoverage;
+@property (strong, nonatomic) NSString* mSpotSignage;
+@property (strong, nonatomic) NSString* mSpotType;
+
+@property (strong, nonatomic) NSString* mAddress;
+@property (strong, nonatomic) NSString* mDirections;
+
+@property (strong, nonatomic) NSArray* imageIDs;
+
+
+@property int offerID;
 
 
 - (id)initWithID:(int)idIn lat:(double)latIn
-             lng:(double)lngIn companyName:(NSString*)companyNameIn
-         localID:(int)localIDIn price:(double)priceIn
-     phoneNumber:(NSString*)phoneNumberIn desc:(NSString*)descIn
-            free:(Boolean)freeIn;
+             lng:(double)lngIn locationName:(NSString*)locationNameIn
+        spotName:(NSString*)spotNameIn
+            free:(Boolean)freeIn
+        spotType:(NSString*)spotTypeIn
+       imageIDs:(NSArray*)imageIDsIn
+
+      spotLayout:(NSString*)spotLayoutIn
+  spotDifficulty:(NSString*)spotDifficultyIn
+    spotCoverage:(NSString*)spotCoverageIn
+     spotSignage:(NSString*)spotSignageIn;
+
+- (id)initWithID:(int)idIn lat:(double)latIn
+             lng:(double)lngIn locationName:(NSString*)locationNameIn
+        spotName:(NSString*)spotNameIn
+            free:(Boolean)freeIn
+        spotType:(NSString*)spotTypeIn
+       imageIDs:(NSArray*)imageIDsIn
+
+      spotLayout:(NSString*)spotLayoutIn
+  spotDifficulty:(NSString*)spotDifficultyIn
+    spotCoverage:(NSString*)spotCoverageIn
+     spotSignage:(NSString*)spotSignageIn
+
+            desc:(NSString*)descIn
+          offers:(NSArray*)offersIn
+         address:(NSString*)addrIn
+      directions:(NSString*)dirIn;
+
+- (double) currentPrice;
+
+- (double) endTime;
+
+- (double) priceFromNowForDurationInSeconds:(double)duration;
+
+- (void) updateAsynchronouslyWithLevelOfDetail:(NSString*)lod;
+
+- (BOOL) updateFromDictionary:(NSDictionary*)spot withLevelOfDetail:(NSString*)levelOfDetail;
+
+- (NSDictionary*) asDictionary;
+
 @end
+
+
 
 @interface ParkingSpotAnnotation : NSObject <MKAnnotation> 
 

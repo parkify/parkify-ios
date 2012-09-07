@@ -14,4 +14,6 @@
 @interface TextFormatter : NSObject
 + (CGAffineTransform) transformForSpotViewText;
 + (CGAffineTransform) transformForSignupViewText;
++ (NSString*) formatDistanceClose:(double)distanceInMiles;
++ (NSString*) formatIdString:(int)idIn;
 @end

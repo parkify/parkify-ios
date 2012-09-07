@@ -37,7 +37,6 @@
 }
 
 
-
 +(void)saveAuthToken:(NSString*)token { 
     [Persistance saveRecord:token withName:@"AuthToken"];
 }
@@ -45,18 +44,81 @@
     return [Persistance retrieveRecordwithName:@"AuthToken"];
 }
 
-/*
-+(void)saveShadowLastFourDigits:(NSString*)token { 
-    [Persistance saveRecord:token withName:@"ShadowLastFourDigits"];
+
++(void)saveLicensePlateNumber:(NSString*)lpn {
+    [Persistance saveRecord:lpn withName:@"LicensePlateNumber"];
 }
-+(NSString*)retrieveShadowLastFourDigits { 
-    return [Persistance retrieveRecordwithName:@"ShadowLastFourDigits"];
++(NSString*)retrieveLicensePlateNumber {
+    return [Persistance retrieveRecordwithName:@"LicensePlateNumber"];
+}
+
++(void)saveLastFourDigits:(NSString*)lfd {
+    [Persistance saveRecord:lfd withName:@"LastFourDigits"];
+}
++(NSString*)retrieveLastFourDigits {
+    return [Persistance retrieveRecordwithName:@"LastFourDigits"];
+
+}
+
++(void)saveLastAmountCharged:(double)lac {
+    [Persistance saveRecord:[NSNumber numberWithDouble:lac] withName:@"LastAmountCharged"];
+}
++(double)retrieveLastAmountCharged {
+    return [[Persistance retrieveRecordwithName:@"LastAmountCharged"] doubleValue];
 }
 
 
-+(NSString*)retrieve {
-    
++(void)saveCurrentSpotId:(int)spotId{
+    if (spotId == -1) {
+        [Persistance saveRecord:nil withName:@"CurrentSpotId"];
+    } else {
+        [Persistance saveRecord:[NSNumber numberWithInt:spotId] withName:@"CurrentSpotId"];
+    }
 }
-+(NSString*)retrieveShadowLicensePlate;
-*/
++(int)retrieveCurrentSpotId {
+    return [[Persistance retrieveRecordwithName:@"CurrentSpotId"] intValue];
+}
+
+
+
++(void)saveCurrentStartTime:(double)timeIn {
+    if (timeIn == -1) {
+        [Persistance saveRecord:nil withName:@"CurrentStartTime"];
+    } else {
+        [Persistance saveRecord:[NSNumber numberWithDouble:timeIn] withName:@"CurrentStartTime"];
+    }
+}
++(double)retrieveCurrentStartTime {
+    return [[Persistance retrieveRecordwithName:@"CurrentStartTime"] doubleValue];
+}
+
++(void)saveCurrentEndTime:(double)timeIn {
+    if (timeIn == -1) {
+        [Persistance saveRecord:nil withName:@"CurrentEndTime"];
+    } else {
+        [Persistance saveRecord:[NSNumber numberWithDouble:timeIn] withName:@"CurrentEndTime"];
+    }
+}
++(double)retrieveCurrentEndTime {
+    return [[Persistance retrieveRecordwithName:@"CurrentEndTime"] doubleValue];
+}
+
++(void)saveCurrentSpot:(ParkingSpot*)spot {
+    if (spot) {
+        [Persistance saveRecord:[spot asDictionary] withName:@"CurrentSpot"];
+    } else {
+        [Persistance saveRecord:nil withName:@"CurrentSpot"];
+    }
+}
+
++(ParkingSpot*)retrieveCurrentSpot {
+    if([Persistance retrieveRecordwithName:@"CurrentSpot"]) {
+        ParkingSpot* toRtn = [[ParkingSpot alloc] init];
+        [toRtn updateFromDictionary:[Persistance retrieveRecordwithName:@"CurrentSpot"] withLevelOfDetail:@"all"];
+        return toRtn;
+    } else {
+        return nil;
+    }
+}
+
 @end

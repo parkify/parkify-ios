@@ -29,6 +29,12 @@
 @end
 
 @implementation ParkifySignInPageViewController
+@synthesize LoginButton = _LoginButton;
+@synthesize loginLabel = _loginLabel;
+@synthesize emailLabel = _emailLabel;
+@synthesize passwordLabel = _passwordLabel;
+@synthesize signUpButton = _signUpButton;
+@synthesize signUpLabel = _signUpLabel;
 @synthesize errorLabel = _errorLabel;
 @synthesize emailField = _emailField;
 @synthesize passwordField = _passwordField;
@@ -46,6 +52,43 @@
     return self;
 }
 
+- (void) updatePage {
+    //[self registerForKeyboardNotifications];
+	// Do any additional setup after loading the view.
+    CGRect frame = self.LoginButton.titleLabel.frame;
+    frame.size.width += 20;
+    //self.LoginButton.titleLabel.frame = frame;
+    
+    if (![Persistance retrieveAuthToken]) {
+        //logged out
+        self.emailField.alpha = 1;
+        self.passwordField.alpha = 1;
+        self.emailLabel.alpha = 1;
+        self.passwordLabel.alpha = 1;
+        self.signUpButton.alpha = 1;
+        self.signUpLabel.alpha = 1;
+        self.loginLabel.text = @"Log in";
+    } else {
+        //logged in
+        self.emailField.alpha = 0;
+        self.passwordField.alpha = 0;
+        self.signUpButton.alpha = 0;
+        self.signUpLabel.alpha = 0;
+        self.emailLabel.alpha = 0;
+        self.passwordLabel.alpha = 0;
+        
+        
+        self.loginLabel.text = @"Log out";
+    }
+    
+    //Setup delegates
+    self.emailField.delegate = self;
+    self.passwordField.delegate = self;
+    
+    [self setUpTextField:self.emailField];
+    [self setUpTextField:self.passwordField];
+    
+}
 
 
 - (void)viewDidLoad
@@ -55,17 +98,9 @@
         [self dismissModalViewControllerAnimated:YES];
     }
     
-    //[self registerForKeyboardNotifications];
-	// Do any additional setup after loading the view.
     
+    [self updatePage];
     
-    
-    //Setup delegates
-    self.emailField.delegate = self;
-    self.passwordField.delegate = self;
-    
-    [self setUpTextField:self.emailField];
-    [self setUpTextField:self.passwordField];
 }
 
 - (void)setUpTextField:(UITextField*) tf {
@@ -87,6 +122,12 @@
     [self setPasswordField:nil];
     [self setErrorLabel:nil];
     [self setScrollView:nil];
+    [self setLoginButton:nil];
+    [self setSignUpButton:nil];
+    [self setSignUpLabel:nil];
+    [self setEmailLabel:nil];
+    [self setPasswordLabel:nil];
+    [self setLoginLabel:nil];
     [super viewDidUnload];
     // Release any retained subviews of the main view.
 }
@@ -126,16 +167,24 @@
 }
 
 - (IBAction)loginButtonPressed:(UIButton *)sender {
-    [Api loginWithEmail:self.emailField.text 
-           withPassword:self.passwordField.text 
-            withSuccess:^(NSDictionary * result) {
-                [self handleLoginSuccess:result];
-        } 
-            withFailure:^(NSError * result) {
-                [self handleLoginFailure:result];
-        }
-     ];
-    /*
+    
+    if (![Persistance retrieveAuthToken]) {
+        [Api loginWithEmail:self.emailField.text
+               withPassword:self.passwordField.text
+                withSuccess:^(NSDictionary * result) {
+                    [self handleLoginSuccess:result];
+                }
+                withFailure:^(NSError * result) {
+                    [self handleLoginFailure:result];
+                }
+         ];
+    } else {
+        [self logoutButtonPressed:nil];
+        [self updatePage];
+    }
+    
+    
+        /*
     if([self verifyLoginWithEmail:self.emailField.text withPassword:self.passwordField.text]) {
         //Go to map view with correct user.
         [self performSegueWithIdentifier:@"ViewMapFromFront" sender:self];
@@ -180,6 +229,11 @@
     //Escape from modal
     NSDictionary* results = [NSDictionary dictionaryWithObjectsAndKeys:@"cancel",@"exit", nil];
     [((ModalSettingsController*)self.tabBarController) exitWithResults:results]; 
+}
+
+- (IBAction)resetPasswordTapped:(id)sender {
+    NSURL *url = [NSURL URLWithString:@"http://parkify-rails.herokuapp.com"];
+    [[UIApplication sharedApplication] openURL:url];
 }
 
 - (IBAction)logoutButtonPressed:(UIButton *)sender {

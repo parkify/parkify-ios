@@ -36,12 +36,13 @@
     return token;
 }
 
-+ (id) makeTransactionRequestWithUserToken:(NSString*)token withSpotId:(int)spotID withStartTime:(double)startTime withEndTime:(double)endTime {        
++ (id) makeTransactionRequestWithUserToken:(NSString*)token withSpotId:(int)spotID withStartTime:(double)startTime withEndTime:(double)endTime withOfferIds:(NSArray*)offerIds {
     NSDictionary *request =  [NSDictionary dictionaryWithObjectsAndKeys:
                               token, @"authentication_token",
                               [[NSNumber alloc] initWithInt:spotID], @"parking_spot_id", 
                                   [[NSNumber alloc] initWithDouble:startTime], @"start_time",
-                                  [[NSNumber alloc] initWithDouble:endTime], @"end_time", nil];
+                                  [[NSNumber alloc] initWithDouble:endTime], @"end_time",
+                              offerIds, @"offer_ids", nil];
         return request;
 }
 

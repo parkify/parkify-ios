@@ -27,11 +27,13 @@
 {
     
     [super viewDidLoad];
+    [self performSegueWithIdentifier:@"ViewMainFromFront" sender:self];
 	// Do any additional setup after loading the view.
 }
 
 - (void)viewWillAppear:(BOOL)animated {
     [self.navigationController setNavigationBarHidden:YES animated:animated];
+    
     [super viewWillAppear:animated];
 }
 
@@ -39,7 +41,7 @@
 {
     
     [super viewDidAppear:animated];
-    [self performSegueWithIdentifier:@"ViewMainFromFront" sender:self];
+    
 }
 
 - (void)viewDidUnload
@@ -55,7 +57,7 @@
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
     if ([segue.identifier isEqualToString:@"ViewMainFromFront"]) {
-        sleep(1.0);
+        //sleep(1.0);
     }
 }
 

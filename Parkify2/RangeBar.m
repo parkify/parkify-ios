@@ -32,27 +32,19 @@
 #define TRACK_BACKGROUND_WIDTH WORKABLE_AREA_WIDTH
 #define TRACK_BACKGROUND_HEIGHT WORKABLE_AREA_HEIGHT
 
-/*
- #define THUMB_DIAMETER 38
- //#define EFFECTIVE_THUMB_DIAMETER 44
- 
- #define TRACK_WIDTH 11
- #define TRACK_HEIGHT 271
- #define TRACK_BACKGROUND_WIDTH 11
- #define TRACK_BACKGROUND_HEIGHT 271
- */
 
-#define CALLOUT_HEIGHT_MAIN (55*0.65)
-#define CALLOUT_HEIGHT_ARROW (29*0.65)
+#define CALLOUT_HEIGHT_MAIN (55*0.42)
+#define CALLOUT_HEIGHT_ARROW (0)
 #define CALLOUT_HEIGHT (CALLOUT_HEIGHT_MAIN+CALLOUT_HEIGHT_ARROW)
-#define CALLOUT_WIDTH (142*0.65) //93
+#define CALLOUT_WIDTH (142*0.45) //93
 
-#define CALLOUT_OFFSET_VERTICAL -3
+#define CALLOUT_OFFSET_VERTICAL -15
 #define CALLOUT_OFFSET_HORIZONTAL   0
 
-#define CALLOUT_TEXT_SIZE 20
+#define CALLOUT_TEXT_SIZE 13
 #define CALLOUT_TEXT_COLOR [UIColor colorWithRed:226.0/255 green:226.0/255 blue:226.0/255 alpha:1]
 
+#define LABEL_TO_LABEL_VERTICAL_OFFSET -CALLOUT_HEIGHT_MAIN
 @interface RangeBar() 
 
 @property BOOL maxThumbOn;
@@ -65,6 +57,9 @@
 @property (strong, nonatomic) UIImageView * trackBackground;
 @property (strong, nonatomic) UILabel * minLabel;
 @property (strong, nonatomic) UILabel * maxLabel;
+
+@property (strong, nonatomic) UILabel * startTimeLabel;
+@property (strong, nonatomic) UILabel * endTimeLabel;
 
 @property (strong, nonatomic) UIImageView * minLabelBackground;
 @property (strong, nonatomic) UIImageView * maxLabelBackground;
@@ -101,6 +96,8 @@
 @synthesize trackBackground = _trackBackground;
 @synthesize minLabel = _minLabel;
 @synthesize maxLabel = _maxLabel;
+@synthesize startTimeLabel = _startTimeLabel;
+@synthesize endTimeLabel = _endTimeLabel;
 @synthesize minLabelBackground = _minLabelBackground;
 @synthesize maxLabelBackground = _maxLabelBackground;
 
@@ -128,7 +125,7 @@
         self.maxLimit = selectedMaxVal;
         
         //track background
-        UIImage* imgRed = [UIImage imageWithImage:[UIImage imageNamed:@"slider_red_background.png"] scaledToSize:CGSizeMake(TRACK_BACKGROUND_WIDTH, TRACK_BACKGROUND_HEIGHT)];
+        UIImage* imgRed = [UIImage imageWithImage:[UIImage imageNamed:@"slider_dark_background.png"] scaledToSize:CGSizeMake(TRACK_BACKGROUND_WIDTH, TRACK_BACKGROUND_HEIGHT)];
         self.trackBackground = [[UIImageView alloc] initWithImage:imgRed];
         self.trackBackground.contentMode = UIViewContentModeLeft;
         
@@ -178,11 +175,11 @@
         [self addSubview:self.maxThumb];
         
         //Label Backgrounds
-        self.minLabelBackground = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"callout_background.png"]];
+        self.minLabelBackground = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"callout_time_label.png"]];
         self.minLabelBackground.frame = CGRectMake(0,0, CALLOUT_WIDTH, CALLOUT_HEIGHT);
         [self addSubview:self.minLabelBackground];
         
-        self.maxLabelBackground = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"slider_callout_background.png"]];
+        self.maxLabelBackground = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"callout_time_label.png"]];
         self.maxLabelBackground.frame = CGRectMake(0,0, CALLOUT_WIDTH, CALLOUT_HEIGHT);
         [self addSubview:self.maxLabelBackground];
         
@@ -194,6 +191,7 @@
         self.minLabel.font = [UIFont fontWithName:@"Arial Rounded MT Bold" size:(CALLOUT_TEXT_SIZE)];
         self.minLabel.text = @"";
         [self.minLabelBackground addSubview:self.minLabel];
+        
         self.maxLabel = [[UILabel alloc] initWithFrame:CGRectMake(0,0,80,35)];
         self.maxLabel.textColor = CALLOUT_TEXT_COLOR;
         self.maxLabel.backgroundColor = [UIColor clearColor];
@@ -201,12 +199,31 @@
         self.maxLabel.text = @"";
         [self.maxLabelBackground addSubview:self.maxLabel];
         
+        self.startTimeLabel = [[UILabel alloc] initWithFrame:CGRectMake(0,0,80,35)];
+        self.startTimeLabel.textColor = CALLOUT_TEXT_COLOR;
+        self.startTimeLabel.backgroundColor = [UIColor clearColor];
+        self.startTimeLabel.font = [UIFont fontWithName:@"Arial Rounded MT Bold" size:(CALLOUT_TEXT_SIZE)];
+        self.startTimeLabel.text = @"Start Time";
+        self.startTimeLabel.textAlignment = UITextAlignmentCenter;
+        [self.minLabelBackground addSubview:self.startTimeLabel];
+        
+        self.endTimeLabel = [[UILabel alloc] initWithFrame:CGRectMake(0,0,80,35)];
+        self.endTimeLabel.textColor = CALLOUT_TEXT_COLOR;
+        self.endTimeLabel.backgroundColor = [UIColor clearColor];
+        self.endTimeLabel.font = [UIFont fontWithName:@"Arial Rounded MT Bold" size:(CALLOUT_TEXT_SIZE)];
+        self.endTimeLabel.text = @"End Time";
+        self.endTimeLabel.textAlignment = UITextAlignmentCenter;
+        [self.maxLabelBackground addSubview:self.endTimeLabel];
+        
+        
+        
+    
 
         
         [self updateMinLabel];
         [self updateMaxLabel];
-        self.minLabelBackground.alpha = 0;
-        self.maxLabelBackground.alpha = 0;
+        //self.minLabelBackground.alpha = 0;
+        //self.maxLabelBackground.alpha = 0;
     }
     return self;
 }
@@ -228,6 +245,7 @@
 
 
 - (void) handleEndTouch {
+    /*
     if(self.minThumbOn) {
         [UIView animateWithDuration:.5
                          animations: ^{[self.minLabelBackground setAlpha:0];}
@@ -241,6 +259,7 @@
                          completion: ^ (BOOL finished) {
                          }];
     }
+     */
     self.minThumbOn = false;
     self.maxThumbOn = false;
 }
@@ -361,27 +380,39 @@
     CGSize expectedLabelSize = [strToSet sizeWithFont:self.minLabel.font];
     self.minLabel.frame = CGRectMake( (CALLOUT_WIDTH - expectedLabelSize.width)/2, (CALLOUT_HEIGHT_MAIN - expectedLabelSize.height)/2, expectedLabelSize.width , expectedLabelSize.height);
     self.minLabel.text = strToSet;
-    
+    /*
     self.minLabelBackground.frame = CGRectMake(self.minThumb.center.x - self.minThumb.frame.size.width/2 - CALLOUT_WIDTH + CALLOUT_OFFSET_HORIZONTAL,
                                                self.minThumb.center.y - self.minLabelBackground.frame.size.height/2 + CALLOUT_OFFSET_VERTICAL,
                                                self.minLabelBackground.frame.size.width,
                                                self.minLabelBackground.frame.size.height);
+     */
+    self.minLabelBackground.frame = CGRectMake([self xForValue:self.minimumValue]-self.minLabelBackground.frame.size.width + CALLOUT_OFFSET_HORIZONTAL,
+                                               self.maxThumb.center.y - self.maxThumb.frame.size.height/2 - CALLOUT_HEIGHT + CALLOUT_OFFSET_VERTICAL,
+                                               self.minLabelBackground.frame.size.width,
+                                               self.minLabelBackground.frame.size.height);
     [self.minLabelBackground setAlpha:1];
+    
+    self.startTimeLabel.center = CGPointMake(self.minLabel.center.x, self.minLabel.center.y + LABEL_TO_LABEL_VERTICAL_OFFSET);
     
 }
 
 -(void)updateMaxLabel {
     NSString* strToSet = self.labelFormatter(self.selectedMaximumValue);
     CGSize expectedLabelSize = [strToSet sizeWithFont:self.maxLabel.font];
+    
+    
     self.maxLabel.frame = CGRectMake( (CALLOUT_WIDTH - expectedLabelSize.width)/2, (CALLOUT_HEIGHT_MAIN - expectedLabelSize.height)/2, expectedLabelSize.width , expectedLabelSize.height);
     self.maxLabel.text = strToSet;
     
-    self.maxLabelBackground.frame = CGRectMake(self.maxThumb.center.x - self.maxLabelBackground.frame.size.width/2 + CALLOUT_OFFSET_HORIZONTAL,
+    double newX = MAX(self.maxThumb.center.x - self.maxLabelBackground.frame.size.width/2 + CALLOUT_OFFSET_HORIZONTAL, [self xForValue:self.minimumValue]);
+    
+    self.maxLabelBackground.frame = CGRectMake(newX,
                                                self.maxThumb.center.y - self.maxThumb.frame.size.height/2 - CALLOUT_HEIGHT + CALLOUT_OFFSET_VERTICAL,
                                                self.maxLabelBackground.frame.size.width,
                                                self.maxLabelBackground.frame.size.height);
     
-    [self.maxLabelBackground setAlpha:1];
+    self.endTimeLabel.center = CGPointMake(self.maxLabel.center.x, self.maxLabel.center.y + LABEL_TO_LABEL_VERTICAL_OFFSET);
+    //[self.maxLabelBackground setAlpha:1];
     
     /*
      
