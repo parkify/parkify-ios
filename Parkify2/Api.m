@@ -14,6 +14,7 @@
 #import "ModalSettingsController.h"
 #import "Persistance.h"
 #import "iToast.h"
+#import "ParkifyWebViewWrapperController.h"
 
 #define TESTING_V1 true
 
@@ -330,6 +331,18 @@ withPasswordConfirmation:(NSString*)passwordConfirmation
     parent.modalTransitionStyle = style;
 }
 
+//Called to bring up SettingsVC modally
++ (void)webWrapperModallyFrom:(UIViewController*)parent withURL:(NSString*)url {
+    UIStoryboard *mainStoryboard = [UIStoryboard storyboardWithName:@"MainStoryboard_iPhone"
+                                                             bundle: nil];
+    
+    ParkifyWebViewWrapperController* controller = [mainStoryboard instantiateViewControllerWithIdentifier: @"WebWrapperVC"];
+    controller.url = url;
+    UIModalTransitionStyle style = parent.modalTransitionStyle;
+    //parent.modalTransitionStyle = UIModalTransitionStyleCrossDissolve;
+    [parent presentViewController:controller animated:true completion:^{}];
+    parent.modalTransitionStyle = style;
+}
 
 + (void)getParkingSpotWithID:(int)spotID
            withLevelofDetail:(NSString*)lod

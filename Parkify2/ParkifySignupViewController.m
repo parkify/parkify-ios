@@ -43,6 +43,7 @@
 @synthesize expirationMonthLabel = _expirationMonthLabel;
 @synthesize expirationYearLabel = _expirationYearLabel;
 @synthesize licensePlateLabel = _licensePlateLabel;
+@synthesize scrollView = _scrollView;
 @synthesize zipField = _zipField;
 @synthesize emailField = _emailField;
 @synthesize passwordField = _passwordField;
@@ -107,6 +108,10 @@
     [self setUpLabels:self.expirationYearLabel];
     [self setUpLabels:self.licensePlateLabel];
     
+    
+    CGRect frame = self.scrollView.frame;
+    frame.size.height = frame.size.height + 50;
+    self.scrollView.contentSize = frame.size;
 
     
     
@@ -120,14 +125,16 @@
 }
 
 - (void)setUpTextField:(UITextField*) tf {
-    tf.layer.cornerRadius=5.0f;
+    tf.layer.cornerRadius=8.0f;
     tf.layer.masksToBounds=YES;
     tf.layer.borderColor=[TEXTFIELD_BORDER_COLOR CGColor];
-    tf.layer.borderWidth=1.0f;
+    tf.layer.borderWidth=2.0f;
     
+    /*
     CGRect rect = tf.frame;
     rect.size.height = TEXTFIELD_HEIGHT;
     tf.frame = rect;
+     */
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -148,6 +155,7 @@
     [self setKeyboardAvoidingScrollView:nil];
     [self setZipField:nil];
     [self setZipField:nil];
+    [self setScrollView:nil];
     [super viewDidUnload];
     // Release any retained subviews of the main view.
 }
@@ -233,4 +241,7 @@ withPasswordConfirmation:self.passwordField.text
 }
 
 
+- (IBAction)tosButtonTapped:(id)sender {
+    [Api webWrapperModallyFrom:self withURL:@"http://www.parkify.me/tos?view=iphone"];
+}
 @end

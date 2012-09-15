@@ -302,7 +302,7 @@ typedef struct STargetLocation {
         self.
         self.mapView.alpha = .5;
         */
-        [self updateBottomBar];
+        
         [self.mapView setNeedsDisplay];
         
         //[UIView animateWithDuration:5
@@ -311,6 +311,7 @@ typedef struct STargetLocation {
 
         
     }
+   
     
     
     //[[UISearchBar appearance]setSearchFieldBackgroundImage:[UIImage imageNamed:@"crosshair.png"] forState:UIControlStateNormal];
@@ -332,6 +333,7 @@ typedef struct STargetLocation {
         }
     } */
     
+    [self updateBottomBar];
     self.timerDuration = 10;
     [self refreshSpots];
     [self startPolling];

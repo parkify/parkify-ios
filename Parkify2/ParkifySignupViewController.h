@@ -36,9 +36,11 @@
 @property (weak, nonatomic) IBOutlet UILabel *zipLabel;
 @property (weak, nonatomic) IBOutlet UILabel *expirationMonthLabel;
 @property (weak, nonatomic) IBOutlet UILabel *expirationYearLabel;
+- (IBAction)tosButtonTapped:(id)sender;
 @property (weak, nonatomic) IBOutlet UILabel *licensePlateLabel;
 
 
+@property (weak, nonatomic) IBOutlet UIScrollView *scrollView;
 
 
 @property (weak, nonatomic) id<CollapsingSegueProtocol> segueParent;

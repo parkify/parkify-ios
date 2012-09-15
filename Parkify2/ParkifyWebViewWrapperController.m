@@ -1,21 +1,21 @@
 //
-//  ParkifyAbioutControllerViewController.m
+//  ParkifyWebViewWrapperController.m
 //  Parkify
 //
-//  Created by Me on 8/24/12.
+//  Created by Me on 9/9/12.
 //
 //
 
-#import "ParkifyAboutControllerViewController.h"
-#import "ModalSettingsController.h"
-#import "UITabBarController+Hide.h"
+#import "ParkifyWebViewWrapperController.h"
 
-@interface ParkifyAboutViewController ()
+@interface ParkifyWebViewWrapperController ()
 
 @end
 
-@implementation ParkifyAboutViewController
-@synthesize viewWeb;
+@implementation ParkifyWebViewWrapperController
+
+@synthesize viewWeb = _viewWeb;
+@synthesize url = _url;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -29,16 +29,15 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    NSString *fullURL = @"http://www.parkify.me/?view=iphone";
+    NSString *fullURL = self.url;
     NSURL *url = [NSURL URLWithString:fullURL];
     NSURLRequest *requestObj = [NSURLRequest requestWithURL:url];
-    [viewWeb loadRequest:requestObj];
+    [self.viewWeb loadRequest:requestObj];
 	// Do any additional setup after loading the view.
 }
 
 -(void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
-    [self.tabBarController showTabBar:NO];
 }
 
 - (void)viewDidUnload
@@ -54,6 +53,6 @@
 }
 
 - (IBAction)closeButtonTapped:(UIBarButtonItem *)sender {
-    self.tabBarController.selectedViewController = [self.tabBarController.viewControllers objectAtIndex:0];
+    [self dismissModalViewControllerAnimated:true];
 }
 @end

@@ -42,6 +42,9 @@ withPasswordConfirmation:(NSString*)passwordConfirmation
 //Called to bring up SettingsVC modally
 + (void)settingsModallyFrom:(UIViewController*)parent withSuccess:(SuccessBlock)successBlock;
 
+//Called to bring up SettingsVC modally
++ (void)webWrapperModallyFrom:(UIViewController*)parent withURL:(NSString*)url;
+
 + (void)getParkingSpotWithID:(int)spotID
            withLevelofDetail:(NSString*)lod
                              withSuccess:(SuccessBlock)successBlock

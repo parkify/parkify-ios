@@ -19,7 +19,7 @@
 #define ORIG_WORKABLE_AREA_X 105
 #define ORIG_WORKABLE_AREA_Y 12
 #define ORIG_WORKABLE_AREA_WIDTH 441
-#define ORIG_WORKABLE_AREA_HEIGHT 64
+#define ORIG_WORKABLE_AREA_HEIGHT 28//64
 
 #define WORKABLE_AREA_X (ORIG_WORKABLE_AREA_X*0.5)
 #define WORKABLE_AREA_Y (ORIG_WORKABLE_AREA_Y*0.5)
@@ -33,19 +33,19 @@
 #define TRACK_BACKGROUND_HEIGHT WORKABLE_AREA_HEIGHT
 
 
-#define CALLOUT_HEIGHT_MAIN (55*0.42)
-#define CALLOUT_HEIGHT_ARROW (0)
+#define CALLOUT_HEIGHT_MAIN (70*0.42)//(55*0.42)
+#define CALLOUT_HEIGHT_ARROW (35*0.42)
 #define CALLOUT_HEIGHT (CALLOUT_HEIGHT_MAIN+CALLOUT_HEIGHT_ARROW)
 #define CALLOUT_WIDTH (142*0.45) //93
 
-#define CALLOUT_OFFSET_VERTICAL -15
+#define CALLOUT_OFFSET_VERTICAL -3
 #define CALLOUT_OFFSET_HORIZONTAL   0
 
 #define CALLOUT_TEXT_SIZE 13
 #define CALLOUT_TEXT_COLOR [UIColor colorWithRed:226.0/255 green:226.0/255 blue:226.0/255 alpha:1]
 
-#define LABEL_TO_LABEL_VERTICAL_OFFSET -CALLOUT_HEIGHT_MAIN
-@interface RangeBar() 
+#define LABEL_TO_LABEL_VERTICAL_OFFSET (-CALLOUT_HEIGHT_MAIN + 5)
+@interface RangeBar()   
 
 @property BOOL maxThumbOn;
 @property BOOL minThumbOn;
@@ -176,10 +176,10 @@
         
         //Label Backgrounds
         self.minLabelBackground = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"callout_time_label.png"]];
-        self.minLabelBackground.frame = CGRectMake(0,0, CALLOUT_WIDTH, CALLOUT_HEIGHT);
+        self.minLabelBackground.frame = CGRectMake(0,0, CALLOUT_WIDTH, CALLOUT_HEIGHT_MAIN);
         [self addSubview:self.minLabelBackground];
         
-        self.maxLabelBackground = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"callout_time_label.png"]];
+        self.maxLabelBackground = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"slider_callout_background.png"]];
         self.maxLabelBackground.frame = CGRectMake(0,0, CALLOUT_WIDTH, CALLOUT_HEIGHT);
         [self addSubview:self.maxLabelBackground];
         
