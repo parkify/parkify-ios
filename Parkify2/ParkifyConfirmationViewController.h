@@ -16,6 +16,7 @@
 
 @property double currentLat;
 @property double currentLong;
+@property (weak, nonatomic) IBOutlet UIActivityIndicatorView *pictureActivityView;
 
 @property (weak, nonatomic) IBOutlet UITextView *infoBox;
 @property (weak, nonatomic) IBOutlet UILabel *timeLabel;

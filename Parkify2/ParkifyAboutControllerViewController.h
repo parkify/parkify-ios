@@ -11,5 +11,6 @@
 @interface ParkifyAboutViewController : UIViewController
 @property (weak, nonatomic) IBOutlet UIWebView *viewWeb;
 - (IBAction)closeButtonTapped:(UIBarButtonItem *)sender;
+@property (strong, nonatomic) NSString* url;
 
 @end

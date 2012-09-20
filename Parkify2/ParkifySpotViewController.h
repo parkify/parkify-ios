@@ -39,8 +39,9 @@
 
 - (IBAction)closeButtonTapped:(id)sender;
 @property (weak, nonatomic) IBOutlet UILabel *taxLabel;
-@property (weak, nonatomic) IBOutlet UIImageView *imageView;
+@property (weak, nonatomic) IBOutlet UIActivityIndicatorView *pictureActivityView;
 
+@property (weak, nonatomic) IBOutlet UIImageView *imageView;
 //@property double startTime;
 //@property double endTime;
 

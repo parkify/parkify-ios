@@ -31,6 +31,7 @@
 @implementation ParkifySignInPageViewController
 @synthesize LoginButton = _LoginButton;
 @synthesize loginLabel = _loginLabel;
+@synthesize greetingLabel = _greetingLabel;
 @synthesize emailLabel = _emailLabel;
 @synthesize passwordLabel = _passwordLabel;
 @synthesize signUpButton = _signUpButton;
@@ -59,6 +60,9 @@
     frame.size.width += 20;
     //self.LoginButton.titleLabel.frame = frame;
     
+    
+    self.greetingLabel.hidden = true;
+    
     if (![Persistance retrieveAuthToken]) {
         //logged out
         self.emailField.alpha = 1;
@@ -68,6 +72,10 @@
         self.signUpButton.alpha = 1;
         self.signUpLabel.alpha = 1;
         self.loginLabel.text = @"Log in";
+        
+        
+        self.greetingLabel.hidden = true;
+        
     } else {
         //logged in
         self.emailField.alpha = 0;
@@ -77,7 +85,8 @@
         self.emailLabel.alpha = 0;
         self.passwordLabel.alpha = 0;
         
-        
+        self.greetingLabel.text = [NSString stringWithFormat:@"You are logged in with credit card xxxx-xxxx-xxxx-%@", [Persistance retrieveLastFourDigits]];
+        self.greetingLabel.hidden = false;
         self.loginLabel.text = @"Log out";
     }
     
@@ -128,6 +137,7 @@
     [self setEmailLabel:nil];
     [self setPasswordLabel:nil];
     [self setLoginLabel:nil];
+    [self setGreetingLabel:nil];
     [super viewDidUnload];
     // Release any retained subviews of the main view.
 }
@@ -140,8 +150,8 @@
 - (void)handleLoginSuccess:(NSDictionary*)result {
     
     [Persistance saveAuthToken:[result objectForKey:@"auth_token"]];
-    self.errorLabel.text = [NSString stringWithFormat:@"User logged in! Token is: %@", [Persistance retrieveAuthToken]];
-    self.errorLabel.hidden = false;
+    //self.errorLabel.text = [NSString stringWithFormat:@"User logged in! Token is: %@", [Persistance retrieveAuthToken]];
+    //self.errorLabel.hidden = false;
     
     
     //Escape from modal
@@ -157,12 +167,21 @@
     
     if (result.domain && [result.domain isEqualToString:@"UserLogin"]) {
         /* Handle user registratin error here */
-        self.errorLabel.text = [result.userInfo objectForKey:@"message"];
-        self.errorLabel.hidden = false;
+        
+        UIAlertView* error = [[UIAlertView alloc] initWithTitle:@"Error" message:[result.userInfo objectForKey:@"message"] delegate:self cancelButtonTitle:@"Ok"
+                                              otherButtonTitles: nil];
+        [error show];
+        
+        //self.errorLabel.text = [result.userInfo objectForKey:@"message"];
+        //self.errorLabel.hidden = false;
     } else {
         /* Handle network error here */
-        self.errorLabel.text = @"Error with your login or password";
-        self.errorLabel.hidden = false;
+        
+        UIAlertView* error = [[UIAlertView alloc] initWithTitle:@"Error" message:@"Cannot connect to server." delegate:self cancelButtonTitle:@"Ok"
+                                              otherButtonTitles: nil];
+        [error show];
+        //self.errorLabel.text = @"Error with your login or password";
+        //self.errorLabel.hidden = false;
     }
 }
 
@@ -216,13 +235,10 @@
 
 - (BOOL) verifyLoginWithEmail:(NSString * )email withPassword:(NSString *)password {
     return true;
-    BOOL b1 = [email isEqualToString:@"dylan.r.jackson@gmail.com"];
-    BOOL b2 = [password isEqualToString:@"4rrowhe4d"];
-    return  b1 && b2;
 }
 
 - (IBAction)signUpButtonPressed:(UIButton *)sender {
-    self.tabBarController.selectedViewController = [self.tabBarController.viewControllers objectAtIndex:1];
+    self.tabBarController.selectedViewController = [self.tabBarController.viewControllers objectAtIndex:1];   
 }
 
 - (IBAction)cancelButtonPressed:(UIBarButtonItem *)sender {

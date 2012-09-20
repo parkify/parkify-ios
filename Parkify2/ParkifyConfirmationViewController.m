@@ -35,6 +35,7 @@
 
 @synthesize currentLat = _currentLat;
 @synthesize currentLong = _currentLong;
+@synthesize pictureActivityView = _pictureActivityView;
 
 @synthesize errorLabel = _errorLabel;
 
@@ -68,6 +69,7 @@
     [self setTopScrollView:nil];
     [self setBottomWebView:nil];
     [self setBottomScrollView:nil];
+    [self setPictureActivityView:nil];
     [super viewDidUnload];
     // Release any retained subviews of the main view.
 }
@@ -136,26 +138,77 @@
 
 }
 - (IBAction)directionsButtonTapped:(UIButton *)sender {
-    NSString* url = [NSString stringWithFormat: @"http://maps.google.com/maps?saddr=%f,%f&daddr=%f,%f",
-                     self.currentLat,self.currentLong,//currentLocation.latitude, currentLocation.longitude,
-                     self.spot.mLat, self.spot.mLong];//[address stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
-    [[UIApplication sharedApplication] openURL: [NSURL URLWithString: url]];
-
+    
+    
+    Class itemClass = [MKMapItem class];
+    if (itemClass && [itemClass respondsToSelector:@selector(openMapsWithItems:launchOptions:)]) {
+        // ios >= 6
+        
+        CLLocationCoordinate2D end;
+        end.latitude = self.spot.mLat;
+        end.longitude = self.spot.mLong;
+        MKPlacemark* endPlacemark = [[MKPlacemark alloc] initWithCoordinate:end addressDictionary:nil];
+        
+        NSArray* startAndEnd = [NSArray arrayWithObjects:[MKMapItem mapItemForCurrentLocation], [[MKMapItem alloc] initWithPlacemark:endPlacemark], nil];
+        
+        NSDictionary* options = [NSDictionary dictionaryWithObjectsAndKeys:MKLaunchOptionsDirectionsModeDriving, MKLaunchOptionsDirectionsModeKey, nil];
+        [MKMapItem openMapsWithItems:startAndEnd launchOptions:options];
+    } else {
+        // ios < 6
+        NSString* url = [NSString stringWithFormat: @"http://maps.google.com/maps?saddr=%f,%f&daddr=%f,%f",
+                         self.currentLat,self.currentLong,//currentLocation.latitude, currentLocation.longitude,
+                         self.spot.mLat, self.spot.mLong];//[address stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
+        [[UIApplication sharedApplication] openURL: [NSURL URLWithString: url]];
+    }
+    
 }
 
 /** TODO: Make this javascript-enabled to update it **/
 -(void)fillTopWebView {
     NSString* infoWebViewString;
+    
+    NSString* styleString = @"<style type=\"text/css\">"
+    //"body { background-color:transparent; font-family:Marker Felt; font-size:12; color:white}"
+    ".top { background-color:transparent; font-family:\"Arial Rounded MT Bold\"; font-size:14; color:black; }"
+    ".top-mid { background-color:transparent; font-family:\"Arial Rounded MT Bold\"; font-size:10; color:#224455; }"
+    ".mid { background-color:transparent; font-family:\"Arial Rounded MT Bold\"; font-size:10; color:#556677; }"
+    ".bottom { background-color:transparent; font-family:\"Arial Rounded MT Bold\"; font-size:16; color:black; }"
+    ".selected { color:#224455; } "
+    ".faded { color:#99AABB; } "
+    "</style>";
+
+    
+    
+    /*
     NSString* styleString = @"<style type=\"text/css\">"
     //"body { background-color:transparent; font-family:Marker Felt; font-size:12; color:white}"
     ".top { background-color:transparent; font-family:\"Arial Rounded MT Bold\"; font-size:14; color:black }"
-    ".mid { background-color:transparent; font-family:\"Arial Rounded MT Bold\"; font-size:10; color:#A9A9A9 }"
+    ".mid { background-color:transparent; font-family:\"Arial Rounded MT Bold\"; font-size:10; color:#778899 }"
     ".bottom { background-color:transparent; font-family:\"Arial Rounded MT Bold\"; font-size:16; color:black }"
     "</style>";
+     
+    */
     if(self.spot == nil) {
         infoWebViewString = [NSString stringWithFormat:@"<html>%@<body>Spot Not Available.</body></html>", styleString];
     }
     else {
+        
+        
+        NSString* layoutString = @"";
+        if ([self.spot.mSpotLayout isEqualToString:@"parallel"]) {
+            layoutString = @"<span class=faded>regular</span> / <span class=selected>parallel</span>";
+        } else {
+            layoutString = @"<span class=selected>regular</span> / <span class=faded>parallel</span>";
+        }
+        
+        NSString* coverageString = @"";
+        if ([self.spot.mSpotLayout isEqualToString:@"covered"]) {
+            coverageString = @"<span class=faded>open air</span> / <span class=selected>covered";
+        } else {
+            coverageString = @"<span class=selected>open air</span> / <span class=faded>covered</span>";
+        }
+        
+        
         //Info web view text
         infoWebViewString = [NSString stringWithFormat:@"<html>%@<body>"
                              "<span class=top>%@</span></br>"
@@ -166,8 +219,8 @@
                              "</body></html>",
                              styleString,
                              self.spot.mAddress,
-                             self.spot.mSpotDifficulty,
-                             self.spot.mSpotCoverage,
+                             layoutString,
+                             coverageString,
                              self.spot.mDesc];
     }
     [self.topWebView loadHTMLString:infoWebViewString baseURL:nil];
@@ -188,7 +241,7 @@
     NSString* styleString = @"<style type=\"text/css\">"
     //"body { background-color:transparent; font-family:Marker Felt; font-size:12; color:white}"
     ".top { background-color:transparent; font-family:\"Arial Rounded MT Bold\"; font-size:14; color:black }"
-    ".mid { background-color:transparent; font-family:\"Arial Rounded MT Bold\"; font-size:10; color:#A9A9A9 }"
+    ".mid { background-color:transparent; font-family:\"Arial Rounded MT Bold\"; font-size:10; color:#778899 }"
     ".bottom { background-color:transparent; font-family:\"Arial Rounded MT Bold\"; font-size:16; color:black }"
     "</style>";
     if(self.spot == nil) {
@@ -197,7 +250,7 @@
     else {
         //Info web view text
         NSString* directions = [self.spot.mDirections stringByReplacingOccurrencesOfString:@"\n"
-                                                                   withString:@"<br\>"];
+                                                                   withString:@"<br\\><br\\>"];
         infoWebViewString = [NSString stringWithFormat:@"<html>%@<body>"
                              "<span class=top>Directions for Spot #%@</span></br>"
                              "<hr/>"
@@ -224,10 +277,15 @@
 -  (void)addPicture {
     if (self.spot.imageIDs != NULL && [self.spot.imageIDs count] != 0) {
         int imageID = [[self.spot.imageIDs objectAtIndex:0] intValue];
+        [self.pictureActivityView startAnimating];
         [Api downloadImageDataAsynchronouslyWithId:imageID withStyle:@"original" withSuccess:^(NSDictionary * result) {
             self.imageView.image = [UIImage imageWithData:[result objectForKey:@"image"]];
+            [self.pictureActivityView stopAnimating];
+            [self.pictureActivityView setHidden:true];
         } withFailure:^(NSError * err) {
-            ;
+            self.imageView.image = [UIImage imageNamed:@"NoPic.png"];
+            [self.pictureActivityView stopAnimating];
+            [self.pictureActivityView setHidden:true];
         }];
     }
 }

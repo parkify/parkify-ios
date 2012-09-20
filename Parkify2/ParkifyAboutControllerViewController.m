@@ -16,6 +16,14 @@
 
 @implementation ParkifyAboutViewController
 @synthesize viewWeb;
+@synthesize url = _url;
+
+- (NSString*) url {
+    if(!_url) {
+        _url = @"http://parkify.me/about_us";
+    }
+    return _url;
+}
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -29,16 +37,21 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    NSString *fullURL = @"http://www.parkify.me/?view=iphone";
-    NSURL *url = [NSURL URLWithString:fullURL];
-    NSURLRequest *requestObj = [NSURLRequest requestWithURL:url];
-    [viewWeb loadRequest:requestObj];
-	// Do any additional setup after loading the view.
+    	// Do any additional setup after loading the view.
 }
 
 -(void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     [self.tabBarController showTabBar:NO];
+    
+    NSString *fullURL = [NSString stringWithFormat:@"%@?view=iphone", self.url];
+    
+    //fullURL = [NSString stringWithFormat:@"%@?view=iphone", self.url];
+    
+    NSURL *url = [NSURL URLWithString:fullURL];
+    NSURLRequest *requestObj = [NSURLRequest requestWithURL:url];
+    [viewWeb loadRequest:requestObj];
+
 }
 
 - (void)viewDidUnload

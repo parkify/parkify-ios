@@ -42,6 +42,9 @@
 
 @property (weak, nonatomic) IBOutlet UIScrollView *scrollView;
 
+@property (weak, nonatomic) IBOutlet UIButton *tosCheckbox;
+- (IBAction)tosCheckboxTapped:(id)sender;
+
 
 @property (weak, nonatomic) id<CollapsingSegueProtocol> segueParent;
 - (IBAction)cancelButtonPressed:(UIBarButtonItem *)sender;

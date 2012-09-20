@@ -29,7 +29,10 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    NSString *fullURL = self.url;
+    
+    NSString *fullURL = [NSString stringWithFormat:@"%@?view=iphone", self.url];
+
+    
     NSURL *url = [NSURL URLWithString:fullURL];
     NSURLRequest *requestObj = [NSURLRequest requestWithURL:url];
     [self.viewWeb loadRequest:requestObj];

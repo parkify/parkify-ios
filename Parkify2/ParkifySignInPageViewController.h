@@ -26,6 +26,7 @@
 
 @property (weak, nonatomic) IBOutlet UIButton *LoginButton;
 @property (weak, nonatomic) IBOutlet UILabel *loginLabel;
+@property (weak, nonatomic) IBOutlet UILabel *greetingLabel;
 
 - (IBAction)logoutButtonPressed:(UIButton *)sender;
 @end

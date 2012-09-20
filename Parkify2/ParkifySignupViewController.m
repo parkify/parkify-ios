@@ -16,15 +16,18 @@
 #import "Stripe.h"
 #import "ModalSettingsController.h"
 #import "TextFormatter.h"
+#import "WaitingMask.h"
 
 
 @interface ParkifySignupViewController ()
 - (void)signUp;
 //- (void)signUpCardSuccessWithCard:(NSString*)token;
 @property (strong, nonatomic) StripeConnection *stripeConnection;
+@property (nonatomic, strong) WaitingMask* waitingMask;
 
 - (void)handleRegistrationSuccess:(NSDictionary*)result;
 - (void)handleRegistrationFailure:(NSError*)result;
+
 
 
 
@@ -44,6 +47,7 @@
 @synthesize expirationYearLabel = _expirationYearLabel;
 @synthesize licensePlateLabel = _licensePlateLabel;
 @synthesize scrollView = _scrollView;
+@synthesize tosCheckbox = _tosCheckbox;
 @synthesize zipField = _zipField;
 @synthesize emailField = _emailField;
 @synthesize passwordField = _passwordField;
@@ -55,6 +59,8 @@
 @synthesize expirationYearField = _expirationYearField;
 @synthesize licensePlateField = _licensePlateField;
 @synthesize segueParent = _segueParent;
+
+@synthesize waitingMask = _waitingMask;
 
 @synthesize stripeConnection = _stripeConnection;
 
@@ -72,6 +78,7 @@
     [super viewDidLoad];
     
     self.stripeConnection = [StripeConnection connectionWithPublishableKey:@"pk_XeTF5KrqXMeSyyqApBF4q9qDzniMn"];
+    
 
     self.emailField.delegate = self;
     self.passwordField.delegate = self;
@@ -110,9 +117,13 @@
     
     
     CGRect frame = self.scrollView.frame;
-    frame.size.height = frame.size.height + 50;
+    //frame.size.height = frame.size.height + 50;
+    frame.size.height = frame.size.height;
     self.scrollView.contentSize = frame.size;
 
+    [self.tosCheckbox setImage:nil forState:UIControlStateNormal];
+    
+    [self.tosCheckbox setImage:[UIImage imageNamed:@"glyphicons_193_circle_ok.png"] forState:UIControlStateSelected];
     
     
 }
@@ -156,6 +167,7 @@
     [self setZipField:nil];
     [self setZipField:nil];
     [self setScrollView:nil];
+    [self setTosCheckbox:nil];
     [super viewDidUnload];
     // Release any retained subviews of the main view.
 }
@@ -167,37 +179,77 @@
 
 
 - (void)handleRegistrationSuccess:(NSDictionary *)result {
+    if(self.waitingMask) {
+        [self.waitingMask removeFromSuperview];
+        self.waitingMask = nil;
+    }
     self.signUpButton.enabled = true;
     [Persistance saveAuthToken:[result objectForKey:@"auth_token"]];
-    self.errorLabel.text = [NSString stringWithFormat:@"User created! Token is: %@", [Persistance retrieveAuthToken]];
+    //self.errorLabel.text = [NSString stringWithFormat:@"User created! Token is: %@", [Persistance retrieveAuthToken]];
     
     //Escape from modal
     NSDictionary* results = [NSDictionary dictionaryWithObjectsAndKeys:@"logged_in",@"exit", nil];
     [((ModalSettingsController*)self.tabBarController) exitWithResults:results];  
 }
 
-- (void)handleRegistrationFailure:(NSError *)result { 
+- (void)handleRegistrationFailure:(NSError *)result {
+    if(self.waitingMask) {
+        [self.waitingMask removeFromSuperview];
+        self.waitingMask = nil;
+    }
     NSLog(@"Error: %@; %@", result.localizedDescription, [result.userInfo objectForKey:@"message"]);
     
     self.signUpButton.enabled = true;
     
     if (result.domain && [result.domain isEqualToString:@"UserRegistration"]) {
         /* Handle user registratin error here */
-        self.errorLabel.text = [result.userInfo objectForKey:@"message"];
-        self.errorLabel.hidden = false;
+        
+        UIAlertView* error = [[UIAlertView alloc] initWithTitle:@"Error" message:[result.userInfo objectForKey:@"message"] delegate:self cancelButtonTitle:@"Ok"
+                                              otherButtonTitles: nil];
+        [error show];
+        
+        
+        //self.errorLabel.text = [result.userInfo objectForKey:@"message"];
+        //self.errorLabel.hidden = false;
     }
     else if (result.domain && [result.domain isEqualToString:@"Stripe"]) {
         /* Handle stipe error here */
-        self.errorLabel.text = [result.userInfo objectForKey:@"message"];  
-        self.errorLabel.hidden = false;
+        
+        UIAlertView* error = [[UIAlertView alloc] initWithTitle:@"Error" message:[result.userInfo objectForKey:@"message"] delegate:self cancelButtonTitle:@"Ok"
+                                              otherButtonTitles: nil];
+        [error show];
+        
+        //self.errorLabel.text = [result.userInfo objectForKey:@"message"];
+        //self.errorLabel.hidden = false;
+        
     } else {
         /* Handle network error here */
-        self.errorLabel.text = @"Could not reach server";
-        self.errorLabel.hidden = false;
+        UIAlertView* error = [[UIAlertView alloc] initWithTitle:@"Error" message:@"Could not reach server" delegate:self cancelButtonTitle:@"Ok"
+                                              otherButtonTitles: nil];
+        [error show];
+        
+        //self.errorLabel.text = @"Could not reach server";
+        //self.errorLabel.hidden = false;
     }
 }
 
 - (void)signUp {
+    
+    if(!self.tosCheckbox.selected) {
+        UIAlertView* error = [[UIAlertView alloc] initWithTitle:@"Error" message:@"Please view our Terms of Service." delegate:self cancelButtonTitle:@"Ok"
+                                              otherButtonTitles: nil];
+        [error show];
+        return;
+    }
+    
+    CGRect waitingMaskFrame = self.view.frame;
+    waitingMaskFrame.origin.x = 0;
+    waitingMaskFrame.origin.y = 0;
+    
+    self.waitingMask = [[WaitingMask alloc] initWithFrame:waitingMaskFrame];
+    [self.view addSubview:self.waitingMask];
+    
+    
     self.signUpButton.enabled = false;
     [Api signUpWithEmail:self.emailField.text 
             withPassword:self.passwordField.text 
@@ -242,6 +294,10 @@ withPasswordConfirmation:self.passwordField.text
 
 
 - (IBAction)tosButtonTapped:(id)sender {
-    [Api webWrapperModallyFrom:self withURL:@"http://www.parkify.me/tos?view=iphone"];
+    [Api webWrapperModallyFrom:self withURL:@"http://parkify.me/tos"];
+}
+- (IBAction)tosCheckboxTapped:(UIButton*)sender {
+    
+    sender.selected = !sender.selected;
 }
 @end

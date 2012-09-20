@@ -10,6 +10,7 @@
 #import "Stripe.h"
 #import "SBJson.h"
 #import "ASIFormDataRequest.h"
+#import "ASIDownloadCache.h"
 #import "Authentication.h"
 #import "ModalSettingsController.h"
 #import "Persistance.h"
@@ -507,6 +508,9 @@ withPasswordConfirmation:(NSString*)passwordConfirmation
     [request setFailedBlock:^{
         failureBlock([request error]);
     }];
+    
+    
+    [request setDownloadCache:[ASIDownloadCache sharedCache]];
     
     [request startAsynchronous];
 

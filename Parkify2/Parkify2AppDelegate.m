@@ -7,7 +7,7 @@
 //
 
 #import "Parkify2AppDelegate.h"
-#import "Flurry.h"
+//#import "Flurry.h"
 
 @implementation Parkify2AppDelegate
 
@@ -23,7 +23,7 @@ void uncaughtExceptionHandler(NSException *exception) {
 {
     // Override point for customization after application launch.
     NSSetUncaughtExceptionHandler(&uncaughtExceptionHandler);
-    [Flurry startSession:@"TS2D3KM78SMZ8MJWNYNV"];
+    //[Flurry startSession:@"TS2D3KM78SMZ8MJWNYNV"];
     return YES;
 }
 							
