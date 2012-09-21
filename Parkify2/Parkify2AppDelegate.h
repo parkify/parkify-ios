@@ -8,6 +8,8 @@
 
 #import <UIKit/UIKit.h>
 
+#define APP_VERSION @"v1.1"
+
 
 @interface Parkify2AppDelegate : UIResponder <UIApplicationDelegate>
 

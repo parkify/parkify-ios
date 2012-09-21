@@ -12,6 +12,7 @@
 #import "TextFormatter.h"
 #import "Api.h"
 #import "Persistance.h"
+#import <AddressBook/AddressBook.h>
 
 @interface ParkifyConfirmationViewController ()
 
@@ -147,8 +148,27 @@
         CLLocationCoordinate2D end;
         end.latitude = self.spot.mLat;
         end.longitude = self.spot.mLong;
-        MKPlacemark* endPlacemark = [[MKPlacemark alloc] initWithCoordinate:end addressDictionary:nil];
         
+        NSArray* addressComponents = [self.spot.mAddress componentsSeparatedByString:@", "];
+        
+        NSArray* addressKeysAll = [NSArray arrayWithObjects:kABPersonAddressStreetKey,
+            kABPersonAddressCityKey,
+            kABPersonAddressStateKey,
+            kABPersonAddressZIPKey,
+            kABPersonAddressCountryKey,
+            kABPersonAddressCountryCodeKey, nil];
+        
+        NSRange matchedRange;
+        matchedRange.location = 0;
+        matchedRange.length = [addressComponents count];
+        
+                
+        NSDictionary* addressDictionary = [NSDictionary dictionaryWithObjects:addressComponents forKeys:[addressKeysAll subarrayWithRange:matchedRange]];
+        
+        // NSDictionary addressDictionary =
+        
+        MKPlacemark* endPlacemark = [[MKPlacemark alloc] initWithCoordinate:end addressDictionary:addressDictionary];
+        //MKPlacemark* endPlacemark = [[MKPlacemark alloc] initWithCoordinate:end addressDictionary:nil];
         NSArray* startAndEnd = [NSArray arrayWithObjects:[MKMapItem mapItemForCurrentLocation], [[MKMapItem alloc] initWithPlacemark:endPlacemark], nil];
         
         NSDictionary* options = [NSDictionary dictionaryWithObjectsAndKeys:MKLaunchOptionsDirectionsModeDriving, MKLaunchOptionsDirectionsModeKey, nil];
@@ -240,25 +260,92 @@
     NSString* infoWebViewString;
     NSString* styleString = @"<style type=\"text/css\">"
     //"body { background-color:transparent; font-family:Marker Felt; font-size:12; color:white}"
-    ".top { background-color:transparent; font-family:\"Arial Rounded MT Bold\"; font-size:14; color:black }"
-    ".mid { background-color:transparent; font-family:\"Arial Rounded MT Bold\"; font-size:10; color:#778899 }"
-    ".bottom { background-color:transparent; font-family:\"Arial Rounded MT Bold\"; font-size:16; color:black }"
+    "body {font-family:\"Arial Rounded MT Bold\";}"
+    ".box { border:2px dashed #89CFF0; }"
+    ".top { background-color:transparent; font-family:\"Arial Rounded MT Bold\"; font-size:14; color:black; }"
+    ".top-mid { background-color:transparent; font-family:\"Arial Rounded MT Bold\"; font-size:10; color:#224455; }"
+    ".mid { background-color:transparent; font-family:\"Arial Rounded MT Bold\"; font-size:10; color:#556677; }"
+    ".bottom { background-color:transparent; font-family:\"Arial Rounded MT Bold\"; font-size:16; color:black; }"
+    ".selected { color:#224455; } "
+    ".faded { color:#99AABB; } "
     "</style>";
     if(self.spot == nil) {
         infoWebViewString = [NSString stringWithFormat:@"<html>%@<body>Spot Not Available.</body></html>", styleString];
     }
     else {
         //Info web view text
-        NSString* directions = [self.spot.mDirections stringByReplacingOccurrencesOfString:@"\n"
-                                                                   withString:@"<br\\><br\\>"];
+        
+        //Time text
+        Formatter formatter = ^(double val) {
+            NSDate* time = [[NSDate alloc] initWithTimeIntervalSince1970:val];
+            NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+            [dateFormatter setDateFormat:@"h:mm a"];
+            return [dateFormatter stringFromDate:time]; };
+        
+        NSString* timeString = [NSString stringWithFormat:@"%@ - %@", formatter(self.startTime), formatter(self.endTime)];
+        
+        //Layout text
+        NSString* layoutString = @"";
+        if ([self.spot.mSpotLayout isEqualToString:@"parallel"]) {
+            layoutString = @"<span class=faded>regular</span> / <span class=selected>parallel</span>";
+        } else {
+            layoutString = @"<span class=selected>regular</span> / <span class=faded>parallel</span>";
+        }
+        
+        //Coverage text
+        NSString* coverageString = @"";
+        if ([self.spot.mSpotLayout isEqualToString:@"covered"]) {
+            coverageString = @"<span class=faded>open air</span> / <span class=selected>covered";
+        } else {
+            coverageString = @"<span class=selected>open air</span> / <span class=faded>covered</span>";
+        }
+        
+        //Price text
+        double durationInSeconds = (self.endTime - self.startTime);
+        double totalPrice;
+        if(self.spot.offers.count > 0) {
+            totalPrice = [self.spot priceFromNowForDurationInSeconds:durationInSeconds];
+            
+            [Persistance saveLastAmountCharged:totalPrice];
+        } else {
+            totalPrice = [Persistance retrieveLastAmountCharged];
+        }
+        NSString* priceString = [NSString stringWithFormat:@"Credit Card ****-****-****-%@<br/>was charged $%0.2f",[Persistance retrieveLastFourDigits],totalPrice];
+
+        
+        
+        NSString* directions = [self.spot.mDirections stringByReplacingOccurrencesOfString:@"\n" withString:@"</li><li>"];
+        
         infoWebViewString = [NSString stringWithFormat:@"<html>%@<body>"
-                             "<span class=top>Directions for Spot #%@</span></br>"
-                             "<hr/>"
-                             "<span class=mid>%@</span></br>"
+                             "<div class=\"box\"><center><h3>Congratulations!</h2><span class=top><p>You bought parking spot #%@<br/>at: %@<br/>Your reservation:<br/>%@</p></span></center></div>"
+                             
+                            
+                             "<div class=\"box\"><span class=top>How to find your spot:</span>"
+                             "<span class=mid><ul><li>%@</li></ul></span></div>"
+                             
+                             "<div class=\"box\"><span class=top>Note:</span><br/>"
+                             "<div style=\"margin:0px 5px;\">"
+                             "<span class=mid>Please don't encroach on the other spots. For spots with no white lines, please make sure every spot has enugh space for the person who parks there. WARNING: Your car will be towed if you stay past your reservation time or if you park in a spot that does not match your reservation.</span></div></div>"
+                             
+                             "<div class=\"box\"><center>"
+                             "<span class=mid>Difficulty: %@</span></br>"
+                             "<span class=mid>Covered: %@</span></center></div>"
+                             
+                             "<div class=\"box\"><center>"
+                             "<span class=bottom>%@</br>Need Help? Call 1-855-Parkify</span></center></div>"
+                             
+                             
                              "</body></html>",
                              styleString,
+                             
                              [TextFormatter formatIdString:self.spot.mID],
-                             directions];
+                             self.spot.mAddress,
+                             timeString,
+                             directions,
+                             layoutString,
+                             coverageString,
+                             priceString
+                             ];
     }
     [self.bottomWebView loadHTMLString:infoWebViewString baseURL:nil];
     

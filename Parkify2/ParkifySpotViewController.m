@@ -104,7 +104,7 @@
     double timeLeft = [self.spot endTime] - currentTime;
     
     timeLeft = timeLeft - fmod(timeLeft,1800);
-    timeLeft = MIN(timeLeft, 9*60*60);
+    timeLeft = MIN(timeLeft, 18*60*60);
     
     Formatter formatter = ^(double val) {
         NSDate* time = [[NSDate alloc] initWithTimeIntervalSince1970:val];
@@ -112,7 +112,7 @@
         [dateFormatter setDateFormat:@"h:mm a"];
         return [dateFormatter stringFromDate:time]; };
     
-    self.rangeBar = [[RangeBar alloc] initWithFrame:[self.rangeBarContainer bounds] minVal:currentTime maxVal:currentTime + 9*60*60 minRange:30*60 selectedMaxVal:currentTime + timeLeft withValueFormatter:formatter];
+    self.rangeBar = [[RangeBar alloc] initWithFrame:[self.rangeBarContainer bounds] minVal:currentTime maxVal:currentTime + 18*60*60 minRange:30*60 selectedMaxVal:currentTime + timeLeft withValueFormatter:formatter];
     //^(double val){return [@"Foo";}
     
     [self.rangeBar addTarget:self action:@selector(timeIntervalChanged) forControlEvents:UIControlEventValueChanged];
@@ -132,7 +132,7 @@
 }
 
 - (void)timeIntervalChanged{
-    [UIView animateWithDuration:1.2 animations:^{
+    [UIView animateWithDuration:0.8 animations:^{
         self.flashingSign.alpha = 0;
     }];
     [self updateInfo];
@@ -365,7 +365,7 @@
         [offerIds addObject:[NSNumber numberWithInt:offer.mId]];
     }
     
-    id transactionRequest = [Authentication makeTransactionRequestWithUserToken:[Persistance retrieveAuthToken] withSpotId:self.spot.mID withStartTime:self.rangeBar.selectedMinimumValue withEndTime:self.rangeBar.selectedMaximumValue withOfferIds:offerIds];
+    id transactionRequest = [Authentication makeTransactionRequestWithUserToken:[Persistance retrieveAuthToken] withSpotId:self.spot.mID withStartTime:self.rangeBar.selectedMinimumValue withEndTime:self.rangeBar.selectedMaximumValue withOfferIds:offerIds withLicensePlate:[Persistance retrieveLicensePlateNumber]];
     
     NSString* urlString = [[NSString alloc] initWithFormat:@"https://parkify-rails.herokuapp.com/api/v1/acceptances.json?auth_token=%@", [Persistance retrieveAuthToken]];
     NSURL *url = [NSURL URLWithString:urlString];

@@ -150,6 +150,7 @@
 - (void)handleLoginSuccess:(NSDictionary*)result {
     
     [Persistance saveAuthToken:[result objectForKey:@"auth_token"]];
+    
     //self.errorLabel.text = [NSString stringWithFormat:@"User logged in! Token is: %@", [Persistance retrieveAuthToken]];
     //self.errorLabel.hidden = false;
     
@@ -248,12 +249,13 @@
 }
 
 - (IBAction)resetPasswordTapped:(id)sender {
-    NSURL *url = [NSURL URLWithString:@"http://parkify-rails.herokuapp.com"];
+    NSURL *url = [NSURL URLWithString:@"https://parkify-rails.herokuapp.com/my/users/password/new"];
     [[UIApplication sharedApplication] openURL:url];
 }
 
 - (IBAction)logoutButtonPressed:(UIButton *)sender {
     /** TODO: also tell server to logout if can **/
     [Persistance saveAuthToken:nil];
+    [Persistance saveUserID:[NSNumber numberWithInt:-1]];
 }
 @end

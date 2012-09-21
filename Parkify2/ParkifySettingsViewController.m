@@ -11,6 +11,7 @@
 #import "UITabBarController+Hide.h"
 #import "ParkifyAboutControllerViewController.h"
 #import "Api.h"
+#import "Persistance.h"
 
 @interface ParkifySettingsViewController ()
 
@@ -49,6 +50,7 @@
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     [self.tabBarController showTabBar:NO];
+    
 }
 
 - (void)viewDidUnload
@@ -73,16 +75,33 @@
     self.tabBarController.selectedViewController = [self.tabBarController.viewControllers objectAtIndex:1];
 }
 
+
 - (IBAction)authButtonTapped:(UIButton *)sender {
     [Api authenticateModallyFrom:self withSuccess:^(NSDictionary *foo) {}];
 }
 
 - (IBAction)accountSettingsButtonTapped:(UIButton*)sender {
+    NSString* authToken = [Persistance retrieveAuthToken];
+    if(!authToken) {
+        UIAlertView* error = [[UIAlertView alloc] initWithTitle:@"Error" message:@"Please log in first" delegate:self cancelButtonTitle:@"Ok"
+                                              otherButtonTitles: nil];
+        [error show];
+    } else {
+    
+        
+        
     ParkifyAboutViewController* accountSettings = [self.tabBarController.viewControllers objectAtIndex:2];
     
-    accountSettings.url = @"https://api.parkify.me/my/account";
+    
+    accountSettings.url = [NSString stringWithFormat:@"https://parkify-rails.herokuapp.com/profile?&auth_token=%@", authToken];
 
     self.tabBarController.selectedViewController =     accountSettings;
+         
+        /*
+        NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"https://api.parkify.me/profile?&auth_token=%@", authToken]];
+        [[UIApplication sharedApplication] openURL:url];
+         */
+    }
 }
 
 
@@ -106,18 +125,21 @@
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    
 
     self.tableOnTap = [NSArray arrayWithObjects:^{
             [self authButtonTapped:nil];
         }, ^{
-            ;
+            [self accountSettingsButtonTapped:nil];
         }, ^{
             [self aboutButtonTapped:nil];
         }, nil];
     
+    [tableView deselectRowAtIndexPath:indexPath animated:YES];
+    
     //int a = indexPath.row;
     ((CompletionBlock)[self.tableOnTap objectAtIndex:indexPath.row])();
+    
+    
 }
 
 @end

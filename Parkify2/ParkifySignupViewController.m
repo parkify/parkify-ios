@@ -184,7 +184,7 @@
         self.waitingMask = nil;
     }
     self.signUpButton.enabled = true;
-    [Persistance saveAuthToken:[result objectForKey:@"auth_token"]];
+    
     //self.errorLabel.text = [NSString stringWithFormat:@"User created! Token is: %@", [Persistance retrieveAuthToken]];
     
     //Escape from modal
@@ -260,13 +260,14 @@ withPasswordConfirmation:self.passwordField.text
                  withCVC:self.securityNumberField.text 
      withExpirationMonth:[NSNumber numberWithInteger:[self.expirationMonthField.text integerValue] ] 
       withExpirationYear:[NSNumber numberWithInteger:[self.expirationYearField.text integerValue] ] 
-        withLicensePlate:self.licensePlateField.text 
+        withLicensePlate:self.licensePlateField.text
+             withZipCode:self.zipField.text
              withSuccess:^(NSDictionary * result) {
                  [self handleRegistrationSuccess:result];
              } 
              withFailure:^(NSError * result) {
                  [self handleRegistrationFailure:result];
-             }    
+             }
      ];
 }
 

@@ -27,6 +27,7 @@
                       withFirstName:(NSString*)firstName
                        withLastName:(NSString*)lastName
                    withLicensePlate:(NSString*)licensePlate
+                        withZipCode:(NSString*)zipCode
                         withSuccess:(SuccessBlock)successBlock
                         withFailure:(FailureBlock)failureBlock;
 @end
@@ -44,6 +45,7 @@ withPasswordConfirmation:(NSString*)passwordConfirmation
     withExpirationMonth:(NSNumber*)expMonth
      withExpirationYear:(NSNumber*)expYear
        withLicensePlate:(NSString*)licensePlate
+            withZipCode:(NSString*)zipCode
             withSuccess:(SuccessBlock)successBlock
             withFailure:(FailureBlock)failureBlock {
     
@@ -54,6 +56,9 @@ withPasswordConfirmation:(NSString*)passwordConfirmation
     card.expiryYear       = expYear;
     //card.name         = self.nameField.text;
     card.securityCode = cvc;
+    card.addressZip = zipCode;
+    
+    
     
     
     [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
@@ -70,6 +75,7 @@ withPasswordConfirmation:(NSString*)passwordConfirmation
                              withFirstName:firstName 
                               withLastName:lastName
                           withLicensePlate:licensePlate
+                               withZipCode:zipCode
                                withSuccess:successBlock
                                withFailure:failureBlock];
      }
@@ -105,6 +111,7 @@ withPasswordConfirmation:(NSString*)passwordConfirmation
                       withFirstName:(NSString*)firstName
                        withLastName:(NSString*)lastName
                    withLicensePlate:(NSString*)licensePlate
+                        withZipCode:(NSString*)zipCode
                         withSuccess:(SuccessBlock)successBlock
                         withFailure:(FailureBlock)failureBlock {
     
@@ -114,7 +121,8 @@ withPasswordConfirmation:(NSString*)passwordConfirmation
                                                         withPassword:password
                                             withPasswordConfirmation:passwordConfirmation
                                                        withFirstName:firstName
-                                                        withLastName:lastName];
+                                                        withLastName:lastName
+                                                         withZipCode:zipCode];
         id tokenRequest = [Authentication makeTokenRequestWithToken:token];
         
         NSURL *url = [NSURL URLWithString:@"https://parkify-rails.herokuapp.com/api/v1/users.json"];
@@ -127,7 +135,7 @@ withPasswordConfirmation:(NSString*)passwordConfirmation
         
         [request addRequestHeader:@"User-Agent" value:@"ASIFormDataRequest"]; 
         [request addRequestHeader:@"Content-Type" value:@"application/json"];
-        [request  setRequestMethod:@"POST"];
+        [request setRequestMethod:@"POST"];
         
         [request setCompletionBlock:^{
             [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
@@ -137,6 +145,9 @@ withPasswordConfirmation:(NSString*)passwordConfirmation
             BOOL success = [[root objectForKey:@"success"] boolValue];
             
             if(success) {
+                int userID = [[[root objectForKey:@"user"] objectForKey:@"id"] intValue];
+                [Persistance saveUserID:[NSNumber numberWithInt:userID]];
+                [Persistance saveAuthToken:[root objectForKey:@"auth_token"]];
                 [Persistance saveLicensePlateNumber:[root objectForKey:@"license_plate_number"]];
                 [Persistance saveLastFourDigits:[root objectForKey:@"last_four_digits"]];
                 successBlock(root);
@@ -270,6 +281,10 @@ withPasswordConfirmation:(NSString*)passwordConfirmation
         BOOL success = [[root objectForKey:@"success"] boolValue];
         
         if(success) {
+            
+            int userID = [[[root objectForKey:@"user"] objectForKey:@"id"] intValue];
+            [Persistance saveUserID:[NSNumber numberWithInt:userID]];
+            
             [Persistance saveLicensePlateNumber:[root objectForKey:@"license_plate_number"]];
             [Persistance saveLastFourDigits:[root objectForKey:@"last_four_digits"]];
             successBlock(root);

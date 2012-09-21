@@ -10,10 +10,12 @@
 #import "ParkingSpot.h"
 
 @interface Persistance : NSObject
-+(void)saveUser:(NSDictionary*)user;
-+(NSDictionary*)retrieveUser;
++(void)saveUserID:(NSNumber*)user;
++(NSNumber*)retrieveUserID;
 +(void)saveAuthToken:(NSString*)token;
 +(NSString*)retrieveAuthToken;
+
++(void)updatePersistedDataWithAppVersion;
 
 
 +(void)saveLicensePlateNumber:(NSString*)lpn;

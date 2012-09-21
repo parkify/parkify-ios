@@ -6,115 +6,173 @@
 //  Copyright (c) 2012 __MyCompanyName__. All rights reserved.
 //
 #import "Persistance.h"
+#import "Parkify2AppDelegate.h"
 
 @interface  Persistance()
++ (void) saveUserRecord:(id)record withName:(NSString*)name;
++ (id) retrieveUserRecordwithName:(NSString*)name;
 + (void) saveRecord:(id)record withName:(NSString*)name;
 + (id) retrieveRecordwithName:(NSString*)name;
-
 @end
 
 @implementation Persistance
 
 + (void) saveRecord:(id)record withName:(NSString*)name {
     NSUserDefaults* standardUserDefaults = [NSUserDefaults standardUserDefaults];
-    if (standardUserDefaults) { 
-        [standardUserDefaults setObject:record forKey:name]; 
-        [standardUserDefaults synchronize]; } 
+    if (standardUserDefaults) {
+        [standardUserDefaults setObject:record forKey:name];
+        [standardUserDefaults synchronize]; }
 }
 + (id) retrieveRecordwithName:(NSString*)name {
     NSUserDefaults* standardUserDefaults = [NSUserDefaults standardUserDefaults];
     id val = nil;
     if (standardUserDefaults) val = [standardUserDefaults objectForKey:name];
-    return val; 
+    return val;
+}
+
++(void)saveUserID:(NSNumber*)user {
+    [Persistance saveRecord:user withName:@"CurrentUser"];
+}
++(NSNumber*)retrieveUserID {
+    NSNumber* toRtn = [Persistance retrieveRecordwithName:@"CurrentUser"];
+    return toRtn;
 }
 
 
++ (void) saveUserRecord:(id)record withName:(NSString*)name {
+    NSUserDefaults* standardUserDefaults = [NSUserDefaults standardUserDefaults];
+    if (standardUserDefaults) {
+        NSNumber* currentUser = [Persistance retrieveUserID];
+        currentUser = (currentUser != nil) ? currentUser : [NSNumber numberWithInt:-1];
+        
+        NSDictionary* toStore = [NSDictionary dictionaryWithObjectsAndKeys:record, [NSString stringWithFormat:@"%@", currentUser ], nil];
+        [standardUserDefaults setObject:[toStore copy] forKey:name];
+        [standardUserDefaults synchronize]; } 
+}
++ (id) retrieveUserRecordwithName:(NSString*)name {
+    NSUserDefaults* standardUserDefaults = [NSUserDefaults standardUserDefaults];
+    
+    NSNumber* currentUser = [Persistance retrieveUserID];
+    currentUser = (currentUser != nil) ? currentUser : [NSNumber numberWithInt:-1];
+    
+    id val = nil;
+    if (standardUserDefaults) val = [standardUserDefaults objectForKey:name];
+    if (val) val = [val objectForKey:[NSString stringWithFormat:@"%@", currentUser ]];
+    return val;
+}
+
+
++(void)saveVersion:(NSString*)version {
+    [Persistance saveRecord:version withName:@"Version"];
+}
++(NSString*)retrieveVersion {
+    return [Persistance retrieveRecordwithName:@"Version"];
+}
+
+//TODO: manage compatability across versions instead of erase on every update.
+
++(void)updatePersistedDataWithAppVersion {
+    NSString* thisVersion = [Persistance retrieveVersion];
+    if(thisVersion && [thisVersion isEqualToString:APP_VERSION]) {
+        return;
+    } else {
+        NSString *appDomain = [[NSBundle mainBundle] bundleIdentifier];
+        [[NSUserDefaults standardUserDefaults] removePersistentDomainForName:appDomain];
+        
+        [Persistance saveVersion:APP_VERSION];
+    }
+    
+}
+
+
+//Deprecated
 +(void)saveUser:(NSDictionary*)user { 
-    [Persistance saveRecord:user withName:@"User"];
+    [Persistance saveUserRecord:user withName:@"User"];
 }
+//Deprecated
 +(NSDictionary*)retrieveUser { 
-    return [Persistance retrieveRecordwithName:@"User"];
+    return [Persistance retrieveUserRecordwithName:@"User"];
 }
 
 
 +(void)saveAuthToken:(NSString*)token { 
-    [Persistance saveRecord:token withName:@"AuthToken"];
+    [Persistance saveUserRecord:token withName:@"AuthToken"];
 }
 +(NSString*)retrieveAuthToken { 
-    return [Persistance retrieveRecordwithName:@"AuthToken"];
+    return [Persistance retrieveUserRecordwithName:@"AuthToken"];
 }
 
 
 +(void)saveLicensePlateNumber:(NSString*)lpn {
-    [Persistance saveRecord:lpn withName:@"LicensePlateNumber"];
+    [Persistance saveUserRecord:lpn withName:@"LicensePlateNumber"];
 }
 +(NSString*)retrieveLicensePlateNumber {
-    return [Persistance retrieveRecordwithName:@"LicensePlateNumber"];
+    return [Persistance retrieveUserRecordwithName:@"LicensePlateNumber"];
 }
 
 +(void)saveLastFourDigits:(NSString*)lfd {
-    [Persistance saveRecord:lfd withName:@"LastFourDigits"];
+    [Persistance saveUserRecord:lfd withName:@"LastFourDigits"];
 }
 +(NSString*)retrieveLastFourDigits {
-    return [Persistance retrieveRecordwithName:@"LastFourDigits"];
+    return [Persistance retrieveUserRecordwithName:@"LastFourDigits"];
 
 }
 
 +(void)saveLastAmountCharged:(double)lac {
-    [Persistance saveRecord:[NSNumber numberWithDouble:lac] withName:@"LastAmountCharged"];
+    [Persistance saveUserRecord:[NSNumber numberWithDouble:lac] withName:@"LastAmountCharged"];
 }
 +(double)retrieveLastAmountCharged {
-    return [[Persistance retrieveRecordwithName:@"LastAmountCharged"] doubleValue];
+    return [[Persistance retrieveUserRecordwithName:@"LastAmountCharged"] doubleValue];
 }
 
 
 +(void)saveCurrentSpotId:(int)spotId{
     if (spotId == -1) {
-        [Persistance saveRecord:nil withName:@"CurrentSpotId"];
+        [Persistance saveUserRecord:nil withName:@"CurrentSpotId"];
     } else {
-        [Persistance saveRecord:[NSNumber numberWithInt:spotId] withName:@"CurrentSpotId"];
+        [Persistance saveUserRecord:[NSNumber numberWithInt:spotId] withName:@"CurrentSpotId"];
     }
 }
 +(int)retrieveCurrentSpotId {
-    return [[Persistance retrieveRecordwithName:@"CurrentSpotId"] intValue];
+    return [[Persistance retrieveUserRecordwithName:@"CurrentSpotId"] intValue];
 }
 
 
 
 +(void)saveCurrentStartTime:(double)timeIn {
     if (timeIn == -1) {
-        [Persistance saveRecord:nil withName:@"CurrentStartTime"];
+        [Persistance saveUserRecord:nil withName:@"CurrentStartTime"];
     } else {
-        [Persistance saveRecord:[NSNumber numberWithDouble:timeIn] withName:@"CurrentStartTime"];
+        [Persistance saveUserRecord:[NSNumber numberWithDouble:timeIn] withName:@"CurrentStartTime"];
     }
 }
 +(double)retrieveCurrentStartTime {
-    return [[Persistance retrieveRecordwithName:@"CurrentStartTime"] doubleValue];
+    return [[Persistance retrieveUserRecordwithName:@"CurrentStartTime"] doubleValue];
 }
 
 +(void)saveCurrentEndTime:(double)timeIn {
     if (timeIn == -1) {
-        [Persistance saveRecord:nil withName:@"CurrentEndTime"];
+        [Persistance saveUserRecord:nil withName:@"CurrentEndTime"];
     } else {
-        [Persistance saveRecord:[NSNumber numberWithDouble:timeIn] withName:@"CurrentEndTime"];
+        [Persistance saveUserRecord:[NSNumber numberWithDouble:timeIn] withName:@"CurrentEndTime"];
     }
 }
 +(double)retrieveCurrentEndTime {
-    return [[Persistance retrieveRecordwithName:@"CurrentEndTime"] doubleValue];
+    return [[Persistance retrieveUserRecordwithName:@"CurrentEndTime"] doubleValue];
 }
 
 +(void)saveCurrentSpot:(ParkingSpot*)spot {
     if (spot) {
-        [Persistance saveRecord:[spot asDictionary] withName:@"CurrentSpot"];
+        [Persistance saveUserRecord:[spot asDictionary] withName:@"CurrentSpot"];
     } else {
-        [Persistance saveRecord:nil withName:@"CurrentSpot"];
+        [Persistance saveUserRecord:nil withName:@"CurrentSpot"];
     }
 }
 
 +(ParkingSpot*)retrieveCurrentSpot {
-    if([Persistance retrieveRecordwithName:@"CurrentSpot"]) {
+    if([Persistance retrieveUserRecordwithName:@"CurrentSpot"]) {
         ParkingSpot* toRtn = [[ParkingSpot alloc] init];
-        [toRtn updateFromDictionary:[Persistance retrieveRecordwithName:@"CurrentSpot"] withLevelOfDetail:@"all"];
+        [toRtn updateFromDictionary:[Persistance retrieveUserRecordwithName:@"CurrentSpot"] withLevelOfDetail:@"all"];
         return toRtn;
     } else {
         return nil;

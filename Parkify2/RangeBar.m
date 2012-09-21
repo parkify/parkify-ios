@@ -13,6 +13,11 @@
 #define THUMB_TOUCH_DIAMETER 44
 //#define EFFECTIVE_THUMB_DIAMETER 44
 
+#define TRACK_PADDING_VERT 20
+#define TRACK_PADDING_HORIZ 20
+
+
+/* //Not Used
 #define ORIG_TRACK_BACKGROUND_WIDTH 579
 #define ORIG_TRACK_BACKGROUND_HEIGHT 88
 
@@ -29,9 +34,9 @@
 
 #define TRACK_WIDTH 271// 20
 #define TRACK_HEIGHT 20// 271
-#define TRACK_BACKGROUND_WIDTH WORKABLE_AREA_WIDTH
-#define TRACK_BACKGROUND_HEIGHT WORKABLE_AREA_HEIGHT
-
+#define TRACK_BACKGROUND_WIDTH (frame.size.width)//WORKABLE_AREA_WIDTH
+#define TRACK_BACKGROUND_HEIGHT (frame.size.height)
+*/ 
 
 #define CALLOUT_HEIGHT_MAIN (70*0.42)//(55*0.42)
 #define CALLOUT_HEIGHT_ARROW (35*0.42)
@@ -114,6 +119,10 @@
 - (RangeBar*)initWithFrame:(CGRect)frame minVal:(double)minVal maxVal:(double)maxVal minRange:(double)minRange selectedMaxVal:(double)selectedMaxVal withValueFormatter:(Formatter)formatter {
     self = [super initWithFrame:frame];
     if (self) {
+        
+        double w = frame.size.width - 2*TRACK_PADDING_HORIZ;
+        double h = frame.size.height - 2*TRACK_PADDING_VERT;
+        
         self.minimumValue = minVal;
         self.maximumValue = maxVal;
         self.minimumRange = minRange;
@@ -125,34 +134,34 @@
         self.maxLimit = selectedMaxVal;
         
         //track background
-        UIImage* imgRed = [UIImage imageWithImage:[UIImage imageNamed:@"slider_dark_background.png"] scaledToSize:CGSizeMake(TRACK_BACKGROUND_WIDTH, TRACK_BACKGROUND_HEIGHT)];
+        UIImage* imgRed = [UIImage imageWithImage:[UIImage imageNamed:@"slider_dark_background.png"] scaledToSize:CGSizeMake(w, h)];
         self.trackBackground = [[UIImageView alloc] initWithImage:imgRed];
         self.trackBackground.contentMode = UIViewContentModeLeft;
         
-        self.trackBackground.frame = CGRectMake((frame.size.width - TRACK_BACKGROUND_WIDTH) / 2, (frame.size.height - TRACK_BACKGROUND_HEIGHT) / 2, TRACK_BACKGROUND_WIDTH, TRACK_BACKGROUND_HEIGHT);
+        self.trackBackground.frame = CGRectMake((frame.size.width - w) / 2, (frame.size.height - h) / 2, w, h);
         self.trackBackground.alpha = 0.75;
         [self addSubview:self.trackBackground];
         
         self.padding = (frame.size.width - self.trackBackground.frame.size.width) / 2.0; 
         
         //track free
-        UIImage* imgWhite = [UIImage imageWithImage:[UIImage imageNamed:@"slider_white_background.png"] scaledToSize:CGSizeMake(TRACK_BACKGROUND_WIDTH, TRACK_BACKGROUND_HEIGHT)];
+        UIImage* imgWhite = [UIImage imageWithImage:[UIImage imageNamed:@"slider_white_background.png"] scaledToSize:CGSizeMake(w, h)];
         self.track_free = [[UIImageView alloc] initWithImage:imgWhite];
         self.track_free.contentMode = UIViewContentModeLeft;
         self.track_free.autoresizingMask = UIViewAutoresizingNone;
         self.track_free.clipsToBounds = true;
         
-        self.track_free.frame = CGRectMake(self.padding, (frame.size.height - TRACK_BACKGROUND_HEIGHT) / 2, [self xForValue:self.maxLimit] - self.padding, TRACK_BACKGROUND_HEIGHT);
+        self.track_free.frame = CGRectMake(self.padding, (frame.size.height - h) / 2, [self xForValue:self.maxLimit] - self.padding, h);
         [self addSubview:self.track_free];
         
         //track booked
-        UIImage* imgBlue = [UIImage imageWithImage:[UIImage imageNamed:@"slider_blue_background.png"] scaledToSize:CGSizeMake(TRACK_BACKGROUND_WIDTH, TRACK_BACKGROUND_HEIGHT)];
+        UIImage* imgBlue = [UIImage imageWithImage:[UIImage imageNamed:@"slider_blue_background.png"] scaledToSize:CGSizeMake(w, h)];
         self.track_booked = [[UIImageView alloc] initWithImage:imgBlue];
         self.track_booked.contentMode = UIViewContentModeLeft;
         self.track_booked.autoresizingMask = UIViewAutoresizingNone;
         self.track_booked.clipsToBounds = true;
         
-        self.track_booked.frame = CGRectMake(self.padding, (frame.size.height - TRACK_BACKGROUND_HEIGHT) / 2, [self xForValue:self.selectedMaximumValue] - self.padding, TRACK_BACKGROUND_HEIGHT);
+        self.track_booked.frame = CGRectMake(self.padding, (frame.size.height - h) / 2, [self xForValue:self.selectedMaximumValue] - self.padding, h);
         self.track_booked.alpha = 0.75;
         
         [self addSubview:self.track_booked];
@@ -380,16 +389,22 @@
     CGSize expectedLabelSize = [strToSet sizeWithFont:self.minLabel.font];
     self.minLabel.frame = CGRectMake( (CALLOUT_WIDTH - expectedLabelSize.width)/2, (CALLOUT_HEIGHT_MAIN - expectedLabelSize.height)/2, expectedLabelSize.width , expectedLabelSize.height);
     self.minLabel.text = strToSet;
-    /*
-    self.minLabelBackground.frame = CGRectMake(self.minThumb.center.x - self.minThumb.frame.size.width/2 - CALLOUT_WIDTH + CALLOUT_OFFSET_HORIZONTAL,
-                                               self.minThumb.center.y - self.minLabelBackground.frame.size.height/2 + CALLOUT_OFFSET_VERTICAL,
-                                               self.minLabelBackground.frame.size.width,
-                                               self.minLabelBackground.frame.size.height);
-     */
+
+     /*
     self.minLabelBackground.frame = CGRectMake([self xForValue:self.minimumValue]-self.minLabelBackground.frame.size.width + CALLOUT_OFFSET_HORIZONTAL,
                                                self.maxThumb.center.y - self.maxThumb.frame.size.height/2 - CALLOUT_HEIGHT + CALLOUT_OFFSET_VERTICAL,
                                                self.minLabelBackground.frame.size.width,
                                                self.minLabelBackground.frame.size.height);
+     */
+    
+    
+    
+     self.minLabelBackground.frame = CGRectMake([self xForValue:self.minimumValue]-(self.minLabelBackground.frame.size.width/2) + CALLOUT_OFFSET_HORIZONTAL,
+     self.maxThumb.center.y - self.maxThumb.frame.size.height/2 - CALLOUT_HEIGHT + CALLOUT_OFFSET_VERTICAL,
+     self.minLabelBackground.frame.size.width,
+     self.minLabelBackground.frame.size.height);
+     
+
     [self.minLabelBackground setAlpha:1];
     
     self.startTimeLabel.center = CGPointMake(self.minLabel.center.x, self.minLabel.center.y + LABEL_TO_LABEL_VERTICAL_OFFSET);
@@ -404,12 +419,33 @@
     self.maxLabel.frame = CGRectMake( (CALLOUT_WIDTH - expectedLabelSize.width)/2, (CALLOUT_HEIGHT_MAIN - expectedLabelSize.height)/2, expectedLabelSize.width , expectedLabelSize.height);
     self.maxLabel.text = strToSet;
     
-    double newX = MAX(self.maxThumb.center.x - self.maxLabelBackground.frame.size.width/2 + CALLOUT_OFFSET_HORIZONTAL, [self xForValue:self.minimumValue]);
     
-    self.maxLabelBackground.frame = CGRectMake(newX,
-                                               self.maxThumb.center.y - self.maxThumb.frame.size.height/2 - CALLOUT_HEIGHT + CALLOUT_OFFSET_VERTICAL,
-                                               self.maxLabelBackground.frame.size.width,
-                                               self.maxLabelBackground.frame.size.height);
+    double newX = self.maxThumb.center.x - self.maxLabelBackground.frame.size.width/2 + CALLOUT_OFFSET_HORIZONTAL;
+    double newXConstrained = [self xForValue:self.minimumValue]+(CALLOUT_WIDTH/2);
+    
+
+    if(newX <= newXConstrained) {
+        newX = newXConstrained;
+        self.maxLabelBackground.image = [UIImage imageNamed:@"callout_time_label.png"];
+        
+        self.maxLabelBackground.frame = CGRectMake(newX,
+                                                   self.maxThumb.center.y - self.maxThumb.frame.size.height/2 - CALLOUT_HEIGHT + CALLOUT_OFFSET_VERTICAL,
+                                                   self.maxLabelBackground.frame.size.width,
+                                                   CALLOUT_HEIGHT_MAIN);
+        
+    } else {
+        self.maxLabelBackground.image = [UIImage imageNamed:@"slider_callout_background.png"];
+        
+        self.maxLabelBackground.frame = CGRectMake(newX,
+                                                   self.maxThumb.center.y - self.maxThumb.frame.size.height/2 - CALLOUT_HEIGHT + CALLOUT_OFFSET_VERTICAL,
+                                                   self.maxLabelBackground.frame.size.width,
+                                                   CALLOUT_HEIGHT);
+        
+    }
+                                                                  
+                                                                  
+    
+    
     
     self.endTimeLabel.center = CGPointMake(self.maxLabel.center.x, self.maxLabel.center.y + LABEL_TO_LABEL_VERTICAL_OFFSET);
     //[self.maxLabelBackground setAlpha:1];

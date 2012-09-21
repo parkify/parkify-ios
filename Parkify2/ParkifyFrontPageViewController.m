@@ -7,6 +7,7 @@
 //
 
 #import "ParkifyFrontPageViewController.h"
+#import "Persistance.h"
 
 @interface ParkifyFrontPageViewController ()
 
@@ -27,6 +28,7 @@
 {
     
     [super viewDidLoad];
+    //[Persistance updatePersistedDataWithAppVersion];
     [self performSegueWithIdentifier:@"ViewMainFromFront" sender:self];
 	// Do any additional setup after loading the view.
 }

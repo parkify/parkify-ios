@@ -16,6 +16,7 @@
 @property (strong, nonatomic) NSArray* tableData;
 @property (strong, nonatomic) NSArray* tableImages;
 @property (strong, nonatomic) NSArray* tableOnTap;
+@property (weak, nonatomic) IBOutlet UITableView *tableView;
 
 
 @end

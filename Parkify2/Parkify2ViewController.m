@@ -372,6 +372,8 @@ typedef struct STargetLocation {
         self.targetLocation = target;
     }
     
+    [self updateBottomBar];
+    
     //NSLog(@"New latitude: %f", newLocation.coordinate.latitude);
     //NSLog(@"New longitude: %f", newLocation.coordinate.longitude);
 }
@@ -734,6 +736,7 @@ typedef struct STargetLocation {
 
 -(void)spotsWereUpdatedWithCount:(NSString *)count withLevelOfDetail:(NSString*)lod withSpot:(int)spotID
 {
+    [self updateBottomBar];
     NSMutableArray* annotations = [[NSMutableArray alloc] init ];
     for (ParkingSpot* spot in [self.parkingSpots.parkingSpots allValues]) {
         [annotations addObject:[ParkingSpotAnnotation annotationForSpot:spot]];

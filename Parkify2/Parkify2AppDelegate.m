@@ -8,6 +8,7 @@
 
 #import "Parkify2AppDelegate.h"
 //#import "Flurry.h"
+#import "Persistance.h"
 
 @implementation Parkify2AppDelegate
 
@@ -23,6 +24,7 @@ void uncaughtExceptionHandler(NSException *exception) {
 {
     // Override point for customization after application launch.
     NSSetUncaughtExceptionHandler(&uncaughtExceptionHandler);
+    [Persistance updatePersistedDataWithAppVersion];
     //[Flurry startSession:@"TS2D3KM78SMZ8MJWNYNV"];
     return YES;
 }
