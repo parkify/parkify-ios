@@ -15,6 +15,7 @@
 #import "UITabBarController+Hide.h"
 #import "ModalSettingsController.h"
 #import "TextFormatter.h"
+//#import "PlacedAgent.h"
 
 
 @interface ParkifySignInPageViewController ()
@@ -106,6 +107,8 @@
     if (self.exitOnLoad) {
         [self dismissModalViewControllerAnimated:YES];
     }
+    
+    //[PlacedAgent logPageView:@"LoginView"];
     
     
     [self updatePage];

@@ -16,6 +16,7 @@
 #import "TextFormatter.h"
 #import "ParkifyConfirmationViewController.h"
 #import "WaitingMask.h"
+//#import "PlacedAgent.h"
 
 @interface ParkifySpotViewController ()
 
@@ -93,7 +94,7 @@
 {
     [super viewDidLoad];
     [self addPicture];
-    
+    //[PlacedAgent logPageView:@"SpotInfoView"];
     
     NSDate* currentDate = [NSDate date];
     

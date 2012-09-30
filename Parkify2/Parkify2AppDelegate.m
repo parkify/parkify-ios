@@ -8,6 +8,7 @@
 
 #import "Parkify2AppDelegate.h"
 //#import "Flurry.h"
+//#import "PlacedAgent.h"
 #import "Persistance.h"
 
 @implementation Parkify2AppDelegate
@@ -26,6 +27,9 @@ void uncaughtExceptionHandler(NSException *exception) {
     NSSetUncaughtExceptionHandler(&uncaughtExceptionHandler);
     [Persistance updatePersistedDataWithAppVersion];
     //[Flurry startSession:@"TS2D3KM78SMZ8MJWNYNV"];
+    
+    //[PlacedAgent initWithAppKey:@"6f15dab4fc2d"];
+    //[PlacedAgent logStartSession];
     return YES;
 }
 							

@@ -280,7 +280,13 @@
     return [NSString stringWithFormat:@"%@ Spot", self.spot.mSpotType];
 }
 - (NSString *)subtitle {
-    return [NSString stringWithFormat:@"%@", self.spot.mLocationName];
+    NSString* adminExtra = @"";
+    
+    if (ADMIN_VER) {
+        adminExtra = [NSString stringWithFormat:@" <#%@>"];
+    }
+    
+    return [NSString stringWithFormat:@"%@%@", self.spot.mLocationName, adminExtra];
 }
 
 - (BOOL)updateAnnotationWith:(id)annotation onlyifIDsAreSame:(BOOL)boolIDsSame

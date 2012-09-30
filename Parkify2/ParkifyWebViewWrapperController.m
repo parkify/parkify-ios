@@ -7,6 +7,7 @@
 //
 
 #import "ParkifyWebViewWrapperController.h"
+//#import "PlacedAgent.h"
 
 @interface ParkifyWebViewWrapperController ()
 
@@ -29,6 +30,8 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+    
+    //[PlacedAgent logPageView:@"WebWrapperView"];
     
     NSString *fullURL = [NSString stringWithFormat:@"%@?view=iphone", self.url];
 

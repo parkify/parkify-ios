@@ -12,6 +12,7 @@
 #import "ParkifyAboutControllerViewController.h"
 #import "Api.h"
 #import "Persistance.h"
+//#import "PlacedAgent.h"
 
 @interface ParkifySettingsViewController ()
 
@@ -42,7 +43,7 @@
     
     self.tableImages = [NSArray arrayWithObjects:@"glyphicons_204_unlock.png", @"glyphicons_003_user.png", @"glyphicons_195_circle_info.png", nil];
     
-    
+    //[PlacedAgent logPageView:@"SettingsView"];
     
 	// Do any additional setup after loading the view.
 }

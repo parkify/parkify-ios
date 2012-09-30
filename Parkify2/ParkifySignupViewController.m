@@ -17,7 +17,7 @@
 #import "ModalSettingsController.h"
 #import "TextFormatter.h"
 #import "WaitingMask.h"
-
+//#import "PlacedAgent.h"
 
 @interface ParkifySignupViewController ()
 - (void)signUp;
@@ -76,6 +76,8 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+    
+    //[PlacedAgent logPageView:@"RegisterView"];
     
     self.stripeConnection = [StripeConnection connectionWithPublishableKey:@"pk_XeTF5KrqXMeSyyqApBF4q9qDzniMn"];
     

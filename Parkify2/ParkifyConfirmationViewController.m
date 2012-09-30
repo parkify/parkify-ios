@@ -13,6 +13,7 @@
 #import "Api.h"
 #import "Persistance.h"
 #import <AddressBook/AddressBook.h>
+//#import "PlacedAgent.h"
 
 @interface ParkifyConfirmationViewController ()
 
@@ -53,9 +54,14 @@
 {
     [super viewDidLoad];
     
+    //[PlacedAgent logPageView:@"SpotConfView"];
+    
     
     //image(s)
-    [self addPicture];
+    //[self addPicture];
+    
+    [self addAllPictures];
+    
     [self fillTopWebView];
     [self fillBottomWebView];
     
@@ -359,21 +365,80 @@
     
 }
 
-
-
--  (void)addPicture {
-    if (self.spot.imageIDs != NULL && [self.spot.imageIDs count] != 0) {
-        int imageID = [[self.spot.imageIDs objectAtIndex:0] intValue];
-        [self.pictureActivityView startAnimating];
-        [Api downloadImageDataAsynchronouslyWithId:imageID withStyle:@"original" withSuccess:^(NSDictionary * result) {
-            self.imageView.image = [UIImage imageWithData:[result objectForKey:@"image"]];
-            [self.pictureActivityView stopAnimating];
-            [self.pictureActivityView setHidden:true];
-        } withFailure:^(NSError * err) {
-            self.imageView.image = [UIImage imageNamed:@"NoPic.png"];
-            [self.pictureActivityView stopAnimating];
-            [self.pictureActivityView setHidden:true];
-        }];
+- (void)scrollViewDidScroll:(UIScrollView *)sender {
+    // Update the page when more than 50% of the previous/next page is visible
+    if (sender == self.pictureScrollView) {
+        CGFloat pageWidth = self.pictureScrollView.frame.size.width;
+        int page = floor((self.pictureScrollView.contentOffset.x - pageWidth / 2) / pageWidth) + 1;
+        self.pageControl.currentPage = page;
     }
+}
+
+- (void)addAllPictures {
+    int marginHoriz = 5;
+    int marginVert = 2;
+    
+    if (self.spot.imageIDs != NULL) {
+        int imgCount = [self.spot.imageIDs count];
+        if (imgCount != 0) {
+            
+            if(imgCount == 1) {
+                [self.pageControl setHidden:true];
+            }
+            
+            self.pageControl.numberOfPages = imgCount;
+            self.pageControl.currentPage = 0;
+            //Now generate each image.
+            for (int i=0; i<imgCount; i++) {
+                UIView* sub=[[UIView alloc]initWithFrame:CGRectMake(self.pictureScrollView.frame.size.width*i, 0, self.pictureScrollView.frame.size.width, self.pictureScrollView.frame.size.height)];
+                
+                //UILabel *lab=[[UILabel alloc]initWithFrame:CGRectMake(10, 200, 100, 100)];
+                
+                //lab.text=@"scrollview";
+                
+                UIImageView *imagev=[[UIImageView alloc]initWithFrame:CGRectMake(marginHoriz, marginVert, sub.frame.size.width-2*marginHoriz, sub.frame.size.height-2*marginVert)];
+                
+                
+                int imageID = [[self.spot.imageIDs objectAtIndex:i] intValue];
+                
+                UIActivityIndicatorView* pictureActivityView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
+                
+                pictureActivityView.center = sub.center;
+                //CGRect frame = pictureActivityView.frame;
+                //frame.origin.x = sub.frame.origin.x + 0.5* sub.frame.size.width
+                
+                [sub addSubview:imagev];
+                [sub addSubview:pictureActivityView];
+                [pictureActivityView startAnimating];
+                
+                [self addPictureWithID:imageID withImageView:imagev withActivityView:pictureActivityView];
+                
+                [self.pictureScrollView addSubview:sub];
+                
+            }
+            
+            [self.pictureScrollView setContentSize:CGSizeMake(self.pictureScrollView.frame.size.width*imgCount, self.pictureScrollView.frame.size.height)];
+            
+            self.pictureScrollView.delegate=self;
+            
+            
+            
+        }
+    }
+    
+}
+
+-  (void)addPictureWithID:(int)imageID withImageView:(UIImageView*)imageView withActivityView:(UIActivityIndicatorView*)pictureActivityView {
+    [self.pictureActivityView startAnimating];
+    [Api downloadImageDataAsynchronouslyWithId:imageID withStyle:@"original" withSuccess:^(NSDictionary * result) {
+        imageView.image = [UIImage imageWithData:[result objectForKey:@"image"]];
+        [pictureActivityView stopAnimating];
+        [pictureActivityView setHidden:true];
+    } withFailure:^(NSError * err) {
+        imageView.image = [UIImage imageNamed:@"NoPic.png"];
+        [pictureActivityView stopAnimating];
+        [pictureActivityView setHidden:true];
+    }];
+    
 }
 @end

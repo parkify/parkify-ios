@@ -9,6 +9,7 @@
 #import "ParkifyAboutControllerViewController.h"
 #import "ModalSettingsController.h"
 #import "UITabBarController+Hide.h"
+//#import "PlacedAgent.h"
 
 @interface ParkifyAboutViewController ()
 
@@ -43,6 +44,13 @@
 -(void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     [self.tabBarController showTabBar:NO];
+    
+    if([self.url isEqualToString:@"http://parkify.me/about_us"])
+    {
+        //[PlacedAgent logPageView:@"AboutView"];
+    } else {
+        //[PlacedAgent logPageView:@"AccountSettingsView"];
+    }
     
     NSString *fullURL = [NSString stringWithFormat:@"%@?view=iphone", self.url];
     

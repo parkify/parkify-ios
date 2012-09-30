@@ -21,6 +21,7 @@
 #import "ParkingSpotCollection.h"
 #import "ParkifyConfirmationViewController.h"
 #import "Persistance.h"
+//#import "PlacedAgent.h"
 
 #define ORIG_ANNOTATION_WIDTH 54
 #define ORIG_ANNOTATION_HEIGHT 89
@@ -30,7 +31,11 @@
 
 #define INIT_VIEW_WIDTH_IN_MILES 1.0
 
-#define ZOOM_LEVEL_STREET 15
+#define ZOOM_LEVEL_STREET 13
+
+#define GOOGLE_MAPS true
+
+#define ZOOM_MARGIN_FACTOR (GOOGLE_MAPS? 1.0 : 2.0)
 
 typedef enum targetLocationType {
     TARGET_NONE = -1,
@@ -152,7 +157,7 @@ typedef struct STargetLocation {
         [self.confirmationButton setHidden:true];
     if(self.targetLocation.type != TARGET_NONE) {
         double distanceToSpot = [self.parkingSpots distanceToClosestAvailableSpotToCoord:self.targetLocation.location];
-        if(distanceToSpot < 5) {
+        if(distanceToSpot <= 5) {
             self.bottomBarLabel.text = [NSString stringWithFormat:@"Closest spot is %@ away.", [TextFormatter formatDistanceClose:distanceToSpot]];
         } else {
             self.bottomBarLabel.text = @"No spots within 5 miles... Yet!";
@@ -235,7 +240,7 @@ typedef struct STargetLocation {
     
     [super viewWillAppear:animated];
     if(!self.bAlreadyInit) {
-        
+        //[PlacedAgent logPageView:@"MapView-Init"];
         //** Set up waitingMask **//
         CGRect waitingMaskFrame = self.view.frame;
         waitingMaskFrame.origin.x = 0;
@@ -310,6 +315,8 @@ typedef struct STargetLocation {
             //             completion: ^(BOOL finished){}];
 
         
+    } else {
+        //[PlacedAgent logPageView:@"MapView-Return"];
     }
    
     
@@ -385,16 +392,32 @@ typedef struct STargetLocation {
 }
 
 /*december*/
-- (void)goToCoord:(CLLocationCoordinate2D)target handleZoom:(BOOL)bHandleZoom {
+- (void)goToCoord:(CLLocationCoordinate2D)target handleZoom:(BOOL)bHandleZoom viewNearestSpot:(BOOL)bNearestSpot{
     [self.mapView selectAnnotation:nil animated:true];
     for (id selectedAnnotation in self.mapView.selectedAnnotations) {
         [self.mapView deselectAnnotation:selectedAnnotation animated:false];
     }
-    int zoomLevel = [self.mapView zoomLevel];
-    if( bHandleZoom ) {
-        zoomLevel = ZOOM_LEVEL_STREET;
+    
+    ParkingSpot* closest = [self.parkingSpots closestAvailableSpotToCoord:target];
+    double distanceToSpot = [self.parkingSpots distanceToClosestAvailableSpotToCoord:self.targetLocation.location];
+    if(bNearestSpot && closest && (distanceToSpot <= 5)) {
+        double minLat = MIN(target.latitude, closest.mLat);
+        double minLong = MIN(target.longitude, closest.mLong);
+        double maxLat = MAX(target.latitude, closest.mLat);
+        double maxLong = MAX(target.longitude, closest.mLong);
+        CLLocationCoordinate2D center = CLLocationCoordinate2DMake((maxLat+minLat)/2.0, (maxLong+minLong)/2.0);
+        
+        MKCoordinateSpan span = MKCoordinateSpanMake(fabsf(maxLat-minLat)*ZOOM_MARGIN_FACTOR, fabsf(maxLong-minLong)*ZOOM_MARGIN_FACTOR);
+        [self.mapView setRegion:MKCoordinateRegionMake(center, span) animated:true];
     }
-    [self.mapView setCenterCoordinate:target zoomLevel:zoomLevel animated:TRUE];
+    else {
+        int zoomLevel = [self.mapView zoomLevel];
+        if( bHandleZoom ) {
+            zoomLevel = ZOOM_LEVEL_STREET;
+        }
+        [self.mapView setCenterCoordinate:target zoomLevel:zoomLevel animated:TRUE];
+    }
+    
 }
 
 - (IBAction)settingsButtonTapped:(UIButton *)sender {
@@ -430,7 +453,7 @@ typedef struct STargetLocation {
     
     //self.targetType = TARGET_CURRENT_LOCATION;
     
-    [self goToCoord:myLocation handleZoom:true];
+    [self goToCoord:myLocation handleZoom:true viewNearestSpot:true];
 }
 
 - (void)expandAddressBar:(BOOL)bExpand {
@@ -913,7 +936,7 @@ typedef struct STargetLocation {
         
         
         
-        [self goToCoord:place.coordinate handleZoom:true];
+        [self goToCoord:place.coordinate handleZoom:true viewNearestSpot:true];
         
         //[self goToRegion:place.coordinateRegion];
     }

@@ -15,6 +15,8 @@ typedef void(^FailureBlock)(NSError*);
 
 typedef NSString* (^Formatter)(double val);
 
+#define ADMIN_VER true
+
 
 
 
