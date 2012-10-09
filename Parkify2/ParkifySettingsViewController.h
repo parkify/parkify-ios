@@ -18,5 +18,6 @@
 @property (strong, nonatomic) NSArray* tableOnTap;
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
 
+- (IBAction)callParkify:(UIButton *)sender;
 
 @end

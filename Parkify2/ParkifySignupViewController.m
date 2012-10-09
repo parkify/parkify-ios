@@ -92,6 +92,7 @@
     self.expirationMonthField.delegate = self;
     self.expirationYearField.delegate = self;
     self.licensePlateField.delegate = self;
+    self.phoneField.delegate = self;
     
 	// Do any additional setup after loading the view.
     
@@ -106,6 +107,7 @@
     [self setUpTextField:self.expirationMonthField];
     [self setUpTextField:self.expirationYearField];
     [self setUpTextField:self.licensePlateField];
+    [self setUpTextField:self.phoneField];
     
     [self setUpLabels:self.nameLabel];
     [self setUpLabels:self.emailLabel];
@@ -116,6 +118,7 @@
     [self setUpLabels:self.expirationMonthLabel];
     [self setUpLabels:self.expirationYearLabel];
     [self setUpLabels:self.licensePlateLabel];
+    [self setUpLabels:self.phoneLabel];
     
     
     CGRect frame = self.scrollView.frame;
@@ -142,12 +145,42 @@
     tf.layer.masksToBounds=YES;
     tf.layer.borderColor=[TEXTFIELD_BORDER_COLOR CGColor];
     tf.layer.borderWidth=2.0f;
+}
+
+//Does not work as expected.
+- (void)setUpTextField:(UITextField*)tf topBoundary:(BOOL)tBound
+bottomBoundary:(BOOL)bBound leftBoundary:(BOOL)lBound rightBoundary:(BOOL)rBound {
+
+    UIRectCorner corner = 0;
+    
+    if(tBound && lBound) {
+        corner = corner | UIRectCornerTopLeft;
+    }
+    if(tBound && rBound) {
+        corner = corner | UIRectCornerTopRight;
+    }
+    if(bBound && lBound) {
+        corner = corner | UIRectCornerBottomLeft;
+    }
+    if(bBound && rBound) {
+        corner = corner | UIRectCornerBottomRight;
+    }
+    
+    UIBezierPath *maskPath = [UIBezierPath bezierPathWithRoundedRect:tf.bounds byRoundingCorners:corner cornerRadii:CGSizeMake(2.0, 2.0)];
+    
+    CAShapeLayer* maskLayer = [CAShapeLayer layer];
+    maskLayer.frame = tf.bounds;
+    maskLayer.path = maskPath.CGPath;
+    
+    tf.layer.mask = maskLayer;
     
     /*
-    CGRect rect = tf.frame;
-    rect.size.height = TEXTFIELD_HEIGHT;
-    tf.frame = rect;
-     */
+    tf.layer.cornerRadius=8.0f;
+    */
+    tf.layer.masksToBounds=YES;
+    tf.layer.borderColor=[TEXTFIELD_BORDER_COLOR CGColor];
+    tf.layer.borderWidth=2.0f;
+    
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -170,6 +203,8 @@
     [self setZipField:nil];
     [self setScrollView:nil];
     [self setTosCheckbox:nil];
+    [self setPhoneLabel:nil];
+    [self setPhoneField:nil];
     [super viewDidUnload];
     // Release any retained subviews of the main view.
 }
@@ -244,6 +279,41 @@
         return;
     }
     
+    if(self.phoneField.text.length != 14) {
+        UIAlertView* error = [[UIAlertView alloc] initWithTitle:@"Error" message:@"Please give a valid phone number." delegate:self cancelButtonTitle:@"Ok"
+                                              otherButtonTitles: nil];
+        [error show];
+        return;
+    }
+    
+    if(self.firstNameField.text.length == 0) {
+        UIAlertView* error = [[UIAlertView alloc] initWithTitle:@"Error" message:@"Please give a valid name." delegate:self cancelButtonTitle:@"Ok"
+                                              otherButtonTitles: nil];
+        [error show];
+        return;
+    }
+    
+    if(self.lastNameField.text.length == 0) {
+        UIAlertView* error = [[UIAlertView alloc] initWithTitle:@"Error" message:@"Please give a valid name." delegate:self cancelButtonTitle:@"Ok"
+                                              otherButtonTitles: nil];
+        [error show];
+        return;
+    }
+    
+    if(self.zipField.text.length == 0) {
+        UIAlertView* error = [[UIAlertView alloc] initWithTitle:@"Error" message:@"Please give a valid zip code." delegate:self cancelButtonTitle:@"Ok"
+                                              otherButtonTitles: nil];
+        [error show];
+        return;
+    }
+    
+    if(self.licensePlateField.text.length == 0) {
+        UIAlertView* error = [[UIAlertView alloc] initWithTitle:@"Error" message:@"Please give a valid license plate." delegate:self cancelButtonTitle:@"Ok"
+                                              otherButtonTitles: nil];
+        [error show];
+        return;
+    }
+    
     CGRect waitingMaskFrame = self.view.frame;
     waitingMaskFrame.origin.x = 0;
     waitingMaskFrame.origin.y = 0;
@@ -264,6 +334,7 @@ withPasswordConfirmation:self.passwordField.text
       withExpirationYear:[NSNumber numberWithInteger:[self.expirationYearField.text integerValue] ] 
         withLicensePlate:self.licensePlateField.text
              withZipCode:self.zipField.text
+               withPhone:self.phoneField.text
              withSuccess:^(NSDictionary * result) {
                  [self handleRegistrationSuccess:result];
              } 
@@ -303,4 +374,108 @@ withPasswordConfirmation:self.passwordField.text
     
     sender.selected = !sender.selected;
 }
+
+
+- (BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string{
+    
+    if(textField != self.phoneField) {
+        return YES;
+    }
+     
+    
+    int length = [self getLength:textField.text];
+    //NSLog(@"Length  =  %d ",length);
+    
+    if(length == 10)
+    {
+        if(range.length == 0)
+            return NO;
+    }
+    
+    if(length == 3)
+    {
+        NSString *num = [self formatNumber:textField.text];
+        textField.text = [NSString stringWithFormat:@"(%@) ",num];
+        if(range.length > 0)
+            textField.text = [NSString stringWithFormat:@"%@",[num substringToIndex:3]];
+    }
+    else if(length == 6)
+    {
+        NSString *num = [self formatNumber:textField.text];
+        //NSLog(@"%@",[num  substringToIndex:3]);
+        //NSLog(@"%@",[num substringFromIndex:3]);
+        textField.text = [NSString stringWithFormat:@"(%@) %@-",[num  substringToIndex:3],[num substringFromIndex:3]];
+        if(range.length > 0)
+            textField.text = [NSString stringWithFormat:@"(%@) %@",[num substringToIndex:3],[num substringFromIndex:3]];
+    }
+    
+    return YES;
+    
+}
+
+-(NSString*)formatNumber:(NSString*)mobileNumber
+{
+    
+    mobileNumber = [mobileNumber stringByReplacingOccurrencesOfString:@"(" withString:@""];
+    mobileNumber = [mobileNumber stringByReplacingOccurrencesOfString:@")" withString:@""];
+    mobileNumber = [mobileNumber stringByReplacingOccurrencesOfString:@" " withString:@""];
+    mobileNumber = [mobileNumber stringByReplacingOccurrencesOfString:@"-" withString:@""];
+    mobileNumber = [mobileNumber stringByReplacingOccurrencesOfString:@"+" withString:@""];
+    
+    NSLog(@"%@", mobileNumber);
+    
+    int length = [mobileNumber length];
+    if(length > 10)
+    {
+        mobileNumber = [mobileNumber substringFromIndex: length-10];
+        NSLog(@"%@", mobileNumber);
+        
+    }
+    
+    
+    return mobileNumber;
+}
+
+
+-(int)getLength:(NSString*)mobileNumber
+{
+    
+    mobileNumber = [mobileNumber stringByReplacingOccurrencesOfString:@"(" withString:@""];
+    mobileNumber = [mobileNumber stringByReplacingOccurrencesOfString:@")" withString:@""];
+    mobileNumber = [mobileNumber stringByReplacingOccurrencesOfString:@" " withString:@""];
+    mobileNumber = [mobileNumber stringByReplacingOccurrencesOfString:@"-" withString:@""];
+    mobileNumber = [mobileNumber stringByReplacingOccurrencesOfString:@"+" withString:@""];
+    
+    int length = [mobileNumber length];
+    
+    return length;
+    
+    
+}
+
+- (IBAction)callParkify:(UIButton *)sender {
+    UIDevice *device = [UIDevice currentDevice];
+    if ([[device model] isEqualToString:@"iPhone"] ) {
+        UIAlertView *Permitted=[[UIAlertView alloc] initWithTitle:@"Need Help?" message:@"Would you like to call Parkify?" delegate:self cancelButtonTitle:@"No" otherButtonTitles:@"Yes", nil];
+        [Permitted show];
+    } else {
+        UIAlertView *Notpermitted=[[UIAlertView alloc] initWithTitle:@"Alert" message:@"Your device doesn't support this feature." delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
+        [Notpermitted show];
+    }
+}
+- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
+{
+    NSString *title = [alertView buttonTitleAtIndex:buttonIndex];
+    
+    if([title isEqualToString:@"No"])
+    {
+        //NSLog(@"Button 1 was selected.");
+    }
+    else if([title isEqualToString:@"Yes"])
+    {
+        //NSLog(@"Button 2 was selected.");
+        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:[NSString stringWithFormat:@"tel:1-855-727-5439"]]];
+    }
+}
+
 @end

@@ -21,7 +21,7 @@
                               nil];
     return request;
 }
-+ (id)makeUserRegistrationRequest:(NSString *)email withPassword:(NSString *)password withPasswordConfirmation:(NSString *)passwordConfirmation withFirstName:(NSString *)firstName withLastName:(NSString*)lastName withZipCode:(NSString*)zipCode{
++ (id)makeUserRegistrationRequest:(NSString *)email withPassword:(NSString *)password withPasswordConfirmation:(NSString *)passwordConfirmation withFirstName:(NSString *)firstName withLastName:(NSString*)lastName withZipCode:(NSString*)zipCode withPhone:(NSString*)phone{
     NSDictionary *request =  [NSDictionary dictionaryWithObjectsAndKeys:
                               email, @"email", 
                               password, @"password", 
@@ -29,6 +29,7 @@
                               firstName, @"first_name",
                               lastName, @"last_name",
                               zipCode, @"zip_code",
+                              phone, @"phone_number",
                               nil];
     return request;
 }

@@ -28,6 +28,7 @@ withPasswordConfirmation:(NSString*)passwordConfirmation
      withExpirationYear:(NSNumber*)expYear
        withLicensePlate:(NSString*)licensePlate
             withZipCode:(NSString*)zipCode
+              withPhone:(NSString*)phone
             withSuccess:(SuccessBlock)successBlock
             withFailure:(FailureBlock)failureBlock ;
 

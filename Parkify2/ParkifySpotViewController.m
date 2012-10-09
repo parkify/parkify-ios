@@ -182,12 +182,13 @@
     NSString* infoWebViewString;
     NSString* styleString = @"<style type=\"text/css\">"
     //"body { background-color:transparent; font-family:Marker Felt; font-size:12; color:white}"
-    ".top { background-color:transparent; font-family:\"Arial Rounded MT Bold\"; font-size:14; color:black; }"
-    ".top-mid { background-color:transparent; font-family:\"Arial Rounded MT Bold\"; font-size:10; color:#224455; }"
-    ".mid { background-color:transparent; font-family:\"Arial Rounded MT Bold\"; font-size:10; color:#556677; }"
+    ".top { background-color:transparent; font-family:\"Arial Rounded MT Bold\"; font-size:14; color:black}"
+    ".top-mid { background-color:transparent; font-family:\"Arial Rounded MT Bold\"; font-size:10; color:#224455;}"
+    ".mid { background-color:transparent; font-family:\"Arial Rounded MT Bold\"; font-size:10; color:#556677;}"
     ".bottom { background-color:transparent; font-family:\"Arial Rounded MT Bold\"; font-size:16; color:black; }"
     ".selected { color:#224455; } "
-    ".faded { color:#99AABB; } "
+    ".faded { color:#99AABB; }"
+    ".fake-space {font-size:5;}"
     "</style>";
     if(self.spot == nil) {
         infoWebViewString = [NSString stringWithFormat:@"<html>%@<body>Spot Not Available.</body></html>", styleString];
@@ -213,8 +214,10 @@
         infoWebViewString = [NSString stringWithFormat:@"<html>%@<body>"
                              "<span class=top>Distance Away: %@</span></br>"
                              "<span class=top-mid>%@</span></br>"
+                             "<span class=fake-space></br></span>"
                              "<span class=mid>Difficulty: %@</span></br>"
                              "<span class=mid>Coverage: %@</span></br>"
+                             "<span class=fake-space></br></span>"
                              "<span class=bottom>Current Rate: $%0.2f/hr</span><hr/>"
                              "<span class=top>%@</span><hr/></p>"
                              "</body></html>",

@@ -13,5 +13,5 @@
 - (IBAction)closeButtonTapped:(UIBarButtonItem *)sender;
 
 @property (strong, nonatomic) NSString* url;
-
+- (IBAction)callParkify:(UIButton *)sender;
 @end

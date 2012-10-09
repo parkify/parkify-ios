@@ -15,6 +15,7 @@
 		8C271910160BE9B100923857 /* app_icon_highres.png in Resources */ = {isa = PBXBuildFile; fileRef = 8C27190E160BE9B100923857 /* app_icon_highres.png */; };
 		8C271911160BE9B100923857 /* app_icon_lowres.png in Resources */ = {isa = PBXBuildFile; fileRef = 8C27190F160BE9B100923857 /* app_icon_lowres.png */; };
 		8C271913160C8F8C00923857 /* AddressBook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8C271912160C8F8A00923857 /* AddressBook.framework */; };
+		8C2E6FFE1617EEBB000BFB4A /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 8C2E6FFD1617EEBB000BFB4A /* Default-568h@2x.png */; };
 		8C607E7E15D9B1A000928DAD /* UITextFieldWithNavigationBar.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C607E7D15D9B1A000928DAD /* UITextFieldWithNavigationBar.m */; };
 		8C607E8215DBF5D900928DAD /* Offer.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C607E8115DBF5D900928DAD /* Offer.m */; };
 		8C607E8A15DDCC5400928DAD /* ParkingSpotCollection.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C607E8915DDCC5400928DAD /* ParkingSpotCollection.m */; };
@@ -157,6 +158,7 @@
 		8C27190E160BE9B100923857 /* app_icon_highres.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = app_icon_highres.png; sourceTree = "<group>"; };
 		8C27190F160BE9B100923857 /* app_icon_lowres.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = app_icon_lowres.png; sourceTree = "<group>"; };
 		8C271912160C8F8A00923857 /* AddressBook.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AddressBook.framework; path = System/Library/Frameworks/AddressBook.framework; sourceTree = SDKROOT; };
+		8C2E6FFD1617EEBB000BFB4A /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x.png"; sourceTree = "<group>"; };
 		8C607E7C15D9B1A000928DAD /* UITextFieldWithNavigationBar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UITextFieldWithNavigationBar.h; sourceTree = "<group>"; };
 		8C607E7D15D9B1A000928DAD /* UITextFieldWithNavigationBar.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UITextFieldWithNavigationBar.m; sourceTree = "<group>"; };
 		8C607E8015DBF5D900928DAD /* Offer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Offer.h; sourceTree = "<group>"; };
@@ -910,6 +912,7 @@
 		8CB12B4715FFAE2100551C0B /* Design 8 */ = {
 			isa = PBXGroup;
 			children = (
+				8C2E6FFD1617EEBB000BFB4A /* Default-568h@2x.png */,
 				8C27190E160BE9B100923857 /* app_icon_highres.png */,
 				8C27190F160BE9B100923857 /* app_icon_lowres.png */,
 				8C27190A160B985A00923857 /* slider_blue_background.png */,
@@ -985,9 +988,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		8CA7A1DB15A3DC980051567D /* Parkify */ = {
+		8CA7A1DB15A3DC980051567D /* Parkify2 */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 8CA7A1FD15A3DC980051567D /* Build configuration list for PBXNativeTarget "Parkify" */;
+			buildConfigurationList = 8CA7A1FD15A3DC980051567D /* Build configuration list for PBXNativeTarget "Parkify2" */;
 			buildPhases = (
 				8CA7A1D815A3DC980051567D /* Sources */,
 				8CA7A1D915A3DC980051567D /* Frameworks */,
@@ -997,7 +1000,7 @@
 			);
 			dependencies = (
 			);
-			name = Parkify;
+			name = Parkify2;
 			productName = Parkify2;
 			productReference = 8CA7A1DC15A3DC980051567D /* Parkify.app */;
 			productType = "com.apple.product-type.application";
@@ -1023,7 +1026,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				8CA7A1DB15A3DC980051567D /* Parkify */,
+				8CA7A1DB15A3DC980051567D /* Parkify2 */,
 			);
 		};
 /* End PBXProject section */
@@ -1102,6 +1105,7 @@
 				8C27190D160B985A00923857 /* slider_dark_background.png in Resources */,
 				8C271910160BE9B100923857 /* app_icon_highres.png in Resources */,
 				8C271911160BE9B100923857 /* app_icon_lowres.png in Resources */,
+				8C2E6FFE1617EEBB000BFB4A /* Default-568h@2x.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1262,14 +1266,16 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Parkify2/Parkify-Prefix.pch";
 				INFOPLIST_FILE = "Parkify2/Parkify-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 5.1;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/Flurry\"",
 					"\"$(SRCROOT)/FlurryAds\"",
 				);
+				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_NAME = Parkify;
 				PROVISIONING_PROFILE = "";
+				SDKROOT = iphoneos;
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -1283,15 +1289,17 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Parkify2/Parkify-Prefix.pch";
 				INFOPLIST_FILE = "Parkify2/Parkify-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 5.1;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/Flurry\"",
 					"\"$(SRCROOT)/FlurryAds\"",
 				);
+				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_NAME = Parkify;
 				PROVISIONING_PROFILE = "";
 				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
+				SDKROOT = iphoneos;
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;
@@ -1308,7 +1316,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		8CA7A1FD15A3DC980051567D /* Build configuration list for PBXNativeTarget "Parkify" */ = {
+		8CA7A1FD15A3DC980051567D /* Build configuration list for PBXNativeTarget "Parkify2" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				8CA7A1FE15A3DC980051567D /* Debug */,

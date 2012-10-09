@@ -35,7 +35,9 @@
 
 #define GOOGLE_MAPS true
 
-#define ZOOM_MARGIN_FACTOR (GOOGLE_MAPS? 1.0 : 2.0)
+#define ZOOM_MARGIN_FACTOR (GOOGLE_MAPS? 1.8 : 1.8)
+
+
 
 typedef enum targetLocationType {
     TARGET_NONE = -1,
@@ -148,12 +150,24 @@ typedef struct STargetLocation {
             [dateFormatter setDateFormat:@"h:mm a"];
             return [dateFormatter stringFromDate:time]; };
         
+        [UIView animateWithDuration:0.3 animations:^{
+            self.bottomBarView.frame = self.bottomBarLargeReferenceView.frame;
+            self.bottomBarView.backgroundColor = [UIColor colorWithRed:32/255.0 green:147/255.0 blue:255/255.0 alpha:1];
+        }];
+        
+        
+        
         
         self.bottomBarLabel.text = [NSString stringWithFormat:@"Reservation ends at %@ | details ", formatter(endTime)];
         
         [self.confirmationButton setHidden:false];
         
     } else {
+        [UIView animateWithDuration:0.3 animations:^{
+            self.bottomBarView.frame = self.bottomBarSmallReferenceView.frame;
+            self.bottomBarView.backgroundColor = [UIColor whiteColor];
+        }];
+        
         [self.confirmationButton setHidden:true];
     if(self.targetLocation.type != TARGET_NONE) {
         double distanceToSpot = [self.parkingSpots distanceToClosestAvailableSpotToCoord:self.targetLocation.location];
@@ -212,6 +226,8 @@ typedef struct STargetLocation {
     [self setBottomBarLabel:nil];
     [self setBottomBarView:nil];
     [self setConfirmationButton:nil];
+    [self setBottomBarSmallReferenceView:nil];
+    [self setBottomBarLargeReferenceView:nil];
     [super viewDidUnload];
     // Release any retained subviews of the main view.
 }

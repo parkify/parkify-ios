@@ -38,6 +38,8 @@
 @property (weak, nonatomic) IBOutlet UISearchBar *addressBar;
 @property (weak, nonatomic) IBOutlet UIButton *myLocationButton;
 @property CLLocationCoordinate2D lastSearchedLocation;
+@property (weak, nonatomic) IBOutlet UIView *bottomBarSmallReferenceView;
+@property (weak, nonatomic) IBOutlet UIView *bottomBarLargeReferenceView;
 
 @property (nonatomic, strong) ParkingSpotCollection* parkingSpots;
 @property (nonatomic, strong) ParkingSpot* targetSpot;

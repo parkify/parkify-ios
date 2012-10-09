@@ -28,6 +28,7 @@
                        withLastName:(NSString*)lastName
                    withLicensePlate:(NSString*)licensePlate
                         withZipCode:(NSString*)zipCode
+                          withPhone:(NSString*)phone
                         withSuccess:(SuccessBlock)successBlock
                         withFailure:(FailureBlock)failureBlock;
 @end
@@ -46,6 +47,7 @@ withPasswordConfirmation:(NSString*)passwordConfirmation
      withExpirationYear:(NSNumber*)expYear
        withLicensePlate:(NSString*)licensePlate
             withZipCode:(NSString*)zipCode
+              withPhone:(NSString*)phone
             withSuccess:(SuccessBlock)successBlock
             withFailure:(FailureBlock)failureBlock {
     
@@ -76,6 +78,7 @@ withPasswordConfirmation:(NSString*)passwordConfirmation
                               withLastName:lastName
                           withLicensePlate:licensePlate
                                withZipCode:zipCode
+                                 withPhone:phone
                                withSuccess:successBlock
                                withFailure:failureBlock];
      }
@@ -112,6 +115,7 @@ withPasswordConfirmation:(NSString*)passwordConfirmation
                        withLastName:(NSString*)lastName
                    withLicensePlate:(NSString*)licensePlate
                         withZipCode:(NSString*)zipCode
+                          withPhone:(NSString *)phone
                         withSuccess:(SuccessBlock)successBlock
                         withFailure:(FailureBlock)failureBlock {
     
@@ -122,7 +126,8 @@ withPasswordConfirmation:(NSString*)passwordConfirmation
                                             withPasswordConfirmation:passwordConfirmation
                                                        withFirstName:firstName
                                                         withLastName:lastName
-                                                         withZipCode:zipCode];
+                                                         withZipCode:zipCode
+                                                           withPhone:phone];
         id tokenRequest = [Authentication makeTokenRequestWithToken:token];
         
         NSURL *url = [NSURL URLWithString:@"https://parkify-rails.herokuapp.com/api/v1/users.json"];

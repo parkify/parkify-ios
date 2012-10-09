@@ -29,4 +29,6 @@
 @property (weak, nonatomic) IBOutlet UILabel *greetingLabel;
 
 - (IBAction)logoutButtonPressed:(UIButton *)sender;
+
+- (IBAction)callParkify:(UIButton *)sender;
 @end

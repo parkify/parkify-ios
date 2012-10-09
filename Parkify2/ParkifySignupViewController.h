@@ -24,6 +24,10 @@
 @property (weak, nonatomic) IBOutlet UITextField *expirationMonthField;
 @property (weak, nonatomic) IBOutlet UITextField *expirationYearField;
 @property (weak, nonatomic) IBOutlet UITextField *licensePlateField;
+@property (weak, nonatomic) IBOutlet UITextField *phoneField;
+
+
+
 - (IBAction)signUpTapped:(id)sender;
 @property (weak, nonatomic) IBOutlet UILabel *errorLabel;
 @property (weak, nonatomic) IBOutlet UIButton *signUpButton;
@@ -38,6 +42,7 @@
 @property (weak, nonatomic) IBOutlet UILabel *expirationYearLabel;
 - (IBAction)tosButtonTapped:(id)sender;
 @property (weak, nonatomic) IBOutlet UILabel *licensePlateLabel;
+@property (weak, nonatomic) IBOutlet UILabel *phoneLabel;
 
 
 @property (weak, nonatomic) IBOutlet UIScrollView *scrollView;
@@ -49,5 +54,7 @@
 @property (weak, nonatomic) id<CollapsingSegueProtocol> segueParent;
 - (IBAction)cancelButtonPressed:(UIBarButtonItem *)sender;
 @property (weak, nonatomic) IBOutlet TPKeyboardAvoidingScrollView *keyboardAvoidingScrollView;
+
+- (IBAction)callParkify:(UIButton *)sender;
 
 @end

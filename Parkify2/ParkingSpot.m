@@ -283,7 +283,7 @@
     NSString* adminExtra = @"";
     
     if (ADMIN_VER) {
-        adminExtra = [NSString stringWithFormat:@" <#%@>"];
+        adminExtra = [NSString stringWithFormat:@" <#%d>", self.spot.mID];
     }
     
     return [NSString stringWithFormat:@"%@%@", self.spot.mLocationName, adminExtra];

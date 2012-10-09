@@ -323,7 +323,7 @@
         NSString* directions = [self.spot.mDirections stringByReplacingOccurrencesOfString:@"\n" withString:@"</li><li>"];
         
         infoWebViewString = [NSString stringWithFormat:@"<html>%@<body>"
-                             "<div class=\"box\"><center><h3>Congratulations!</h2><span class=top><p>You bought parking spot #%@<br/>at: %@<br/>Your reservation:<br/>%@</p></span></center></div>"
+                             "<div class=\"box\"><center><h3>Congratulations!</h2><span class=top><p>You bought parking spot with Unique ID #%@<br/>at: %@<br/>Your reservation:<br/>%@</p></span></center></div>"
                              
                             
                              "<div class=\"box\"><span class=top>How to find your spot:</span>"
@@ -338,7 +338,7 @@
                              "<span class=mid>Covered: %@</span></center></div>"
                              
                              "<div class=\"box\"><center>"
-                             "<span class=bottom>%@</br>Need Help? Call 1-855-Parkify</span></center></div>"
+                             "<span class=bottom>%@</br>Need Help? Call <a href=\"tel:1-855-727-5439\">1-855-Parkify</a></span></center></div>"
                              
                              
                              "</body></html>",
