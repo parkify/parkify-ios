@@ -8,14 +8,22 @@
 
 #import "RangeBar.h"
 #import "UIImage+Resize.h"
+#import "RangeBubble.h"
 
 #define THUMB_DIAMETER 44
 #define THUMB_TOUCH_DIAMETER 44
 //#define EFFECTIVE_THUMB_DIAMETER 44
 
-#define TRACK_PADDING_VERT 20
-#define TRACK_PADDING_HORIZ 20
+#define TRACK_PADDING_VERT 0.0
+#define TRACK_PADDING_HORIZ 0.0
 
+#define NUM_INTERVALS_PER_BUBBLE 2.0
+
+#define MAX_SCROLL_SPEED 8.0
+#define MIN_SCROLL_SPEED 2.0
+#define SCROLL_RANGE 40.0
+
+#define LIN_SCROLL_RATE ((MAX_SCROLL_SPEED - MIN_SCROLL_SPEED) / SCROLL_RANGE )
 
 /* //Not Used
 #define ORIG_TRACK_BACKGROUND_WIDTH 579
@@ -50,6 +58,9 @@
 #define CALLOUT_TEXT_COLOR [UIColor colorWithRed:226.0/255 green:226.0/255 blue:226.0/255 alpha:1]
 
 #define LABEL_TO_LABEL_VERTICAL_OFFSET (-CALLOUT_HEIGHT_MAIN + 5)
+
+
+
 @interface RangeBar()   
 
 @property BOOL maxThumbOn;
@@ -57,9 +68,11 @@
 @property float padding;
 @property (strong, nonatomic) UIImageView * minThumb;
 @property (strong, nonatomic) UIImageView * maxThumb;
-@property (strong, nonatomic) UIImageView * track_booked;
-@property (strong, nonatomic) UIImageView * track_free;
-@property (strong, nonatomic) UIImageView * trackBackground;
+
+@property CGRect trackRect;
+
+@property (strong, nonatomic) NSMutableArray* trackBubbles;
+
 @property (strong, nonatomic) UILabel * minLabel;
 @property (strong, nonatomic) UILabel * maxLabel;
 
@@ -70,6 +83,13 @@
 @property (strong, nonatomic) UIImageView * maxLabelBackground;
 
 @property double maxLimit;
+
+@property double scrollPos;
+@property double scrollVel;
+@property int numDisplayedBubbles;
+
+@property BOOL animating;
+
 
 -(float)xForValue:(float)value;
 -(float)valueForX:(float)x;
@@ -86,6 +106,7 @@
 @synthesize minimumValue = _minimumValue;
 @synthesize maximumValue = _maximumValue;
 @synthesize minimumRange = _minimumRange;
+@synthesize displayedRange = _displayedRange;
 @synthesize maxLimit = _maxLimit;
 @synthesize selectedMinimumValue = _selectedMinimumValue;
 @synthesize selectedMaximumValue = _selectedMaximumValue;
@@ -96,9 +117,6 @@
 @synthesize padding = _padding;
 @synthesize minThumb = _minThumb;
 @synthesize maxThumb = _maxThumb;
-@synthesize track_booked = _track_booked;
-@synthesize track_free = _free;
-@synthesize trackBackground = _trackBackground;
 @synthesize minLabel = _minLabel;
 @synthesize maxLabel = _maxLabel;
 @synthesize startTimeLabel = _startTimeLabel;
@@ -106,7 +124,12 @@
 @synthesize minLabelBackground = _minLabelBackground;
 @synthesize maxLabelBackground = _maxLabelBackground;
 
+@synthesize scrollPos = _scrollPos;
+@synthesize numDisplayedBubbles = _numDisplayedBubbles;
+
 @synthesize labelFormatter = _labelFormatter;
+@synthesize animating = _animating;
+@synthesize scrollVel = _scrollVel;
 
 -(Formatter)labelFormatter {
     if(!_labelFormatter) {
@@ -116,123 +139,72 @@
     return _labelFormatter;
 }
 
-- (RangeBar*)initWithFrame:(CGRect)frame minVal:(double)minVal maxVal:(double)maxVal minRange:(double)minRange selectedMaxVal:(double)selectedMaxVal withValueFormatter:(Formatter)formatter {
+- (RangeBar*)initWithFrame:(CGRect)frame minVal:(double)minVal maxVal:(double)maxVal minRange:(double)minRange displayedRange:(double)displayedRange selectedMinVal:(double)selectedMinVal selectedMaxVal:(double)selectedMaxVal withValueFormatter:(Formatter)formatter {
     self = [super initWithFrame:frame];
     if (self) {
         
-        double w = frame.size.width - 2*TRACK_PADDING_HORIZ;
-        double h = frame.size.height - 2*TRACK_PADDING_VERT;
+        
+        
         
         self.minimumValue = minVal;
         self.maximumValue = maxVal;
         self.minimumRange = minRange;
+        self.displayedRange = displayedRange;
+        
+        
         self.labelFormatter = formatter;
         
         //for now
-        self.selectedMinimumValue = self.minimumValue;
-        self.selectedMaximumValue = self.minimumValue + self.minimumRange;
-        self.maxLimit = selectedMaxVal;
+        self.selectedMinimumValue = selectedMinVal;
+        self.selectedMaximumValue = selectedMaxVal;
+        
+        
+        self.scrollPos = 0;
         
         //track background
-        UIImage* imgRed = [UIImage imageWithImage:[UIImage imageNamed:@"slider_dark_background.png"] scaledToSize:CGSizeMake(w, h)];
-        self.trackBackground = [[UIImageView alloc] initWithImage:imgRed];
-        self.trackBackground.contentMode = UIViewContentModeLeft;
-        
-        self.trackBackground.frame = CGRectMake((frame.size.width - w) / 2, (frame.size.height - h) / 2, w, h);
-        self.trackBackground.alpha = 0.75;
-        [self addSubview:self.trackBackground];
-        
-        self.padding = (frame.size.width - self.trackBackground.frame.size.width) / 2.0; 
-        
-        //track free
-        UIImage* imgWhite = [UIImage imageWithImage:[UIImage imageNamed:@"slider_white_background.png"] scaledToSize:CGSizeMake(w, h)];
-        self.track_free = [[UIImageView alloc] initWithImage:imgWhite];
-        self.track_free.contentMode = UIViewContentModeLeft;
-        self.track_free.autoresizingMask = UIViewAutoresizingNone;
-        self.track_free.clipsToBounds = true;
-        
-        self.track_free.frame = CGRectMake(self.padding, (frame.size.height - h) / 2, [self xForValue:self.maxLimit] - self.padding, h);
-        [self addSubview:self.track_free];
-        
-        //track booked
-        UIImage* imgBlue = [UIImage imageWithImage:[UIImage imageNamed:@"slider_blue_background.png"] scaledToSize:CGSizeMake(w, h)];
-        self.track_booked = [[UIImageView alloc] initWithImage:imgBlue];
-        self.track_booked.contentMode = UIViewContentModeLeft;
-        self.track_booked.autoresizingMask = UIViewAutoresizingNone;
-        self.track_booked.clipsToBounds = true;
-        
-        self.track_booked.frame = CGRectMake(self.padding, (frame.size.height - h) / 2, [self xForValue:self.selectedMaximumValue] - self.padding, h);
-        self.track_booked.alpha = 0.75;
-        
-        [self addSubview:self.track_booked];
         
         
-        //minThumb
-        self.minThumb = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@""]];
+        //okay, how many do we want???
+        // we want (maxVal-minVal)/(minRange*NUM_INTERVALS_PER_BUBBLE) bubbles.
         
-        self.minThumb.frame = CGRectMake(0,0, THUMB_DIAMETER,THUMB_DIAMETER);
-        self.minThumb.contentMode = UIViewContentModeScaleAspectFit;
-        self.minThumb.center = CGPointMake([self xForValue:self.selectedMinimumValue], frame.size.height / 2);
-        [self addSubview:self.minThumb];
+        float bubbleRange = self.minimumRange*NUM_INTERVALS_PER_BUBBLE;
         
-        //maxThumb
-        self.maxThumb = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"slider_thumb.png"]];
+        float cappedDisplayedRange = MIN(self.displayedRange, maxVal-minVal);
         
-        self.maxThumb.frame = CGRectMake(0,0, THUMB_DIAMETER,THUMB_DIAMETER);
-        self.maxThumb.contentMode = UIViewContentModeScaleAspectFit;
-        self.maxThumb.center = CGPointMake([self xForValue:self.selectedMaximumValue], frame.size.height / 2);
-        [self addSubview:self.maxThumb];
-        
-        //Label Backgrounds
-        self.minLabelBackground = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"callout_time_label.png"]];
-        self.minLabelBackground.frame = CGRectMake(0,0, CALLOUT_WIDTH, CALLOUT_HEIGHT_MAIN);
-        [self addSubview:self.minLabelBackground];
-        
-        self.maxLabelBackground = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"slider_callout_background.png"]];
-        self.maxLabelBackground.frame = CGRectMake(0,0, CALLOUT_WIDTH, CALLOUT_HEIGHT);
-        [self addSubview:self.maxLabelBackground];
-        
-        
-        //Labels
-        self.minLabel = [[UILabel alloc] initWithFrame:CGRectMake(0,0,80,28)];
-        self.minLabel.textColor = CALLOUT_TEXT_COLOR;
-        self.minLabel.backgroundColor = [UIColor clearColor];
-        self.minLabel.font = [UIFont fontWithName:@"Arial Rounded MT Bold" size:(CALLOUT_TEXT_SIZE)];
-        self.minLabel.text = @"";
-        [self.minLabelBackground addSubview:self.minLabel];
-        
-        self.maxLabel = [[UILabel alloc] initWithFrame:CGRectMake(0,0,80,35)];
-        self.maxLabel.textColor = CALLOUT_TEXT_COLOR;
-        self.maxLabel.backgroundColor = [UIColor clearColor];
-        self.maxLabel.font = [UIFont fontWithName:@"Arial Rounded MT Bold" size:(CALLOUT_TEXT_SIZE)];
-        self.maxLabel.text = @"";
-        [self.maxLabelBackground addSubview:self.maxLabel];
-        
-        self.startTimeLabel = [[UILabel alloc] initWithFrame:CGRectMake(0,0,80,35)];
-        self.startTimeLabel.textColor = CALLOUT_TEXT_COLOR;
-        self.startTimeLabel.backgroundColor = [UIColor clearColor];
-        self.startTimeLabel.font = [UIFont fontWithName:@"Arial Rounded MT Bold" size:(CALLOUT_TEXT_SIZE)];
-        self.startTimeLabel.text = @"Start Time";
-        self.startTimeLabel.textAlignment = UITextAlignmentCenter;
-        [self.minLabelBackground addSubview:self.startTimeLabel];
-        
-        self.endTimeLabel = [[UILabel alloc] initWithFrame:CGRectMake(0,0,80,35)];
-        self.endTimeLabel.textColor = CALLOUT_TEXT_COLOR;
-        self.endTimeLabel.backgroundColor = [UIColor clearColor];
-        self.endTimeLabel.font = [UIFont fontWithName:@"Arial Rounded MT Bold" size:(CALLOUT_TEXT_SIZE)];
-        self.endTimeLabel.text = @"End Time";
-        self.endTimeLabel.textAlignment = UITextAlignmentCenter;
-        [self.maxLabelBackground addSubview:self.endTimeLabel];
+        self.numDisplayedBubbles = round((cappedDisplayedRange)/bubbleRange);
         
         
         
+        self.trackRect = CGRectMake(frame.origin.x + TRACK_PADDING_HORIZ,
+                                    frame.origin.y + TRACK_PADDING_HORIZ,
+                                    frame.size.width - 2*TRACK_PADDING_HORIZ,
+                                    frame.size.height - 2*TRACK_PADDING_VERT);
+        
+        
+        CGRect bubbleRect = CGRectMake(0,0,[self bubbleWidth], self.trackRect.size.height);
+        
+        self.trackBubbles = [[NSMutableArray alloc] init];
+        for (int i = 0; i< self.numDisplayedBubbles; i++) {
+            float minVal = self.minimumValue + (bubbleRange*i);
+            float maxVal = self.minimumValue + (bubbleRange*(i+1));
+            float selectedMinVal = MAX(minVal, self.selectedMinimumValue);
+            float selectedMaxVal = MIN(maxVal, self.selectedMaximumValue);
+            
+            RangeBubble* bubble = [[RangeBubble alloc] initWithFrame:bubbleRect minVal:minVal maxVal:maxVal minRange:self.minimumRange selectedMinVal:selectedMinVal selectedMaxVal:selectedMaxVal withPriceFormatter:^NSString *(double val) {
+                return @"";
+            } withTimeFormatter:^NSString *(double val) {
+                return @"";
+            }];
+            [self addSubview:bubble];
+            [self.trackBubbles addObject:bubble];
+        }
+        
+        [self adjustBubbles];
     
 
         
-        [self updateMinLabel];
-        [self updateMaxLabel];
-        //self.minLabelBackground.alpha = 0;
-        //self.maxLabelBackground.alpha = 0;
+        //[self updateMinLabel];
+        //[self updateMaxLabel];
     }
     return self;
 }
@@ -240,16 +212,17 @@
 //I suggest you don't use this one.
 - (id)initWithFrame:(CGRect)frame
 {
-    return [self initWithFrame:frame minVal:0 maxVal:1 minRange:0.01 selectedMaxVal:1 withValueFormatter:^(double val){return @"";}];
+    return [self initWithFrame:frame minVal:0 maxVal:1 minRange:0.01 displayedRange:10 selectedMinVal:0 selectedMaxVal:1 withValueFormatter:^(double val){return @"";}];
 }
 
 -(float)xForValue:(float)value {
-    float normalizedValue = (value - self.minimumValue) / (self.maximumValue - self.minimumValue);
-    float x = (self.frame.size.width - (self.padding * 2)) * normalizedValue + self.padding;
+    value = value - self.scrollPos;
+    float normalizedValue = (value - self.minimumValue) / (self.displayedRange);
+    float x = (self.trackRect.size.width) * normalizedValue + self.padding;
     return x;
 }
 -(float)valueForX:(float)x {
-    return self.minimumValue + (x-self.padding) / (self.frame.size.width-(self.padding*2)) * (self.maximumValue - self.minimumValue);
+    return self.scrollPos + self.minimumValue + (x-self.padding) / (self.trackRect.size.width) * (self.displayedRange);
 }
 
 
@@ -269,6 +242,9 @@
                          }];
     }
      */
+    
+    self.scrollVel = 0;
+    
     self.minThumbOn = false;
     self.maxThumbOn = false;
 }
@@ -293,10 +269,10 @@
     frame.origin.y -= (frame.size.height-THUMB_TOUCH_DIAMETER)/2;
     frame.size = CGSizeMake(THUMB_TOUCH_DIAMETER, THUMB_TOUCH_DIAMETER);
                        
-    
+    [self doTouchHandler:touchPoint];
     
     if(CGRectContainsPoint(frame, touchPoint)){
-        _maxThumbOn = true;
+        self.maxThumbOn = true;
     }
     
     
@@ -317,12 +293,41 @@
     for( UITouch* t in touches) {
         touch = t;
     }
-    if(!self.minThumbOn && !self.maxThumbOn){
-        return;
-    }
+    //if(!self.minThumbOn && !self.maxThumbOn){
+    //    return;
+    //}
     
     CGPoint touchPoint = [touch locationInView:self];
-    if(self.minThumbOn){
+    [self doTouchHandler:touchPoint];
+}
+
+
+
+- (void) doTouchHandler:(CGPoint)touchPoint {
+    //we don't allow moving this one for now.
+    //Also, be careful: this case is deprecated...
+    
+    
+    double leftScrollDist = touchPoint.x;
+    double rightScrollDist = self.frame.size.width - touchPoint.x;
+    
+    if (leftScrollDist < SCROLL_RANGE) {
+        leftScrollDist = MAX(leftScrollDist, 0);
+        float unitVel = - (MIN_SCROLL_SPEED + LIN_SCROLL_RATE * (SCROLL_RANGE - leftScrollDist));
+        self.scrollVel = self.minimumRange * unitVel;
+        [self animateBubbles];
+        return;
+    } else if (rightScrollDist < SCROLL_RANGE) {
+        rightScrollDist = MAX(rightScrollDist, 0);
+        float unitVel = MIN_SCROLL_SPEED + LIN_SCROLL_RATE * (SCROLL_RANGE - rightScrollDist);
+        self.scrollVel = self.minimumRange * unitVel;
+        [self animateBubbles];
+        return;
+    } else {
+        self.scrollVel = 0;
+    }
+    
+    if(false){
         
         double oldVal = self.selectedMinimumValue;
         double delVal = [self valueForX:touchPoint.x] - oldVal;
@@ -330,7 +335,7 @@
         if(delVal >= 0) {
             delVal = delVal + self.minimumRange/2.0 - fmodf(delVal+self.minimumRange/2.0, self.minimumRange); //snap to nearest one
         } else {
-            delVal = delVal - self.minimumRange/2.0 - fmodf(delVal-self.minimumRange/2.0, self.minimumRange); 
+            delVal = delVal - self.minimumRange/2.0 - fmodf(delVal-self.minimumRange/2.0, self.minimumRange);
         }
         
         double newVal = oldVal + delVal;
@@ -346,21 +351,22 @@
         [self updateTrackHighlight];
         [self sendActionsForControlEvents:UIControlEventValueChanged];
     }
-    if(self.maxThumbOn){
-        double oldVal = self.selectedMaximumValue;
-        double delVal = [self valueForX:touchPoint.x] - oldVal;
+    //if(self.maxThumbOn){
+    if(true){
+        double lowVal = self.selectedMinimumValue;
+        double delVal = [self valueForX:touchPoint.x] - lowVal;
         
         if(delVal >= 0) {
             delVal = delVal + self.minimumRange/2.0 - fmodf(delVal+self.minimumRange/2.0, self.minimumRange); //snap to nearest one
         } else {
-            delVal = delVal - self.minimumRange/2.0 - fmodf(delVal-self.minimumRange/2.0, self.minimumRange); 
+            delVal = delVal - self.minimumRange/2.0 - fmodf(delVal-self.minimumRange/2.0, self.minimumRange);
         }
         
-        double newVal = oldVal + delVal;
+        double newVal = lowVal + delVal;
         newVal = MIN(newVal, self.maximumValue);
         newVal = MAX(newVal, self.selectedMinimumValue + self.minimumRange);
         
-        if(newVal <= self.maxLimit) {
+        if(newVal <= self.maximumValue) {
             self.maxThumb.center = CGPointMake([self xForValue:newVal], self.maxThumb.center.y);
             [self updateMaxLabel];
             self.selectedMaximumValue = newVal;
@@ -370,7 +376,7 @@
     }
     //NSLog(@"diff:%f", [self valueForY:self.maxThumb.center.y]-[self valueForY:self.minThumb.center.y]);
     //NSLog(@"Min: %f, Max: %f", [self valueForY:self.minThumb.center.y], [self valueForY:self.maxThumb.center.y]);
-    [self setNeedsDisplay]; 
+    [self setNeedsDisplay];
 }
 
 - (void)updateTrackHighlight{
@@ -379,9 +385,11 @@
                                   self.minThumb.center.y - (self.track.frame.size.height/2),
                                   self.maxThumb.center.x - self.minThumb.center.x, self.track.frame.size.height);    
      */
-    self.track_booked.frame = CGRectMake(self.minThumb.center.x,
-                                  self.minThumb.center.y - (self.track_booked.frame.size.height/2),
-                                  self.maxThumb.center.x - self.minThumb.center.x, self.track_booked.frame.size.height);  
+    for(RangeBubble* bubble in self.trackBubbles) {
+        bubble.selectedMinimumValue = self.selectedMinimumValue;
+        bubble.selectedMaximumValue = self.selectedMaximumValue;
+    }
+    
 }
 
 -(void)updateMinLabel {
@@ -460,7 +468,119 @@
      */ 
 }
 
+// gives the width of each bubble given the current track parameters.
+- (float) bubbleWidth {
+    return self.trackRect.size.width/ self.numDisplayedBubbles;
+}
 
+// gives the frame origin for the corresponding bubble.
+- (CGRect) frameForBubble:(RangeBubble*)bubble {
+    
+    float y = self.trackRect.origin.y;
+    float x = [self xForValue:bubble.minimumValue];
+    float w = [self bubbleWidth];
+    float h = self.trackRect.size.height;
+    return CGRectMake(x,y,w,h);
+}
+
+- (void) addMoreBubblesIfNeeded {
+    if(!self.trackBubbles || self.trackBubbles.count <= 0) {
+        return;
+    }
+    
+    RangeBubble* lastBubble = self.trackBubbles.lastObject;
+    
+    //check if we need another bubble. Is is the largest shown value represented in our shown bubbles?
+    if (self.minimumValue + self.scrollPos + self.displayedRange < lastBubble.maximumValue) {
+        return;
+    }
+    
+    float bubbleRange = self.minimumRange*NUM_INTERVALS_PER_BUBBLE;
+    CGRect bubbleRect = CGRectMake(10000,0,[self bubbleWidth], self.trackRect.size.height);
+    
+    
+    float minVal = lastBubble.maximumValue;
+    float maxVal = lastBubble.maximumValue + bubbleRange;
+    float selectedMinVal = MAX(minVal, self.selectedMinimumValue);
+    float selectedMaxVal = MIN(maxVal, self.selectedMaximumValue);
+        
+    RangeBubble* bubble = [[RangeBubble alloc] initWithFrame:bubbleRect minVal:minVal maxVal:maxVal minRange:self.      minimumRange selectedMinVal:selectedMinVal selectedMaxVal:selectedMaxVal
+                                          withPriceFormatter:^NSString *(double val) {
+                                              return @"";
+                                          } withTimeFormatter:^NSString *(double val) {
+                                              return @"";
+                                          }];
+    [self addSubview:bubble];
+    [self.trackBubbles addObject:bubble];
+    
+}
+
+- (void) animateBubbles {
+    
+    if(!self.animating && self.scrollVel!=0) {
+        self.animating = true;
+        
+        // 1 over number of intervals per second
+        float period = fabs(self.minimumRange/self.scrollVel);
+        
+        if(self.scrollVel>0 && [self hasMoreBubblesRight]) {
+            self.scrollPos += self.minimumRange;
+            [self addMoreBubblesIfNeeded];
+        } else if (self.scrollVel<0 && [self hasMoreBubblesLeft]) {
+            self.scrollPos -= self.minimumRange;
+        } else {
+            self.animating = false;
+            return;
+        }
+        
+        
+        [UIView animateWithDuration:period animations:^{
+            [self adjustBubbles];
+        }
+        completion:^(BOOL finished) {
+            self.animating = false;
+            [self animateBubbles];
+        }];
+        
+    }
+    
+}
+
+- (void) adjustBubbles {
+    //TODO: adjust bubble size if certain parameters were changed
+    
+    //move each bubble to the appropriate position
+    
+    float falloff = 0.1;
+    int i = 0;
+    for (RangeBubble* bubble in self.trackBubbles) {
+        CGRect frame = [self frameForBubble:bubble];
+        bubble.frame = frame;
+        
+        float leftPos = frame.origin.x - (self.trackRect.origin.x + 20);
+        float rightPos = (self.trackRect.origin.x + self.trackRect.size.width - 20) - (frame.origin.x+frame.size.width);
+        
+        if ([self hasMoreBubblesLeft] && leftPos < 0) {
+            [bubble setAlpha:MIN(1, (1/(-leftPos*falloff)) )];
+        } else if ([self hasMoreBubblesRight] && rightPos < 0) {
+            [bubble setAlpha:MIN(1, (1/(-rightPos*falloff)) )];
+        } else {
+            [bubble setAlpha:1];
+        }
+        i++;
+    }
+}
+
+//Check to see if we can scroll left
+- (BOOL)hasMoreBubblesLeft {
+    return self.scrollPos > 0;
+}
+
+- (BOOL)hasMoreBubblesRight {
+    float bubbleRange = self.minimumRange*NUM_INTERVALS_PER_BUBBLE;
+    float totalBubbleRange = (1+ceil((self.maximumValue - self.minimumValue)/bubbleRange))*bubbleRange;
+    return (self.scrollPos + self.displayedRange) <= totalBubbleRange;
+}
 
 // Only override drawRect: if you perform custom drawing.
 // An empty implementation adversely affects performance during animation.

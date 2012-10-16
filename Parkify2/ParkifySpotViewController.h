@@ -30,6 +30,11 @@
 @property (weak, nonatomic) IBOutlet UIView *rangeBarContainer;
 - (IBAction)parkButtonTapped:(UIButton *)sender;
 
+
+@property (weak, nonatomic) IBOutlet UILabel *startTimeLabel;
+@property (weak, nonatomic) IBOutlet UILabel *endTimeALabel;
+@property (weak, nonatomic) IBOutlet UILabel *endTimeLabel;
+
 @property (weak, nonatomic) IBOutlet UILabel *errorLabel;
 @property (strong, nonatomic) NSTimer *timerPolling;
 @property (strong, nonatomic) NSString* distanceString;
@@ -45,4 +50,5 @@
 //@property double startTime;
 //@property double endTime;
 
+@property (weak, nonatomic) IBOutlet UIView *testBubble;
 @end

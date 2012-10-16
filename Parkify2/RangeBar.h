@@ -14,11 +14,12 @@
 @property(nonatomic) double minimumValue;
 @property(nonatomic) double maximumValue;
 @property(nonatomic) double minimumRange;
+@property(nonatomic) double displayedRange;
 @property(nonatomic) double selectedMinimumValue;
 @property(nonatomic) double selectedMaximumValue;
 
 @property (nonatomic, strong) Formatter labelFormatter;
 
-- (RangeBar*)initWithFrame:(CGRect)frame minVal:(double)minVal maxVal:(double)maxVal minRange:(double)minRange selectedMaxVal:(double)selectedMaxVal withValueFormatter:(Formatter)formatter;
+- (RangeBar*)initWithFrame:(CGRect)frame minVal:(double)minVal maxVal:(double)maxVal minRange:(double)minRange displayedRange:(double)displayedRange selectedMinVal:(double)selectedMinVal selectedMaxVal:(double)selectedMaxVal withValueFormatter:(Formatter)formatter;
 
 @end

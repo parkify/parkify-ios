@@ -36,7 +36,11 @@
     if(distanceInMiles < 0.25) {
         return [NSString stringWithFormat:@"%0.0f feet", distanceInMiles*5280.0];
     } else {
-        return [NSString stringWithFormat:@"%0.1f miles", distanceInMiles];
+        if(distanceInMiles >= 100) {
+            return [NSString stringWithFormat:@"%0.0f miles", distanceInMiles];
+        } else {
+            return [NSString stringWithFormat:@"%0.1f miles", distanceInMiles];
+        }
     }
 }
 

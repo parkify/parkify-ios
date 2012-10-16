@@ -583,7 +583,7 @@ typedef struct STargetLocation {
         btnViewVenue.frame = CGRectMake(0, 0,70, 32);
         
         //NSString *btnString = @"PARK!";
-        NSString *btnString = @"Park";
+        NSString *btnString = @"Info";
         CGSize s = [btnString sizeWithFont:[UIFont fontWithName:@"Arial Rounded MT Bold" size:(16.0)] constrainedToSize:btnViewVenue.frame.size lineBreakMode:UILineBreakModeMiddleTruncation];
         [btnViewVenue setBackgroundImage:[UIImage imageNamed:@"blue_big_button.png"]
                             forState:UIControlStateNormal];
