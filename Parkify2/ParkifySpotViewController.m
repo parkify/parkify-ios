@@ -105,32 +105,30 @@
     
     double timeLeft = [self.spot endTime] - currentTime;
     
-    float numHours = 9;
+    double numHours = 9;
     
     timeLeft = timeLeft - fmod(timeLeft,1800);
     timeLeft = MIN(timeLeft, numHours*60*60);
     
     
-    float prevHourMark = (floor(currentTime/3600))*3600;
+    double prevHourMark = (floor(currentTime/3600))*3600;
     
-    Formatter formatter = ^(double val) {
+    Formatter timeFormatter = ^(double val) {
         NSDate* time = [[NSDate alloc] initWithTimeIntervalSince1970:val];
         NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-        [dateFormatter setDateFormat:@"h:mm a"];
+        [dateFormatter setDateFormat:@"ha"];
         return [dateFormatter stringFromDate:time]; };
     
-    double maxVal = prevHourMark + 12*60*60;
+    double maxVal = prevHourMark + 120*60*60;
     
-    self.rangeBar = [[RangeBar alloc] initWithFrame:[self.rangeBarContainer bounds] minVal:prevHourMark maxVal:maxVal minRange:30*60 displayedRange:numHours*60*60 selectedMinVal:currentTime selectedMaxVal:currentTime + 1800 withValueFormatter:formatter];
+    self.rangeBar = [[RangeBar alloc] initWithFrame:[self.rangeBarContainer bounds] minVal:prevHourMark maxVal:maxVal minRange:30*60 displayedRange:numHours*60*60 selectedMinVal:currentTime selectedMaxVal:currentTime + 1800 withTimeFormatter:timeFormatter withPriceFormatter:^NSString *(double val) {
+        return [NSString stringWithFormat:@"$%0.0f", val];
+    } withPriceSource:self.spot];
     
     
     //^(double val){return [@"Foo";}
     
-    [self.testBubble addSubview:[[RangeBubble alloc] initWithFrame:[self.testBubble bounds] minVal:0 maxVal:10 minRange:1 selectedMinVal:5 selectedMaxVal:8 withPriceFormatter:^NSString *(double val) {
-        return @"";
-    } withTimeFormatter:^NSString *(double val) {
-        return @"";
-    }]];
+    
          
     [self.rangeBar addTarget:self action:@selector(timeIntervalChanged) forControlEvents:UIControlEventValueChanged];
     [self.rangeBarContainer addSubview:self.rangeBar];
@@ -346,7 +344,7 @@
         priceString = [NSString stringWithFormat:@"$%0.2f", totalPrice];
         
         //TimeDuration text
-        float hoursAndMinutes = durationInSeconds/3600;
+        double hoursAndMinutes = round(durationInSeconds/60)/60;
         int hours = floor(hoursAndMinutes);
         int minutes = floor((hoursAndMinutes-hours)*60);
 

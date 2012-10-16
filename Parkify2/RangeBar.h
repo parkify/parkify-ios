@@ -8,6 +8,7 @@
 
 #import <UIKit/UIKit.h>
 #import "ExtraTypes.h"
+#import "ParkingSpot.h"
 
 @interface RangeBar : UIControl
 
@@ -18,8 +19,9 @@
 @property(nonatomic) double selectedMinimumValue;
 @property(nonatomic) double selectedMaximumValue;
 
-@property (nonatomic, strong) Formatter labelFormatter;
+@property (nonatomic, strong) Formatter timeFormatter;
+@property (nonatomic, strong) Formatter priceFormatter;
 
-- (RangeBar*)initWithFrame:(CGRect)frame minVal:(double)minVal maxVal:(double)maxVal minRange:(double)minRange displayedRange:(double)displayedRange selectedMinVal:(double)selectedMinVal selectedMaxVal:(double)selectedMaxVal withValueFormatter:(Formatter)formatter;
+- (RangeBar*)initWithFrame:(CGRect)frame minVal:(double)minVal maxVal:(double)maxVal minRange:(double)minRange displayedRange:(double)displayedRange selectedMinVal:(double)selectedMinVal selectedMaxVal:(double)selectedMaxVal withTimeFormatter:(Formatter)timeFormatter withPriceFormatter:(Formatter)priceFormatter withPriceSource:(NSObject<PriceStore>*)  priceSource;
 
 @end

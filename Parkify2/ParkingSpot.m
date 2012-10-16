@@ -13,7 +13,6 @@
 #import "iToast.h"
 #import "ParkingSpotCollection.h"
 
-
 @implementation ParkingSpot
 
 @synthesize parentCollection = _parentCollection;
@@ -128,6 +127,28 @@
         }
     }
     return 0;
+}
+
+- (NSArray*) findPricesInRange:(double)startTime endTime:(double)endTime {
+    //ok, so find all price intervals.
+    NSMutableArray* arrayIn = [[NSMutableArray alloc] init];
+    for (Offer* iterOffer in self.offers) {
+        if(startTime >= iterOffer.startTime &&
+           startTime <= iterOffer.endTime &&
+           endTime >= iterOffer.startTime &&
+           endTime <= iterOffer.endTime &&
+           endTime >= startTime) {
+            [arrayIn addObjectsFromArray:[iterOffer findPricesInRange:startTime endTime:endTime]];
+        }
+    }
+    
+    NSMutableArray* toRtn = [[NSMutableArray alloc] init];
+    for (NSNumber* num in arrayIn) {
+        if (![toRtn containsObject:num]) {
+            [toRtn addObject:num];
+        }
+    }
+    return toRtn;
 }
 
 - (double) endTime {

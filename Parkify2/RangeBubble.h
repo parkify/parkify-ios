@@ -8,6 +8,7 @@
 
 #import <UIKit/UIKit.h>
 #import "ExtraTypes.h"
+#import "ParkingSpot.h"
 
 @interface RangeBubble : UIControl
 
@@ -21,6 +22,6 @@
 @property (nonatomic, strong) Formatter priceFormatter;
 
 
-- (RangeBubble*)initWithFrame:(CGRect)frame minVal:(double)minVal maxVal:(double)maxVal minRange:(double)minRange selectedMinVal:(double)selectedMinVal selectedMaxVal:(double)selectedMaxVal withPriceFormatter:(Formatter)priceFormatter withTimeFormatter:(Formatter)timeFormatter;
+- (RangeBubble*)initWithFrame:(CGRect)frame minVal:(double)minVal maxVal:(double)maxVal minRange:(double)minRange selectedMinVal:(double)selectedMinVal selectedMaxVal:(double)selectedMaxVal withPriceFormatter:(Formatter)priceFormatter withTimeFormatter:(Formatter)timeFormatter withPriceSource:(NSObject<PriceStore> *)priceSource;
 
 @end

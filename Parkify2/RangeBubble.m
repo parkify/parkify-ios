@@ -22,12 +22,19 @@
 @property (strong, nonatomic) UIView * bubbleBooked;
 @property (strong, nonatomic) UIImageView * bubbleFree;
 @property (strong, nonatomic) UIImageView * bubbleBackground;
+@property (strong, nonatomic) UIImageView * vertBar;
+@property (strong, nonatomic) UILabel * priceLabel;
+@property (strong, nonatomic) UILabel * timeLabel;
+@property CGRect mainRect;
+@property (strong, nonatomic) UIColor * selectedColor;
+@property (strong, nonatomic) UIColor * unselectedColor;
 
+@property (strong, nonatomic) NSObject<PriceStore>* priceSource;
 
 @property double maxLimit;
 
--(float)xForValue:(float)value;
--(float)valueForX:(float)x;
+-(double)xForValue:(double)value;
+-(double)valueForX:(double)x;
 
 -(void)updateTrackHighlight;
 
@@ -49,6 +56,10 @@
 
 @synthesize timeFormatter = _timeFormatter;
 @synthesize priceFormatter = _priceFormatter;
+
+@synthesize mainRect = _mainRect;
+@synthesize selectedColor = _selectedColor;
+@synthesize unselectedColor = _unselectedColor;
 
 -(void) setAlpha:(CGFloat)alpha {
     [super setAlpha:alpha];
@@ -90,7 +101,9 @@
     return _priceFormatter;
 }
 
-- (RangeBubble*)initWithFrame:(CGRect)frame minVal:(double)minVal maxVal:(double)maxVal minRange:(double)minRange selectedMinVal:(double)selectedMinVal selectedMaxVal:(double)selectedMaxVal withPriceFormatter:(Formatter)priceFormatter withTimeFormatter:(Formatter)timeFormatter {
+- (RangeBubble*)initWithFrame:(CGRect)frame minVal:(double)minVal maxVal:(double)maxVal minRange:(double)minRange selectedMinVal:(double)selectedMinVal selectedMaxVal:(double)selectedMaxVal withPriceFormatter:(Formatter)priceFormatter withTimeFormatter:(Formatter)timeFormatter withPriceSource:(NSObject<PriceStore>*)priceSource {
+    
+    self.priceSource = priceSource;
     
     [self setUserInteractionEnabled:false];
     
@@ -99,6 +112,11 @@
         
         double w = frame.size.width;
         double h = frame.size.height;
+        
+        double h_main = w*2;
+        
+        //calculate mainRect, which will be where the bubble is actually displayed.
+        self.mainRect = CGRectMake(0,h-h_main,w,h_main);
         
         self.minimumValue = minVal;
         self.maximumValue = maxVal;
@@ -110,29 +128,49 @@
         self.selectedMaximumValue = selectedMaxVal;
         self.maxLimit = selectedMaxVal;
         
+        self.selectedColor = [UIColor colorWithRed:(97.0/255.0) green:(189.0/255.0) blue:(250.0/255.0) alpha:1];
+        self.unselectedColor = [UIColor colorWithRed:(130.0/255.0) green:(130.0/255.0) blue:(130.0/255.0) alpha:1];
+        
         //track background
-        UIImage* imgNone = [UIImage imageWithImage:[UIImage imageNamed:@"slider_dark_background.png"] scaledToSize:CGSizeMake(w, h)];
+        /*
+        UIImage* imgNone = [UIImage imageWithImage:[UIImage imageNamed:@"slider_dark_background.png"] scaledToSize:CGSizeMake(w, h_main)];
         self.bubbleBackground = [[UIImageView alloc] initWithImage:imgNone];
         self.bubbleBackground.contentMode = UIViewContentModeLeft;
         
+        self.bubbleBackground.frame = self.mainRect;
+        
         
         self.bubbleBackground.alpha = self.alpha;
+         */
+        
+        
+        //Vert Bar
+        UIImage* imgVertBar = [UIImage imageWithImage:[UIImage imageNamed:@"slider_vert_bar.png"] scaledToSize:CGSizeMake(1, h-(3*h_main/4))];
+        self.vertBar = [[UIImageView alloc] initWithImage:imgVertBar];
+        self.vertBar.contentMode = UIViewContentModeLeft;
+        
+        self.vertBar.frame = CGRectMake(0,0,1,h-(3*h_main/4));
+        
+        self.vertBar.alpha = self.alpha;
+
+        [self addSubview:self.vertBar];
         
         //track free
-        UIImage* imgWhite = [UIImage imageWithImage:[UIImage imageNamed:@"unselected_bubble.png"] scaledToSize:CGSizeMake(w, h)];
+        UIImage* imgWhite = [UIImage imageWithImage:[UIImage imageNamed:@"unselected_bubble.png"] scaledToSize:CGSizeMake(w, h_main)];
         self.bubbleFree = [[UIImageView alloc] initWithImage:imgWhite];
         self.bubbleFree.contentMode = UIViewContentModeLeft;
         self.bubbleFree.autoresizingMask = UIViewAutoresizingNone;
         self.bubbleFree.clipsToBounds = true;
+        self.bubbleFree.frame = self.mainRect;
         
         
         [self addSubview:self.bubbleFree];
         
         //track booked
-        UIImage* imgBlue = [UIImage imageWithImage:[UIImage imageNamed:@"selected_bubble.png"] scaledToSize:CGSizeMake(w, h)];
+        UIImage* imgBlue = [UIImage imageWithImage:[UIImage imageNamed:@"selected_bubble.png"] scaledToSize:CGSizeMake(w, h_main)];
         UIImageView* bubbleBookedImgView = [[UIImageView alloc] initWithImage:imgBlue];
         
-        bubbleBookedImgView.frame = frame;
+        bubbleBookedImgView.frame = self.mainRect;
         bubbleBookedImgView.alpha = self.alpha;
         
         self.bubbleBooked = [[UIView alloc] initWithFrame:frame];
@@ -142,13 +180,47 @@
         
         [self addSubview:self.bubbleBooked];
         
+        //labels
+        float text_height = (h-h_main)/4;
+        self.timeLabel = [[UILabel alloc] initWithFrame:CGRectMake(5,text_height,w-5,text_height)];
+        self.timeLabel.textColor = self.selectedColor;
+        self.timeLabel.backgroundColor = [UIColor clearColor];
+        self.timeLabel.font = [UIFont fontWithName:@"Arial Rounded MT Bold" size:text_height];
+        self.timeLabel.text = self.timeFormatter(self.minimumValue);
+        self.timeLabel.textAlignment = UITextAlignmentLeft;
         
+        self.timeLabel.frame = CGRectMake(3,text_height,w-3,text_height);
         
+        [self addSubview:self.timeLabel];
+        
+        self.priceLabel = [[UILabel alloc] initWithFrame:CGRectMake(0,0,w,12)];
+        self.priceLabel.textColor = self.selectedColor;
+        self.priceLabel.backgroundColor = [UIColor clearColor];
+        self.priceLabel.font = [UIFont fontWithName:@"Arial Rounded MT Bold" size:12];
+        self.priceLabel.text = [self priceString]; //self.timeFormatter(self.maximumValue);
+        self.priceLabel.textAlignment = UITextAlignmentCenter;
+        self.priceLabel.center = CGPointMake(w/2, (h-(3*h_main/4)));        self.priceLabel.shadowOffset = CGSizeMake(0,-1);
+        
+        [self addSubview:self.priceLabel];
         
         //Adust everything!
         [self updateTrackHighlight];
     }
     return self;
+}
+
+-(NSString*) priceString {
+    if(!self.priceSource) {
+        return @"";
+    }
+    NSArray* prices = [self.priceSource findPricesInRange:self.minimumValue + 60*5 endTime:self.maximumValue - 60*5];
+    if(!prices || prices.count == 0) {
+        return @"";
+    } else if (prices.count == 1) {
+        return self.priceFormatter([[prices objectAtIndex:0] doubleValue]);
+    } else {
+        return @"/";
+    }
 }
 
 //I suggest you don't use this one.
@@ -158,16 +230,16 @@
         return @"DEFAULT";
     } withTimeFormatter:^NSString *(double val) {
         return @"DEFAULT";
-    }];
+    } withPriceSource:nil];
 }
 
 
--(float)xForValue:(float)value {
-    float normalizedValue = (value - self.minimumValue) / (self.maximumValue - self.minimumValue);
-    float x = (self.frame.size.width) * normalizedValue;
+-(double)xForValue:(double)value {
+    double normalizedValue = (value - self.minimumValue) / (self.maximumValue - self.minimumValue);
+    double x = (self.frame.size.width) * normalizedValue;
     return x;
 }
--(float)valueForX:(float)x {
+-(double)valueForX:(double)x {
     return self.minimumValue / (self.frame.size.width) * (self.maximumValue - self.minimumValue);
 }
 
@@ -190,19 +262,33 @@
     
     
     
-    float begin = [self xForValue:self.selectedMinimumValue];
-    float end = [self xForValue:self.selectedMaximumValue];
+    double begin = [self xForValue:self.selectedMinimumValue];
+    double end = [self xForValue:self.selectedMaximumValue];
     
 
     
     CALayer* maskLayer = [CALayer layer];
     maskLayer.frame = CGRectMake(begin,0,end-begin ,self.bubbleBooked.frame.size.height);
+    CGRect rect = CGRectMake(begin,0,end-begin ,self.bubbleBooked.frame.size.height);
     maskLayer.contents = (__bridge id)[[UIImage imageNamed:@"maskImage.png"] CGImage];
 
     
     self.bubbleBooked.layer.mask = maskLayer;
     
-    [self.bubbleBackground setNeedsDisplay];
+    [self.bubbleBooked setNeedsDisplay];
+    
+    //NOW labels!
+    
+    if(end-begin > 0) {
+        self.timeLabel.textColor = self.selectedColor;
+        self.priceLabel.textColor = [UIColor whiteColor];
+        self.priceLabel.shadowColor = [UIColor blackColor];
+    } else {
+        self.timeLabel.textColor = self.unselectedColor;
+        self.priceLabel.textColor = self.unselectedColor;
+        self.priceLabel.shadowColor = [UIColor clearColor];
+    }
+    
     
    
     

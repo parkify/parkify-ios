@@ -17,7 +17,9 @@ typedef NSString* (^Formatter)(double val);
 
 #define ADMIN_VER false
 
-
+@protocol PriceStore <NSObject>
+- (NSArray*) findPricesInRange:(double)startTime endTime:(double)endTime;
+@end
 
 
 

@@ -78,4 +78,20 @@
     return i0 < i1;
 }
 
+//We assume that startTime and endTime are within this offer's interval of activeness.
+- (NSArray*) findPricesInRange:(double)startTime endTime:(double)endTime {
+    //ok, so find all price intervals.
+    NSMutableArray* toRtn = [[NSMutableArray alloc] init];
+    for (PriceInterval* iterPrice in self.priceList) {
+        if(startTime >= iterPrice.startTime &&
+            startTime <= iterPrice.endTime &&
+            endTime >= iterPrice.startTime &&
+            endTime <= iterPrice.endTime &&
+            endTime >= startTime) {
+            [toRtn addObject:[NSNumber numberWithDouble:iterPrice.pricePerHour]];
+        }
+    }
+    return toRtn;
+}
+
 @end

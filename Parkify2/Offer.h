@@ -30,4 +30,7 @@
 
 - (BOOL) overlapsWithStartTime:(double)startTime endTime:(double)endTime;
 
+- (NSArray*) findPricesInRange:(double)startTime endTime:(double)endTime;
+
+
 @end

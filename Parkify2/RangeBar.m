@@ -9,6 +9,7 @@
 #import "RangeBar.h"
 #import "UIImage+Resize.h"
 #import "RangeBubble.h"
+#import "ParkingSpot.h"
 
 #define THUMB_DIAMETER 44
 #define THUMB_TOUCH_DIAMETER 44
@@ -19,7 +20,7 @@
 
 #define NUM_INTERVALS_PER_BUBBLE 2.0
 
-#define MAX_SCROLL_SPEED 8.0
+#define MAX_SCROLL_SPEED 16.0
 #define MIN_SCROLL_SPEED 2.0
 #define SCROLL_RANGE 40.0
 
@@ -65,7 +66,7 @@
 
 @property BOOL maxThumbOn;
 @property BOOL minThumbOn;
-@property float padding;
+@property double padding;
 @property (strong, nonatomic) UIImageView * minThumb;
 @property (strong, nonatomic) UIImageView * maxThumb;
 
@@ -90,13 +91,13 @@
 
 @property BOOL animating;
 
+@property (strong, nonatomic) NSObject<PriceStore>*  priceSource;
 
--(float)xForValue:(float)value;
--(float)valueForX:(float)x;
+
+-(double)xForValue:(double)value;
+-(double)valueForX:(double)x;
 
 -(void)updateTrackHighlight;
--(void)updateMinLabel;
--(void)updateMaxLabel;
 
 
 @end
@@ -110,7 +111,8 @@
 @synthesize maxLimit = _maxLimit;
 @synthesize selectedMinimumValue = _selectedMinimumValue;
 @synthesize selectedMaximumValue = _selectedMaximumValue;
-
+@synthesize timeFormatter = _timeFormatter;
+@synthesize priceFormatter = _priceFormatter;
 
 @synthesize maxThumbOn = _maxThumbOn;
 @synthesize minThumbOn = _minThumbOn;
@@ -127,24 +129,17 @@
 @synthesize scrollPos = _scrollPos;
 @synthesize numDisplayedBubbles = _numDisplayedBubbles;
 
-@synthesize labelFormatter = _labelFormatter;
 @synthesize animating = _animating;
 @synthesize scrollVel = _scrollVel;
 
--(Formatter)labelFormatter {
-    if(!_labelFormatter) {
-        _labelFormatter = ^(double val) {
-            return [NSString stringWithFormat:@"%0.2f", val]; };
-    }
-    return _labelFormatter;
-}
+@synthesize priceSource = _priceSource;
 
-- (RangeBar*)initWithFrame:(CGRect)frame minVal:(double)minVal maxVal:(double)maxVal minRange:(double)minRange displayedRange:(double)displayedRange selectedMinVal:(double)selectedMinVal selectedMaxVal:(double)selectedMaxVal withValueFormatter:(Formatter)formatter {
+- (RangeBar*)initWithFrame:(CGRect)frame minVal:(double)minVal maxVal:(double)maxVal minRange:(double)minRange displayedRange:(double)displayedRange selectedMinVal:(double)selectedMinVal selectedMaxVal:(double)selectedMaxVal withTimeFormatter:(Formatter)timeFormatter withPriceFormatter:(Formatter)priceFormatter withPriceSource:(NSObject<PriceStore>*)  priceSource{
     self = [super initWithFrame:frame];
     if (self) {
         
         
-        
+        self.priceSource = priceSource;
         
         self.minimumValue = minVal;
         self.maximumValue = maxVal;
@@ -152,7 +147,8 @@
         self.displayedRange = displayedRange;
         
         
-        self.labelFormatter = formatter;
+        self.timeFormatter = timeFormatter;
+        self.priceFormatter = priceFormatter;
         
         //for now
         self.selectedMinimumValue = selectedMinVal;
@@ -167,9 +163,9 @@
         //okay, how many do we want???
         // we want (maxVal-minVal)/(minRange*NUM_INTERVALS_PER_BUBBLE) bubbles.
         
-        float bubbleRange = self.minimumRange*NUM_INTERVALS_PER_BUBBLE;
+        double bubbleRange = self.minimumRange*NUM_INTERVALS_PER_BUBBLE;
         
-        float cappedDisplayedRange = MIN(self.displayedRange, maxVal-minVal);
+        double cappedDisplayedRange = MIN(self.displayedRange, maxVal-minVal);
         
         self.numDisplayedBubbles = round((cappedDisplayedRange)/bubbleRange);
         
@@ -185,16 +181,12 @@
         
         self.trackBubbles = [[NSMutableArray alloc] init];
         for (int i = 0; i< self.numDisplayedBubbles; i++) {
-            float minVal = self.minimumValue + (bubbleRange*i);
-            float maxVal = self.minimumValue + (bubbleRange*(i+1));
-            float selectedMinVal = MAX(minVal, self.selectedMinimumValue);
-            float selectedMaxVal = MIN(maxVal, self.selectedMaximumValue);
+            double minVal = self.minimumValue + (bubbleRange*i);
+            double maxVal = self.minimumValue + (bubbleRange*(i+1));
+            double selectedMinVal = MAX(minVal, self.selectedMinimumValue);
+            double selectedMaxVal = MIN(maxVal, self.selectedMaximumValue);
             
-            RangeBubble* bubble = [[RangeBubble alloc] initWithFrame:bubbleRect minVal:minVal maxVal:maxVal minRange:self.minimumRange selectedMinVal:selectedMinVal selectedMaxVal:selectedMaxVal withPriceFormatter:^NSString *(double val) {
-                return @"";
-            } withTimeFormatter:^NSString *(double val) {
-                return @"";
-            }];
+            RangeBubble* bubble = [[RangeBubble alloc] initWithFrame:bubbleRect minVal:minVal maxVal:maxVal minRange:self.minimumRange selectedMinVal:selectedMinVal selectedMaxVal:selectedMaxVal withPriceFormatter:self.priceFormatter withTimeFormatter:self.timeFormatter withPriceSource:self.priceSource];
             [self addSubview:bubble];
             [self.trackBubbles addObject:bubble];
         }
@@ -203,8 +195,6 @@
     
 
         
-        //[self updateMinLabel];
-        //[self updateMaxLabel];
     }
     return self;
 }
@@ -212,16 +202,20 @@
 //I suggest you don't use this one.
 - (id)initWithFrame:(CGRect)frame
 {
-    return [self initWithFrame:frame minVal:0 maxVal:1 minRange:0.01 displayedRange:10 selectedMinVal:0 selectedMaxVal:1 withValueFormatter:^(double val){return @"";}];
+    return [self initWithFrame:frame minVal:0 maxVal:1 minRange:0.01 displayedRange:10 selectedMinVal:0 selectedMaxVal:1 withTimeFormatter:^NSString *(double val) {
+        return @"";
+    } withPriceFormatter:^NSString *(double val) {
+        return @"";
+    } withPriceSource:nil];
 }
 
--(float)xForValue:(float)value {
+-(double)xForValue:(double)value {
     value = value - self.scrollPos;
-    float normalizedValue = (value - self.minimumValue) / (self.displayedRange);
-    float x = (self.trackRect.size.width) * normalizedValue + self.padding;
+    double normalizedValue = (value - self.minimumValue) / (self.displayedRange);
+    double x = (self.trackRect.size.width) * normalizedValue + self.padding;
     return x;
 }
--(float)valueForX:(float)x {
+-(double)valueForX:(double)x {
     return self.scrollPos + self.minimumValue + (x-self.padding) / (self.trackRect.size.width) * (self.displayedRange);
 }
 
@@ -311,15 +305,16 @@
     double leftScrollDist = touchPoint.x;
     double rightScrollDist = self.frame.size.width - touchPoint.x;
     
-    if (leftScrollDist < SCROLL_RANGE) {
+    
+    if ([self hasMoreBubblesLeft] && leftScrollDist < SCROLL_RANGE) {
         leftScrollDist = MAX(leftScrollDist, 0);
-        float unitVel = - (MIN_SCROLL_SPEED + LIN_SCROLL_RATE * (SCROLL_RANGE - leftScrollDist));
+        double unitVel = - (MIN_SCROLL_SPEED + LIN_SCROLL_RATE * (SCROLL_RANGE - leftScrollDist));
         self.scrollVel = self.minimumRange * unitVel;
         [self animateBubbles];
         return;
-    } else if (rightScrollDist < SCROLL_RANGE) {
+    } else if ([self hasMoreBubblesRight] && rightScrollDist < SCROLL_RANGE) {
         rightScrollDist = MAX(rightScrollDist, 0);
-        float unitVel = MIN_SCROLL_SPEED + LIN_SCROLL_RATE * (SCROLL_RANGE - rightScrollDist);
+        double unitVel = MIN_SCROLL_SPEED + LIN_SCROLL_RATE * (SCROLL_RANGE - rightScrollDist);
         self.scrollVel = self.minimumRange * unitVel;
         [self animateBubbles];
         return;
@@ -345,7 +340,6 @@
         newVal = MIN(newVal, self.selectedMaximumValue - self.minimumRange);
         
         self.minThumb.center = CGPointMake([self xForValue:newVal], self.minThumb.center.y);
-        [self updateMinLabel];
         
         self.selectedMinimumValue = newVal;
         [self updateTrackHighlight];
@@ -368,7 +362,6 @@
         
         if(newVal <= self.maximumValue) {
             self.maxThumb.center = CGPointMake([self xForValue:newVal], self.maxThumb.center.y);
-            [self updateMaxLabel];
             self.selectedMaximumValue = newVal;
             [self updateTrackHighlight];
             [self sendActionsForControlEvents:UIControlEventValueChanged];
@@ -385,101 +378,27 @@
                                   self.minThumb.center.y - (self.track.frame.size.height/2),
                                   self.maxThumb.center.x - self.minThumb.center.x, self.track.frame.size.height);    
      */
+    int i = 0;
     for(RangeBubble* bubble in self.trackBubbles) {
         bubble.selectedMinimumValue = self.selectedMinimumValue;
         bubble.selectedMaximumValue = self.selectedMaximumValue;
+        i++;
     }
     
-}
-
--(void)updateMinLabel {
-    NSString* strToSet = self.labelFormatter(self.selectedMinimumValue);
-    CGSize expectedLabelSize = [strToSet sizeWithFont:self.minLabel.font];
-    self.minLabel.frame = CGRectMake( (CALLOUT_WIDTH - expectedLabelSize.width)/2, (CALLOUT_HEIGHT_MAIN - expectedLabelSize.height)/2, expectedLabelSize.width , expectedLabelSize.height);
-    self.minLabel.text = strToSet;
-
-     /*
-    self.minLabelBackground.frame = CGRectMake([self xForValue:self.minimumValue]-self.minLabelBackground.frame.size.width + CALLOUT_OFFSET_HORIZONTAL,
-                                               self.maxThumb.center.y - self.maxThumb.frame.size.height/2 - CALLOUT_HEIGHT + CALLOUT_OFFSET_VERTICAL,
-                                               self.minLabelBackground.frame.size.width,
-                                               self.minLabelBackground.frame.size.height);
-     */
-    
-    
-    
-     self.minLabelBackground.frame = CGRectMake([self xForValue:self.minimumValue]-(self.minLabelBackground.frame.size.width/2) + CALLOUT_OFFSET_HORIZONTAL,
-     self.maxThumb.center.y - self.maxThumb.frame.size.height/2 - CALLOUT_HEIGHT + CALLOUT_OFFSET_VERTICAL,
-     self.minLabelBackground.frame.size.width,
-     self.minLabelBackground.frame.size.height);
-     
-
-    [self.minLabelBackground setAlpha:1];
-    
-    self.startTimeLabel.center = CGPointMake(self.minLabel.center.x, self.minLabel.center.y + LABEL_TO_LABEL_VERTICAL_OFFSET);
-    
-}
-
--(void)updateMaxLabel {
-    NSString* strToSet = self.labelFormatter(self.selectedMaximumValue);
-    CGSize expectedLabelSize = [strToSet sizeWithFont:self.maxLabel.font];
-    
-    
-    self.maxLabel.frame = CGRectMake( (CALLOUT_WIDTH - expectedLabelSize.width)/2, (CALLOUT_HEIGHT_MAIN - expectedLabelSize.height)/2, expectedLabelSize.width , expectedLabelSize.height);
-    self.maxLabel.text = strToSet;
-    
-    
-    double newX = self.maxThumb.center.x - self.maxLabelBackground.frame.size.width/2 + CALLOUT_OFFSET_HORIZONTAL;
-    double newXConstrained = [self xForValue:self.minimumValue]+(CALLOUT_WIDTH/2);
-    
-
-    if(newX <= newXConstrained) {
-        newX = newXConstrained;
-        self.maxLabelBackground.image = [UIImage imageNamed:@"callout_time_label.png"];
-        
-        self.maxLabelBackground.frame = CGRectMake(newX,
-                                                   self.maxThumb.center.y - self.maxThumb.frame.size.height/2 - CALLOUT_HEIGHT + CALLOUT_OFFSET_VERTICAL,
-                                                   self.maxLabelBackground.frame.size.width,
-                                                   CALLOUT_HEIGHT_MAIN);
-        
-    } else {
-        self.maxLabelBackground.image = [UIImage imageNamed:@"slider_callout_background.png"];
-        
-        self.maxLabelBackground.frame = CGRectMake(newX,
-                                                   self.maxThumb.center.y - self.maxThumb.frame.size.height/2 - CALLOUT_HEIGHT + CALLOUT_OFFSET_VERTICAL,
-                                                   self.maxLabelBackground.frame.size.width,
-                                                   CALLOUT_HEIGHT);
-        
-    }
-                                                                  
-                                                                  
-    
-    
-    
-    self.endTimeLabel.center = CGPointMake(self.maxLabel.center.x, self.maxLabel.center.y + LABEL_TO_LABEL_VERTICAL_OFFSET);
-    //[self.maxLabelBackground setAlpha:1];
-    
-    /*
-     
-     self.maxLabel.text = self.labelFormatter(self.selectedMaximumValue);
-     self.maxLabel.frame = CGRectMake(self.maxThumb.center.x + self.maxThumb.frame.size.width/2,
-     self.maxThumb.center.y - self.maxLabel.frame.size.height/2,
-     self.maxLabel.frame.size.width,
-     self.maxLabel.frame.size.height);
-     */ 
 }
 
 // gives the width of each bubble given the current track parameters.
-- (float) bubbleWidth {
+- (double) bubbleWidth {
     return self.trackRect.size.width/ self.numDisplayedBubbles;
 }
 
 // gives the frame origin for the corresponding bubble.
 - (CGRect) frameForBubble:(RangeBubble*)bubble {
     
-    float y = self.trackRect.origin.y;
-    float x = [self xForValue:bubble.minimumValue];
-    float w = [self bubbleWidth];
-    float h = self.trackRect.size.height;
+    double y = self.trackRect.origin.y;
+    double x = [self xForValue:bubble.minimumValue];
+    double w = [self bubbleWidth];
+    double h = self.trackRect.size.height;
     return CGRectMake(x,y,w,h);
 }
 
@@ -495,23 +414,22 @@
         return;
     }
     
-    float bubbleRange = self.minimumRange*NUM_INTERVALS_PER_BUBBLE;
-    CGRect bubbleRect = CGRectMake(10000,0,[self bubbleWidth], self.trackRect.size.height);
+    double bubbleRange = self.minimumRange*NUM_INTERVALS_PER_BUBBLE;
+    CGRect bubbleRect = CGRectMake(0,0,[self bubbleWidth], self.trackRect.size.height);
+
     
-    
-    float minVal = lastBubble.maximumValue;
-    float maxVal = lastBubble.maximumValue + bubbleRange;
-    float selectedMinVal = MAX(minVal, self.selectedMinimumValue);
-    float selectedMaxVal = MIN(maxVal, self.selectedMaximumValue);
+    double minVal = lastBubble.maximumValue;
+    double maxVal = lastBubble.maximumValue + bubbleRange;
+    double selectedMinVal = self.selectedMinimumValue;
+    double selectedMaxVal = self.selectedMaximumValue;
         
     RangeBubble* bubble = [[RangeBubble alloc] initWithFrame:bubbleRect minVal:minVal maxVal:maxVal minRange:self.      minimumRange selectedMinVal:selectedMinVal selectedMaxVal:selectedMaxVal
-                                          withPriceFormatter:^NSString *(double val) {
-                                              return @"";
-                                          } withTimeFormatter:^NSString *(double val) {
-                                              return @"";
-                                          }];
+                                          withPriceFormatter:self.priceFormatter withTimeFormatter:self.timeFormatter withPriceSource:self.priceSource];
     [self addSubview:bubble];
     [self.trackBubbles addObject:bubble];
+    
+    CGRect frame = [self frameForBubble:bubble];
+    bubble.frame = frame;
     
 }
 
@@ -521,7 +439,7 @@
         self.animating = true;
         
         // 1 over number of intervals per second
-        float period = fabs(self.minimumRange/self.scrollVel);
+        double period = fabs(self.minimumRange/self.scrollVel);
         
         if(self.scrollVel>0 && [self hasMoreBubblesRight]) {
             self.scrollPos += self.minimumRange;
@@ -551,14 +469,14 @@
     
     //move each bubble to the appropriate position
     
-    float falloff = 0.1;
+    double falloff = 0.1;
     int i = 0;
     for (RangeBubble* bubble in self.trackBubbles) {
         CGRect frame = [self frameForBubble:bubble];
         bubble.frame = frame;
         
-        float leftPos = frame.origin.x - (self.trackRect.origin.x + 20);
-        float rightPos = (self.trackRect.origin.x + self.trackRect.size.width - 20) - (frame.origin.x+frame.size.width);
+        double leftPos = frame.origin.x - (self.trackRect.origin.x + 20);
+        double rightPos = (self.trackRect.origin.x + self.trackRect.size.width - 20) - (frame.origin.x+frame.size.width);
         
         if ([self hasMoreBubblesLeft] && leftPos < 0) {
             [bubble setAlpha:MIN(1, (1/(-leftPos*falloff)) )];
@@ -577,8 +495,8 @@
 }
 
 - (BOOL)hasMoreBubblesRight {
-    float bubbleRange = self.minimumRange*NUM_INTERVALS_PER_BUBBLE;
-    float totalBubbleRange = (1+ceil((self.maximumValue - self.minimumValue)/bubbleRange))*bubbleRange;
+    double bubbleRange = self.minimumRange*NUM_INTERVALS_PER_BUBBLE;
+    double totalBubbleRange = (ceil((self.maximumValue - self.minimumValue)/bubbleRange))*bubbleRange;
     return (self.scrollPos + self.displayedRange) <= totalBubbleRange;
 }
 

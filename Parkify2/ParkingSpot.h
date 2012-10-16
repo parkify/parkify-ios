@@ -10,6 +10,11 @@
 #import <MapKit/MapKit.h>
 #import "Offer.h"
 
+#import "ExtraTypes.h"
+
+
+
+
 @class ParkingSpotCollection;
 
 @protocol ParkingSpotObserver <NSObject>
@@ -19,7 +24,8 @@
 @end
 
 
-@interface ParkingSpot : NSObject
+
+@interface ParkingSpot : NSObject<PriceStore>
 
 @property (strong, nonatomic) ParkingSpotCollection* parentCollection;
 
@@ -93,6 +99,8 @@
 - (BOOL) updateFromDictionary:(NSDictionary*)spot withLevelOfDetail:(NSString*)levelOfDetail;
 
 - (NSDictionary*) asDictionary;
+
+- (NSArray*) findPricesInRange:(double)startTime endTime:(double)endTime;
 
 @end
 
