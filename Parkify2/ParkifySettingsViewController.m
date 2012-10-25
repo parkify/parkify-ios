@@ -12,6 +12,9 @@
 #import "ParkifyAboutControllerViewController.h"
 #import "Api.h"
 #import "Persistance.h"
+#import "User.h"
+#import "AccountSettingsTableViewController.h"
+#import "AccountSettingsNavigationViewController.h"
 //#import "PlacedAgent.h"
 
 @interface ParkifySettingsViewController ()
@@ -39,9 +42,7 @@
 {
     [super viewDidLoad];
     
-    self.tableData = [NSArray arrayWithObjects:@"Login/Logout", @"Account Settings", @"About", nil ];
     
-    self.tableImages = [NSArray arrayWithObjects:@"glyphicons_204_unlock.png", @"glyphicons_003_user.png", @"glyphicons_195_circle_info.png", nil];
     
     //[PlacedAgent logPageView:@"SettingsView"];
     
@@ -51,6 +52,21 @@
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     [self.tabBarController showTabBar:NO];
+    
+    NSString* loginLogoutString = @"Login/Register";
+    NSString* loginLogoutIconString = @"glyphicons_204_unlock.png";
+    
+    if([Persistance retrieveAuthToken]) {
+        //Logged in
+        loginLogoutString = @"Logout";
+        loginLogoutIconString = @"glyphicons_203_lock.png";
+    }
+    
+    self.tableData = [NSArray arrayWithObjects:loginLogoutString, @"Account Settings", @"About", nil ];
+    
+    self.tableImages = [NSArray arrayWithObjects:loginLogoutIconString, @"glyphicons_003_user.png", @"glyphicons_195_circle_info.png", nil];
+    
+    [self.tableView reloadData];
     
 }
 
@@ -94,7 +110,7 @@
     ParkifyAboutViewController* accountSettings = [self.tabBarController.viewControllers objectAtIndex:2];
     
     
-    accountSettings.url = [NSString stringWithFormat:@"https://parkify-rails.herokuapp.com/profile?&auth_token=%@", authToken];
+    accountSettings.url = [NSString stringWithFormat:@"https://%@/profile?&auth_token=%@", TARGET_SERVER, authToken];
 
     self.tabBarController.selectedViewController =     accountSettings;
          
@@ -143,6 +159,26 @@
     
 }
 
+
+- (IBAction)testTapped:(id)sender {
+    User* u = [[User alloc] init];
+    [u updateFromServerWithSuccess:^(NSDictionary * d) {
+        
+        AccountSettingsNavigationViewController* accountSettings = [self.tabBarController.viewControllers objectAtIndex:3];
+        
+        
+        
+        //AccountSettingsTableViewController* accountSettings = [self.tabBarController.viewControllers objectAtIndex:3];
+        
+        
+        accountSettings.user = u;
+        
+        self.tabBarController.selectedViewController = accountSettings;
+        
+    } withFailure:^(NSError * e) {
+        ;
+    }];
+}
 
 - (IBAction)callParkify:(UIButton *)sender {
     UIDevice *device = [UIDevice currentDevice];

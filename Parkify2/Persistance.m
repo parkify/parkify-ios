@@ -125,6 +125,27 @@
     return [[Persistance retrieveUserRecordwithName:@"LastAmountCharged"] doubleValue];
 }
 
++(void)saveLastPaymentInfoDetails:(NSString*)lpid {
+    [Persistance saveUserRecord:lpid withName:@"LastPaymentInfoDetails"];
+}
++(NSString*)retrieveLastPaymentInfoDetails {
+    return [Persistance retrieveUserRecordwithName:@"LastPaymentInfoDetails"];
+}
+
++(void)saveFirstName:(NSString*)name {
+    [Persistance saveUserRecord:name withName:@"FirstName"];
+}
++(NSString*)retrieveFirstName {
+    return [Persistance retrieveUserRecordwithName:@"FirstName"];
+}
++(void)saveLastName:(NSString*)name {
+    [Persistance saveUserRecord:name withName:@"LastName"];
+}
++(NSString*)retrieveLastName {
+    return [Persistance retrieveUserRecordwithName:@"LastName"];
+}
+
+
 
 +(void)saveCurrentSpotId:(int)spotId{
     if (spotId == -1) {

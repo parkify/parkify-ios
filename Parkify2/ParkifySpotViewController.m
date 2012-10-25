@@ -17,16 +17,21 @@
 #import "ParkifyConfirmationViewController.h"
 #import "WaitingMask.h"
 #import "RangeBubble.h"
+#import "MultiImageViewer.h"
 //#import "PlacedAgent.h"
 
 @interface ParkifySpotViewController ()
 
 @property (strong, nonatomic) WaitingMask* waitingMask;
+@property (weak, nonatomic) IBOutlet UIPageControl *pageControl;
+@property (weak, nonatomic) IBOutlet UIScrollView *pictureScrollView;
 
 @end
 
 @implementation ParkifySpotViewController
 @synthesize waitingMask = _waitingMask;
+@synthesize pageControl = _pageControl;
+@synthesize pictureScrollView = _pictureScrollView;
 
 @synthesize taxLabel = _taxLabel;
 @synthesize pictureActivityView = _pictureActivityView;
@@ -94,12 +99,19 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    [self addPicture];
+    //[self addAllPictures];
     //[PlacedAgent logPageView:@"SpotInfoView"];
     
     NSDate* currentDate = [NSDate date];
     
     double currentTime = [currentDate timeIntervalSince1970];
+    
+    MultiImageViewer* miViewer = [[MultiImageViewer alloc] initWithFrame:self.multiImageViewFrame.frame withImageIds:self.spot.landscapeInfoImageIDs];
+    
+    CGRect frame = miViewer.frame;
+    frame.origin = CGPointMake(0,0);
+    miViewer.frame = frame;
+    [self.multiImageViewFrame addSubview:miViewer];
     
     //currentTime = currentTime - fmod(currentTime,1800);
     
@@ -172,6 +184,9 @@
     [self setEndTimeALabel:nil];
     [self setEndTimeLabel:nil];
     [self setTestBubble:nil];
+    [self setPageControl:nil];
+    [self setPictureScrollView:nil];
+    [self setMultiImageViewFrame:nil];
     [super viewDidUnload];
     // Release any retained subviews of the main view.
 }
@@ -212,10 +227,10 @@
      */
     NSString* styleString = @"<style type=\"text/css\">"
     //"body { background-color:transparent; font-family:Marker Felt; font-size:12; color:white}"
-    ".l1 { background-color:transparent; font-family:\"Arial Rounded MT Bold\"; font-size:12; color:white}"
-    ".l2 { background-color:transparent; font-family:\"Arial Rounded MT Bold\"; font-size:30; color:white;}"
-    ".l3 { background-color:transparent; font-family:\"Arial Rounded MT Bold\"; font-size:12; color:white;}"
-    ".l4 { background-color:transparent; font-family:\"Arial Rounded MT Bold\"; font-size:12; color:white; }"
+    ".l1 { background-color:transparent; font-family:\"HelveticaNeue-Bold\"; font-size:12; color:white}"
+    ".l2 { background-color:transparent; font-family:\"HelveticaNeue-Bold\"; font-size:30; color:white;}"
+    ".l3 { background-color:transparent; font-family:\"HelveticaNeue-Bold\"; font-size:12; color:white;}"
+    ".l4 { background-color:transparent; font-family:\"HelveticaNeue-Bold\"; font-size:12; color:white; }"
     ".selected { color:white; } "
     ".faded { color:white; }"
     ".fake-space {font-size:5;}"
@@ -378,20 +393,11 @@
         [self switchToConfirmation];
         return;
     }
-    
     if ([Persistance retrieveAuthToken] == nil) {
         [Api authenticateModallyFrom:self withSuccess:^(NSDictionary * result){}];
         return;
     } else {
-        double durationInSeconds = (self.rangeBar.selectedMaximumValue - self.rangeBar.selectedMinimumValue);
-        double totalPrice = [self.spot priceFromNowForDurationInSeconds:durationInSeconds];
-        NSString* lastfourdigits = [Persistance retrieveLastFourDigits];
-        UIAlertView* areYouSure = [[UIAlertView alloc] initWithTitle:@"Are you sure?"
-                                                          message:[NSString stringWithFormat:@"Amount of %0.2f will be charged to credit card ending in %@ for this purchase.", totalPrice,lastfourdigits]
-                                                         delegate:self
-                                                cancelButtonTitle:@"Cancel"
-                                                otherButtonTitles:@"Yes", nil];
-        [areYouSure show];
+        [self previewTransaction];
     }
 }
 
@@ -431,6 +437,8 @@
         controller.currentLat = self.currentLat;
         controller.currentLong = self.currentLong;
         
+        controller.topBarText = [Persistance retrieveLastPaymentInfoDetails];
+        
         [Persistance saveCurrentSpot:self.spot];
         
         parent.modalTransitionStyle = UIModalTransitionStyleCoverVertical;
@@ -449,7 +457,7 @@
     
     id transactionRequest = [Authentication makeTransactionRequestWithUserToken:[Persistance retrieveAuthToken] withSpotId:self.spot.mID withStartTime:self.rangeBar.selectedMinimumValue withEndTime:self.rangeBar.selectedMaximumValue withOfferIds:offerIds withLicensePlate:[Persistance retrieveLicensePlateNumber]];
     
-    NSString* urlString = [[NSString alloc] initWithFormat:@"https://parkify-rails.herokuapp.com/api/v1/acceptances.json?auth_token=%@", [Persistance retrieveAuthToken]];
+    NSString* urlString = [[NSString alloc] initWithFormat:@"https://%@/api/v1/acceptances.json?auth_token=%@", TARGET_SERVER, [Persistance retrieveAuthToken]];
     NSURL *url = [NSURL URLWithString:urlString];
     
     
@@ -469,6 +477,9 @@
         NSDictionary * root = [responseString JSONValue];
         if([root objectForKey:@"success"]) {
             //Needs to happen on success
+            NSString* paymentInfoDetails = [[root objectForKey:@"acceptance"] objectForKey:@"details"];
+            [Persistance saveLastPaymentInfoDetails:paymentInfoDetails];
+            
             [self switchToConfirmation];
             
             //[self performSegueWithIdentifier:@"ViewConfirmation" sender:self];
@@ -520,6 +531,98 @@
 }
 
 
+
+- (void) previewTransaction {
+    
+    NSMutableArray* offerIds = [[NSMutableArray alloc] init];
+    for (Offer* offer in self.spot.offers) {
+        if ([offer overlapsWithStartTime:self.rangeBar.selectedMinimumValue endTime:self.rangeBar.selectedMaximumValue])
+            [offerIds addObject:[NSNumber numberWithInt:offer.mId]];
+    }
+    
+    id transactionRequest = [Authentication makeTransactionRequestWithUserToken:[Persistance retrieveAuthToken] withSpotId:self.spot.mID withStartTime:self.rangeBar.selectedMinimumValue withEndTime:self.rangeBar.selectedMaximumValue withOfferIds:offerIds withLicensePlate:[Persistance retrieveLicensePlateNumber]];
+    
+    NSString* urlString = [[NSString alloc] initWithFormat:@"https://%@/api/v1/acceptances/preview.json?auth_token=%@", TARGET_SERVER, [Persistance retrieveAuthToken]];
+    NSURL *url = [NSURL URLWithString:urlString];
+    
+    
+    
+    NSLog(@"%@", [transactionRequest JSONRepresentation]);
+    ASIFormDataRequest *request = [ASIFormDataRequest requestWithURL:url];
+    [request addPostValue:[transactionRequest JSONRepresentation] forKey:@"transaction"];
+    
+    [request addRequestHeader:@"User-Agent" value:@"ASIFormDataRequest"];
+    [request addRequestHeader:@"Content-Type" value:@"application/json"];
+    [request  setRequestMethod:@"POST"];
+    [request setCompletionBlock:^{
+        
+        
+        //[UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+        NSString *responseString = [request responseString];
+        NSDictionary * root = [responseString JSONValue];
+        if([root objectForKey:@"success"]) {
+            //Needs to happen on success
+            
+            [self.waitingMask removeFromSuperview];
+            self.waitingMask = nil;
+            
+            UIAlertView* areYouSure = [[UIAlertView alloc] initWithTitle:@"Are you sure?"
+                                                                 message:[root objectForKey:@"price_string"]
+                                                                delegate:self
+                                                       cancelButtonTitle:@"Cancel"
+                                                       otherButtonTitles:@"Yes", nil];
+            [areYouSure show];
+            
+            //[self performSegueWithIdentifier:@"ViewConfirmation" sender:self];
+            //NSLog(@"TEST");
+        } else {
+            
+            UIAlertView* error = [[UIAlertView alloc] initWithTitle:@"Error" message:[root objectForKey:@"price_string"] delegate:self cancelButtonTitle:@"Ok"
+                                                  otherButtonTitles: nil];
+            [error show];
+            
+            //self.errorLabel.text = [root objectForKey:@"error"];
+            //self.errorLabel.hidden = false;
+            [self.waitingMask removeFromSuperview];
+            self.waitingMask = nil;
+        }
+        
+        NSLog(@"Response: %@", responseString);
+        
+        
+    }];
+    [request setFailedBlock:^{
+        [self.waitingMask removeFromSuperview];
+        self.waitingMask = nil;
+        //[UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+        NSError *error = [request error];
+        NSLog(@"Error: %@", error.localizedDescription);
+        if(request.responseStatusCode == 401) {
+            [Api authenticateModallyFrom:self withSuccess:^(NSDictionary * result){}];
+        }
+        else {
+            UIAlertView* error = [[UIAlertView alloc] initWithTitle:@"Error" message:@"Could not contact server" delegate:self cancelButtonTitle:@"Ok"
+                                                  otherButtonTitles: nil];
+            [error show];
+            //self.errorLabel.text = @"Could not contact server";
+            //self.errorLabel.hidden = false;
+        }
+        
+    }];
+    
+    CGRect waitingMaskFrame = self.view.frame;
+    waitingMaskFrame.origin.x = 0;
+    waitingMaskFrame.origin.y = 0;
+    
+    self.waitingMask = [[WaitingMask alloc] initWithFrame:waitingMaskFrame];
+    [self.view addSubview:self.waitingMask];
+    
+    [request startAsynchronous];
+    
+}
+
+
+
 //Starts polling if not already. Otherwise continues polling.
 -(void)startPolling {
     if (self.timerPolling != nil)
@@ -565,20 +668,6 @@
 }
 
 
--  (void)addPicture {
-    if (self.spot.imageIDs != NULL && [self.spot.imageIDs count] != 0) {
-        int imageID = [[self.spot.imageIDs objectAtIndex:0] intValue];
-        [self.pictureActivityView startAnimating];
-        [Api downloadImageDataAsynchronouslyWithId:imageID withStyle:@"original" withSuccess:^(NSDictionary * result) {
-            self.imageView.image = [UIImage imageWithData:[result objectForKey:@"image"]];
-            [self.pictureActivityView stopAnimating];
-            [self.pictureActivityView setHidden:true];
-        } withFailure:^(NSError * err) {
-            self.imageView.image = [UIImage imageNamed:@"NoPic.png"];
-            [self.pictureActivityView stopAnimating];
-            [self.pictureActivityView setHidden:true];
-        }];
-    }
-}
+
 
 @end

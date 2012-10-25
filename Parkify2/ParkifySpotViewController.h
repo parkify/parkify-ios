@@ -49,6 +49,7 @@
 @property (weak, nonatomic) IBOutlet UIImageView *imageView;
 //@property double startTime;
 //@property double endTime;
+@property (weak, nonatomic) IBOutlet UIView *multiImageViewFrame;
 
 @property (weak, nonatomic) IBOutlet UIView *testBubble;
 @end

@@ -86,7 +86,7 @@
         self.emailLabel.alpha = 0;
         self.passwordLabel.alpha = 0;
         
-        self.greetingLabel.text = [NSString stringWithFormat:@"You are logged in with credit card xxxx-xxxx-xxxx-%@", [Persistance retrieveLastFourDigits]];
+        self.greetingLabel.text = [NSString stringWithFormat:@"Hello, %@. Thank you for using Parkify!", [Persistance retrieveFirstName]];
         self.greetingLabel.hidden = false;
         self.loginLabel.text = @"Log out";
     }
@@ -252,7 +252,7 @@
 }
 
 - (IBAction)resetPasswordTapped:(id)sender {
-    NSURL *url = [NSURL URLWithString:@"https://parkify-rails.herokuapp.com/my/users/password/new"];
+    NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"https://%@/my/users/password/new", TARGET_SERVER]];
     [[UIApplication sharedApplication] openURL:url];
 }
 

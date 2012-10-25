@@ -132,40 +132,47 @@ typedef struct STargetLocation {
     [self updateBottomBar];
 }
 
--(void)updateBottomBar {
-    
+-(BOOL)hasReservation {
     double startTime = [Persistance retrieveCurrentStartTime];
     double endTime = [Persistance retrieveCurrentEndTime];
-    ParkingSpot* currentSpot = [Persistance retrieveCurrentSpot];
     
     double currentTime = [[NSDate date] timeIntervalSince1970];
-    BOOL bInInterval = (currentTime >= startTime) && (currentTime <= endTime);
+    return (currentTime >= startTime) && (currentTime <= endTime);
+}
+
+-(void)updateBottomBar {
     
-    
-    
-    if(bInInterval) {
+    if([self hasReservation]) {
         Formatter formatter = ^(double val) {
             NSDate* time = [[NSDate alloc] initWithTimeIntervalSince1970:val];
             NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-            [dateFormatter setDateFormat:@"h:mm a"];
+            [dateFormatter setDateFormat:@"h:mma"];
             return [dateFormatter stringFromDate:time]; };
         
         [UIView animateWithDuration:0.3 animations:^{
             self.bottomBarView.frame = self.bottomBarLargeReferenceView.frame;
             self.bottomBarView.backgroundColor = [UIColor colorWithRed:32/255.0 green:147/255.0 blue:255/255.0 alpha:1];
+            self.bottomBarLabel.textColor = [UIColor colorWithWhite:0.95 alpha:1];
+            self.myLocationButton.frame = self.locationButtonLargeReferenceView.frame;
         }];
         
         
         
+        double endTime = [Persistance retrieveCurrentEndTime];
+        self.bottomBarLabel.text = [NSString stringWithFormat:@"Reservation ends at %@          Details ", formatter(endTime)];
+        self.bottomBarLabel.textAlignment = UITextAlignmentRight;
         
-        self.bottomBarLabel.text = [NSString stringWithFormat:@"Reservation ends at %@ | details ", formatter(endTime)];
         
         [self.confirmationButton setHidden:false];
         
     } else {
+        self.bottomBarLabel.textAlignment = UITextAlignmentCenter;
+        
         [UIView animateWithDuration:0.3 animations:^{
             self.bottomBarView.frame = self.bottomBarSmallReferenceView.frame;
             self.bottomBarView.backgroundColor = [UIColor whiteColor];
+            self.bottomBarLabel.textColor = [UIColor colorWithWhite:0.1 alpha:1];
+            self.myLocationButton.frame = self.locationButtonSmallReferenceView.frame;
         }];
         
         [self.confirmationButton setHidden:true];
@@ -228,6 +235,13 @@ typedef struct STargetLocation {
     [self setConfirmationButton:nil];
     [self setBottomBarSmallReferenceView:nil];
     [self setBottomBarLargeReferenceView:nil];
+    [self setSearchButton:nil];
+    [self setSearchBarLargeReferenceView:nil];
+    [self setSearchBarSmallReferenceView:nil];
+    [self setSearchBarContainer:nil];
+    [self setBottomBarButton:nil];
+    [self setLocationButtonLargeReferenceView:nil];
+    [self setLocationButtonSmallReferenceView:nil];
     [super viewDidUnload];
     // Release any retained subviews of the main view.
 }
@@ -312,6 +326,8 @@ typedef struct STargetLocation {
         self.addressBar.showsSearchResultsButton = false;
         
         self.addressBarOrigFrame = self.addressBar.frame;
+        
+        [[UISearchBar appearance] setBackgroundImage:[UIImage imageNamed:@"clear.png"]];
         
         self.bAlreadyInit = true;
         
@@ -456,6 +472,8 @@ typedef struct STargetLocation {
         return;
     }
     
+    
+    
     //[self showTargetPin:false];
     
     CLLocationCoordinate2D myLocation;
@@ -474,47 +492,24 @@ typedef struct STargetLocation {
 
 - (void)expandAddressBar:(BOOL)bExpand {
     if(bExpand) {
-        CGRect newFrame = self.addressBarOrigFrame;
-        newFrame.size.width = self.view.frame.size.width;
-        newFrame.origin.x = 0;
-        [UIView animateWithDuration:.1 animations:^{
-            CGRect newSettingsButtonFrame = self.settingsButton.frame;
-            newSettingsButtonFrame.origin.y = self.addressBar.frame.origin.y + self.addressBar.frame.size.height-1;
-            self.settingsButton.frame = newSettingsButtonFrame;
-            CGRect newCurrentLocationButtonFrame = self.currentLocationButton.frame;
-            newCurrentLocationButtonFrame.origin.y = self.addressBar.frame.origin.y + self.addressBar.frame.size.height-1;
-            self.currentLocationButton.frame = newCurrentLocationButtonFrame;
-        } completion:^(BOOL finished) {
-            if (finished) {
-                [UIView animateWithDuration:.1
-                                 animations: ^{
-                                     self.addressBar.frame = newFrame;
-                                     [self.addressBar layoutSubviews];
+        //CGRect newFrame = self
+        //newFrame.size.width = self.view.frame.size.width;
+        //newFrame.origin.x = 0;
+        //newFrame.origin.y = self.addressBarOrigFrame.size.height;
+        [UIView animateWithDuration:.2                                 animations: ^{
+            self.searchBarContainer.frame = self.searchBarLargeReferenceView.frame;
+            //self.addressBar.frame = newFrame;
+            //[self.addressBar layoutSubviews];
                                  }
                                  completion: ^(BOOL finished){}];
-            }
-        }];
 
     } else {
         [UIView animateWithDuration:.1
                          animations: ^{
-                             self.addressBar.frame = self.addressBarOrigFrame;
-                            [self.addressBar layoutSubviews];
+                             self.searchBarContainer.frame = self.searchBarSmallReferenceView.frame;
+                             //[self.addressBar layoutSubviews];
                          }
                          completion: ^(BOOL finished){
-                             if(finished) {
-                                 [UIView animateWithDuration:.1
-                                              animations: ^{
-                                                  
-                                                  CGRect newSettingsButtonFrame = self.settingsButton.frame;
-                                                  newSettingsButtonFrame.origin.y = self.addressBar.frame.origin.y-1;
-                                                  self.settingsButton.frame = newSettingsButtonFrame;
-                                                  CGRect newCurrentLocationButtonFrame = self.currentLocationButton.frame;
-                                                  newCurrentLocationButtonFrame.origin.y = self.addressBar.frame.origin.y-1;
-                                                  self.currentLocationButton.frame = newCurrentLocationButtonFrame;
-                                              
-                                              }];
-                             }
                          }
          ];
     }
@@ -580,12 +575,12 @@ typedef struct STargetLocation {
         
         //UIButton* btnViewVenue = [UIButton buttonWithType:UIButtonTypeDetailDisclosure];
         UIButton* btnViewVenue = [UIButton buttonWithType:UIButtonTypeCustom];
-        btnViewVenue.frame = CGRectMake(0, 0,70, 32);
+        btnViewVenue.frame = CGRectMake(0, 0,74, 32);
         
         //NSString *btnString = @"PARK!";
         NSString *btnString = @"Info";
         CGSize s = [btnString sizeWithFont:[UIFont fontWithName:@"Arial Rounded MT Bold" size:(16.0)] constrainedToSize:btnViewVenue.frame.size lineBreakMode:UILineBreakModeMiddleTruncation];
-        [btnViewVenue setBackgroundImage:[UIImage imageNamed:@"blue_big_button.png"]
+        [btnViewVenue setBackgroundImage:[UIImage imageNamed:@"blue_button.png"]
                             forState:UIControlStateNormal];
 
         btnViewVenue.titleLabel.frame = CGRectMake(0,0,s.width,s.height);
@@ -598,6 +593,8 @@ typedef struct STargetLocation {
         btnViewVenue.tag = spot.mID;
         [btnViewVenue addTarget:self action:@selector(spotMoreInfo:) forControlEvents:UIControlEventTouchUpInside];
         annotationView.rightCalloutAccessoryView = btnViewVenue;
+        
+        annotationView.centerOffset = CGPointMake(0, -annotationView.frame.size.height/2);
         
         return annotationView;
     } else if ([annotation isKindOfClass:[LocationAnnotation class]]) {
@@ -788,6 +785,25 @@ typedef struct STargetLocation {
         }
     }
     
+    if(ADMIN_VER) {
+    NSMutableArray* ids = [[NSMutableArray alloc] init ];
+    for (ParkingSpot* spot in [self.parkingSpots.parkingSpots allValues]) {
+        
+        [ids addObject:[NSNumber numberWithInt:(spot.mID - 90000)]];
+    }
+    
+    
+    NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"intValue" ascending:TRUE];
+    [ids sortUsingDescriptors:[NSArray arrayWithObject:sortDescriptor]];
+    
+        NSString * toToast = @"";
+        for (NSNumber * num in ids) {
+            toToast = [toToast stringByAppendingString:[NSString stringWithFormat:@"%d,",[num intValue]]];
+        }
+    
+        [[[iToast makeText:toToast] setGravity:iToastGravityBottom ] show];
+    }
+    
 }
 
 - (void)updateMapView {
@@ -892,6 +908,9 @@ typedef struct STargetLocation {
 }
 
 - (IBAction)confirmationButtonTapped:(id)sender {
+    if(![self hasReservation]) {
+        return;
+    }
     [self switchToConfirmation];
     //[self openSpotConirmationViewWithSpot:[Persistance retrieveCurrentSpotId]];
 }
@@ -1003,5 +1022,8 @@ typedef struct STargetLocation {
         
         self.modalTransitionStyle = UIModalTransitionStyleCoverVertical;
         [self presentViewController:controller animated:true completion:^{}];
+}
+- (IBAction)searchButtonTapped:(id)sender {
+    [self.addressBar becomeFirstResponder];
 }
 @end

@@ -8,7 +8,7 @@
 
 #import <Foundation/Foundation.h>
 
-#define TEXTFIELD_BORDER_COLOR [UIColor colorWithRed:48.0/255 green:95.0/255 blue:230.0/255 alpha:1]
+#define TEXTFIELD_BORDER_COLOR [UIColor colorWithRed:77.0/255 green:151.0/255 blue:200.0/255 alpha:1]
 #define TEXTFIELD_HEIGHT 35
 
 @interface TextFormatter : NSObject

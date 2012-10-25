@@ -130,7 +130,7 @@ withPasswordConfirmation:(NSString*)passwordConfirmation
                                                            withPhone:phone];
         id tokenRequest = [Authentication makeTokenRequestWithToken:token];
         
-        NSURL *url = [NSURL URLWithString:@"https://parkify-rails.herokuapp.com/api/v1/users.json"];
+        NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"https://%@/api/v1/users.json", TARGET_SERVER]];
         NSLog(@"%@", [userRequest JSONRepresentation]);
         
         ASIFormDataRequest *request = [ASIFormDataRequest requestWithURL:url];
@@ -155,6 +155,9 @@ withPasswordConfirmation:(NSString*)passwordConfirmation
                 [Persistance saveAuthToken:[root objectForKey:@"auth_token"]];
                 [Persistance saveLicensePlateNumber:[root objectForKey:@"license_plate_number"]];
                 [Persistance saveLastFourDigits:[root objectForKey:@"last_four_digits"]];
+                [Persistance saveFirstName:[[root objectForKey:@"user"] objectForKey:@"first_name"]];
+                [Persistance saveLastName:[[root objectForKey:@"user"] objectForKey:@"last_name"]];
+                
                 successBlock(root);
             } else {
                 NSString* message = @"";
@@ -264,7 +267,7 @@ withPasswordConfirmation:(NSString*)passwordConfirmation
     
     NSURL *url;
     if(TESTING_V1) {
-        url = [NSURL URLWithString:@"https://parkify-rails.herokuapp.com/api/v1/users/sign_in.json"];
+        url = [NSURL URLWithString:[NSString stringWithFormat:@"https://%@/api/v1/users/sign_in.json", TARGET_SERVER]];
     } else {
         url = [NSURL URLWithString:@"https://swooplot.herokuapp.com/api/users/sign_in.json"];
     }
@@ -292,6 +295,8 @@ withPasswordConfirmation:(NSString*)passwordConfirmation
             
             [Persistance saveLicensePlateNumber:[root objectForKey:@"license_plate_number"]];
             [Persistance saveLastFourDigits:[root objectForKey:@"last_four_digits"]];
+            [Persistance saveFirstName:[[root objectForKey:@"user"] objectForKey:@"first_name"]];
+            [Persistance saveLastName:[[root objectForKey:@"user"] objectForKey:@"last_name"]];
             successBlock(root);
         } else {
             NSString* message = @"";
@@ -371,9 +376,10 @@ withPasswordConfirmation:(NSString*)passwordConfirmation
                   withFailure:(FailureBlock)failureBlock {
     NSString* strUrl;
     if([lod isEqualToString: @"low"]) {
-        strUrl = [NSString stringWithFormat:@"http://parkify-rails.herokuapp.com/api/v1/resources/%d.json?level_of_detail=%@", spotID, @"low"];
+        
+        strUrl = [NSString stringWithFormat:@"http://%@/api/v1/resources/%d.json?level_of_detail=%@", TARGET_SERVER, spotID, @"low"];
     } else {
-        strUrl = [NSString stringWithFormat:@"http://parkify-rails.herokuapp.com/api/v1/resources/%d.json?level_of_detail=%@", spotID, @"all"];
+        strUrl = [NSString stringWithFormat:@"http://%@/api/v1/resources/%d.json?level_of_detail=%@", TARGET_SERVER, spotID, @"all"];
     }
     
     NSURL *url = [NSURL URLWithString:strUrl];
@@ -407,9 +413,9 @@ withPasswordConfirmation:(NSString*)passwordConfirmation
     
     NSString* strUrl;
     if([lod isEqualToString: @"low"]) {
-        strUrl = [NSString stringWithFormat:@"http://parkify-rails.herokuapp.com/api/v1/resources.json?level_of_detail=%@", @"low"];
+        strUrl = [NSString stringWithFormat:@"http://%@/api/v1/resources.json?level_of_detail=%@",TARGET_SERVER, @"low"];
     } else {
-        strUrl = [NSString stringWithFormat:@"http://parkify-rails.herokuapp.com/api/v1/resources.json?level_of_detail=%@", @"all"];
+        strUrl = [NSString stringWithFormat:@"http://%@/api/v1/resources.json?level_of_detail=%@", TARGET_SERVER, @"all"];
     }
             
     NSURL *url = [NSURL URLWithString:strUrl];
@@ -504,7 +510,8 @@ withPasswordConfirmation:(NSString*)passwordConfirmation
 + (void)downloadImageDataAsynchronouslyWithId:(int)imageID withStyle:(NSString*)style
                               withSuccess:(SuccessBlock)successBlock
                               withFailure:(FailureBlock)failureBlock {
-    NSString* strUrl = [NSString stringWithFormat:@"http://parkify-rails.herokuapp.com/images/%d?image_attachment=true&style=%@", imageID, style];
+                                  
+    NSString* strUrl = [NSString stringWithFormat:@"http://%@/images/%d?image_attachment=true&style=%@", TARGET_SERVER, imageID, style];
     
     NSURL *url = [NSURL URLWithString:strUrl];
     
@@ -535,6 +542,104 @@ withPasswordConfirmation:(NSString*)passwordConfirmation
     [request startAsynchronous];
 
 }
+
+
++ (void)getUserProfileWithSuccess:(SuccessBlock)successBlock
+                      withFailure:(FailureBlock)failureBlock {
+    
+    NSString* authToken = [Persistance retrieveAuthToken];
+    if(!authToken) {
+        //NSError* error = [[NSError errorWithDomain:@"Auth" code:0 userInfo:[NSDictionary dictionaryWithObject:<#(id)#> forKey:<#(id<NSCopying>)#>]]]
+        //TODO: GIVE BETTER ERROR
+        failureBlock(nil);
+        return;
+    }
+    NSString* strUrl = [NSString stringWithFormat:@"https://%@/api/v1/account.json?&auth_token=%@", TARGET_SERVER, authToken];
+    
+    NSURL *url = [NSURL URLWithString:strUrl];
+    
+    
+    ASIHTTPRequest *_request = [ASIHTTPRequest requestWithURL:url];
+    __weak ASIHTTPRequest *request = _request;
+    
+    request.requestMethod = @"GET";
+    
+    [request setDelegate:self];
+    [request setCompletionBlock:^{
+        NSString *responseString = [request responseString];
+        NSDictionary * root = [responseString JSONValue];
+        successBlock(root);
+    }];
+    [request setFailedBlock:^{
+        failureBlock([request error]);
+    }];
+    
+    [request startAsynchronous];
+    
+}
+
++ (void)updateUserProfileWithDict:(NSDictionary*)dicIn
+                      withSuccess:(SuccessBlock)successBlock
+                      withFailure:(FailureBlock)failureBlock {
+    NSString* authToken = [Persistance retrieveAuthToken];
+    if(!authToken) {
+        //NSError* error = [[NSError errorWithDomain:@"Auth" code:0 userInfo:[NSDictionary dictionaryWithObject:<#(id)#> forKey:<#(id<NSCopying>)#>]]]
+        //TODO: GIVE BETTER ERROR
+        failureBlock(nil);
+        return;
+    }
+    NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"https://%@/api/v1/account.json?&auth_token=%@", TARGET_SERVER, authToken]];
+    NSLog(@"%@", [dicIn JSONRepresentation]);
+    
+    ASIFormDataRequest *request = [ASIFormDataRequest requestWithURL:url];
+    [request addPostValue:[dicIn JSONRepresentation] forKey:@"user"];
+    [request addRequestHeader:@"User-Agent" value:@"ASIFormDataRequest"];
+    [request addRequestHeader:@"Content-Type" value:@"application/json"];
+    [request setRequestMethod:@"PUT"];
+    
+    [request setCompletionBlock:^{
+        [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+        
+        NSString *responseString = [request responseString];
+        NSDictionary * root = [responseString JSONValue];
+        BOOL success = [[root objectForKey:@"success"] boolValue];
+        
+        if(success) {
+            successBlock([root objectForKey:@"user"]);
+        } else {
+            NSString* message = @"";
+            
+            NSDictionary* errorDescription = [root objectForKey:@"error"];
+            
+            for( NSString* key in errorDescription.allKeys) {
+                for( NSString* val in [errorDescription objectForKey:key]) {
+                    message = [NSString stringWithFormat:@"%@%@ %@\n", message, key, val] ;
+                }
+                //NSString* object = [[NSString stringWithFormat:@"%@",[errorDescription objectForKey:key]]stringByReplacingOccurrencesOfString:@"\n" withString:@""];
+            }
+            
+            NSDictionary* userInfo;
+            if(![message isEqualToString:@""]) {
+                userInfo = [NSDictionary dictionaryWithObjectsAndKeys:message,@"message", nil];
+            }
+            else {
+                NSLog(@"WARNING: Error from server not handled well: %@", responseString);
+                userInfo = [NSDictionary dictionaryWithObjectsAndKeys:@"error from server not formatted correctly",@"message", nil];
+            }
+            NSError* error = [NSError errorWithDomain:@"UserUpdate" code:0 userInfo:userInfo];
+            failureBlock(error);
+        }
+    }];
+    
+    [request setFailedBlock:^{
+        [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+        failureBlock([request error]);
+    }];
+    
+    [request startAsynchronous];
+    
+}
+
 
 @end
 

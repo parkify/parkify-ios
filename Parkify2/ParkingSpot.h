@@ -25,7 +25,7 @@
 
 
 
-@interface ParkingSpot : NSObject<PriceStore>
+@interface ParkingSpot : NSObject<PriceStore, NameIdMappingDelegate>
 
 @property (strong, nonatomic) ParkingSpotCollection* parentCollection;
 
@@ -54,6 +54,10 @@
 @property (strong, nonatomic) NSString* mDirections;
 
 @property (strong, nonatomic) NSArray* imageIDs;
+@property (strong, nonatomic) NSArray* landscapeInfoImageIDs;
+@property (strong, nonatomic) NSArray* landscapeConfImageIDs;
+@property (strong, nonatomic) NSDictionary* standardImageIDs;
+
 
 
 @property int offerID;
@@ -77,7 +81,9 @@
             free:(Boolean)freeIn
         spotType:(NSString*)spotTypeIn
        imageIDs:(NSArray*)imageIDsIn
-
+    landscapeInfoImageIDs:(NSArray*)landscapeInfoImageIDs
+    landscapeConfImageIDs:(NSArray*)landscapeConfImageIDs
+        standardImageIDs:(NSDictionary*)standardImageIDs
       spotLayout:(NSString*)spotLayoutIn
   spotDifficulty:(NSString*)spotDifficultyIn
     spotCoverage:(NSString*)spotCoverageIn
@@ -101,6 +107,8 @@
 - (NSDictionary*) asDictionary;
 
 - (NSArray*) findPricesInRange:(double)startTime endTime:(double)endTime;
+
+- (int)idForName:(NSString *)name;
 
 @end
 

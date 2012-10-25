@@ -39,6 +39,17 @@
 +(void)saveCurrentEndTime:(double)timeIn;
 +(double)retrieveCurrentEndTime;
 
++(void)saveLastPaymentInfoDetails:(NSString*)lpid;
++(NSString*)retrieveLastPaymentInfoDetails;
+
+
+
+
++(void)saveFirstName:(NSString*)name;
++(NSString*)retrieveFirstName;
++(void)saveLastName:(NSString*)name;
++(NSString*)retrieveLastName;
+
 //ok, so I need to add spots serverside and check if spots are free
 
 /*

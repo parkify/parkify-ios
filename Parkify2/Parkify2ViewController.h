@@ -40,13 +40,21 @@
 @property CLLocationCoordinate2D lastSearchedLocation;
 @property (weak, nonatomic) IBOutlet UIView *bottomBarSmallReferenceView;
 @property (weak, nonatomic) IBOutlet UIView *bottomBarLargeReferenceView;
+@property (weak, nonatomic) IBOutlet UIView *searchBarLargeReferenceView;
+@property (weak, nonatomic) IBOutlet UIButton *bottomBarButton;
+@property (weak, nonatomic) IBOutlet UIImageView *searchBarSmallReferenceView;
+@property (weak, nonatomic) IBOutlet UIView *searchBarContainer;
 
+@property (weak, nonatomic) IBOutlet UIView *locationButtonLargeReferenceView;
+@property (weak, nonatomic) IBOutlet UIView *locationButtonSmallReferenceView;
 @property (nonatomic, strong) ParkingSpotCollection* parkingSpots;
 @property (nonatomic, strong) ParkingSpot* targetSpot;
 
 @property (nonatomic, strong) NSArray* annotations; //Of type id <MKAnnotation>
 
 - (IBAction)parkMeNowButtonTapped:(UIButton *)sender;
+@property (weak, nonatomic) IBOutlet UIButton *searchButton;
+- (IBAction)searchButtonTapped:(id)sender;
 
 - (IBAction)refreshTapped:(id)sender;
 - (IBAction)settingsButtonTapped:(UIButton *)sender;

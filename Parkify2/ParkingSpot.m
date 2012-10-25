@@ -25,6 +25,9 @@
 @synthesize mSpotName = _mSpotName;
 
 @synthesize imageIDs = _imageIDs;
+@synthesize landscapeInfoImageIDs = _landscapeInfoImageIDs;
+@synthesize landscapeConfImageIDs = _landscapeConfImageIDs;
+@synthesize standardImageIDs = _standardImageIDs;
 
 @synthesize mDesc = _mDesc;
 @synthesize mFree = _mFree;
@@ -78,19 +81,20 @@
         spotName:(NSString*)spotNameIn
             free:(Boolean)freeIn
         spotType:(NSString*)spotTypeIn
-       numImages:(NSArray*)imageIDsIn
-
+        imageIDs:(NSArray*)imageIDsIn
+landscapeInfoImageIDs:(NSArray*)landscapeInfoImageIDs
+landscapeConfImageIDs:(NSArray*)landscapeConfImageIDs
+standardImageIDs:(NSDictionary*)standardImageIDs
       spotLayout:(NSString*)spotLayoutIn
   spotDifficulty:(NSString*)spotDifficultyIn
     spotCoverage:(NSString*)spotCoverageIn
      spotSignage:(NSString*)spotSignageIn
-
             desc:(NSString*)descIn
           offers:(NSArray*)offersIn
          address:(NSString*)addrIn
-      directions:(NSString*)dirIn{
-    
-    
+      directions:(NSString*)dirIn {
+
+
     if ((self = [super init])) {
         self.mID = idIn;
         self.mLat = latIn;
@@ -100,6 +104,9 @@
         self.mFree = freeIn;
         self.mRemove = false;
         self.imageIDs = [imageIDsIn copy];
+        self.landscapeInfoImageIDs = [landscapeInfoImageIDs copy];
+        self.landscapeConfImageIDs = [landscapeConfImageIDs copy];
+        self.standardImageIDs = [standardImageIDs copy];
         self.mSpotLayout = [spotLayoutIn copy];
         self.mSpotDifficulty = [spotDifficultyIn copy];
         self.mSpotCoverage = [spotCoverageIn copy];
@@ -184,6 +191,9 @@
     [dictOut setObject:self.mSpotName forKey:@"title"];
     [dictOut setObject:self.mDesc forKey:@"description"];
     [dictOut setObject:self.imageIDs forKey:@"imageIDs"];
+    [dictOut setObject:self.landscapeInfoImageIDs forKey:@"land_info"];
+    [dictOut setObject:self.landscapeConfImageIDs forKey:@"land_conf"];
+    [dictOut setObject:self.standardImageIDs forKey:@"standard"];
     
     NSMutableDictionary* location = [[NSMutableDictionary alloc]init];
     [location setObject:[NSNumber numberWithDouble:self.mLat] forKey:@"latitude"];
@@ -261,7 +271,31 @@
         [imageIds addObject:imageId];
     }
     self.imageIDs = [imageIds copy];
-        
+    
+    
+    NSMutableArray* landscapeInfoImageIDs = [[NSMutableArray alloc] init];
+    for (id imageId in [spot objectForKey:@"land_info"]) {
+        [landscapeInfoImageIDs addObject:imageId];
+    }
+    self.landscapeInfoImageIDs = [landscapeInfoImageIDs copy];
+    
+    
+    NSMutableArray* landscapeConfImageIDs = [[NSMutableArray alloc] init];
+    for (id imageId in [spot objectForKey:@"land_conf"]) {
+        [landscapeConfImageIDs addObject:imageId];
+    }
+    self.landscapeConfImageIDs = [imageIds copy];
+    
+    
+    /*
+    NSMutableArray* standardImageIDs = [[NSMutableArray alloc] init];
+    for (id imageId in [spot objectForKey:@"standard"]) {
+        [standardImageIDs addObject:imageId];
+    }
+     */
+    self.standardImageIDs = [[spot objectForKey:@"standard"] copy];
+    
+    
     
     if ([levelOfDetail isEqualToString:@"all"]) {
         self.mDesc = [spot objectForKey:@"description"];
@@ -276,6 +310,13 @@
         self.mDirections = [[spot objectForKey:@"location"] objectForKey:@"directions"];
     }
     return true;
+}
+
+
+
+
+- (int)idForName:(NSString *)name {
+    return [[self.standardImageIDs objectForKey:name] intValue];
 }
 
 @end

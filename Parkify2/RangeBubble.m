@@ -156,18 +156,16 @@
         [self addSubview:self.vertBar];
         
         //track free
-        UIImage* imgWhite = [UIImage imageWithImage:[UIImage imageNamed:@"unselected_bubble.png"] scaledToSize:CGSizeMake(w, h_main)];
+        UIImage* imgWhite = [UIImage imageNamed:@"unselected_bubble.png"];//[UIImage imageWithImage:[UIImage imageNamed:@"unselected_bubble.png"] scaledToSize:CGSizeMake(w, h_main)];
         self.bubbleFree = [[UIImageView alloc] initWithImage:imgWhite];
-        self.bubbleFree.contentMode = UIViewContentModeLeft;
-        self.bubbleFree.autoresizingMask = UIViewAutoresizingNone;
         self.bubbleFree.clipsToBounds = true;
         self.bubbleFree.frame = self.mainRect;
-        
+        self.bubbleFree.alpha = self.alpha;
         
         [self addSubview:self.bubbleFree];
         
         //track booked
-        UIImage* imgBlue = [UIImage imageWithImage:[UIImage imageNamed:@"selected_bubble.png"] scaledToSize:CGSizeMake(w, h_main)];
+        UIImage* imgBlue = [UIImage imageNamed:@"selected_bubble.png"];//[UIImage imageWithImage:[UIImage imageNamed:@"selected_bubble.png"] scaledToSize:CGSizeMake(w, h_main)];
         UIImageView* bubbleBookedImgView = [[UIImageView alloc] initWithImage:imgBlue];
         
         bubbleBookedImgView.frame = self.mainRect;
@@ -185,7 +183,7 @@
         self.timeLabel = [[UILabel alloc] initWithFrame:CGRectMake(5,text_height,w-5,text_height)];
         self.timeLabel.textColor = self.selectedColor;
         self.timeLabel.backgroundColor = [UIColor clearColor];
-        self.timeLabel.font = [UIFont fontWithName:@"Arial Rounded MT Bold" size:text_height];
+        self.timeLabel.font = [UIFont fontWithName:@"HelveticaNeue-Bold" size:text_height*1.2];
         self.timeLabel.text = self.timeFormatter(self.minimumValue);
         self.timeLabel.textAlignment = UITextAlignmentLeft;
         
@@ -196,7 +194,7 @@
         self.priceLabel = [[UILabel alloc] initWithFrame:CGRectMake(0,0,w,12)];
         self.priceLabel.textColor = self.selectedColor;
         self.priceLabel.backgroundColor = [UIColor clearColor];
-        self.priceLabel.font = [UIFont fontWithName:@"Arial Rounded MT Bold" size:12];
+        self.priceLabel.font = [UIFont fontWithName:@"HelveticaNeue-Bold" size:12];
         self.priceLabel.text = [self priceString]; //self.timeFormatter(self.maximumValue);
         self.priceLabel.textAlignment = UITextAlignmentCenter;
         self.priceLabel.center = CGPointMake(w/2, (h-(3*h_main/4)));        self.priceLabel.shadowOffset = CGSizeMake(0,-1);

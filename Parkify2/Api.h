@@ -67,4 +67,13 @@ withPasswordConfirmation:(NSString*)passwordConfirmation
                               withSuccess:(SuccessBlock)successBlock
                               withFailure:(FailureBlock)failureBlock;
 
+
++ (void)getUserProfileWithSuccess:(SuccessBlock)successBlock
+withFailure:(FailureBlock)failureBlock;
+
++ (void)updateUserProfileWithDict:(NSDictionary*)dicIn
+                      withSuccess:(SuccessBlock)successBlock
+                      withFailure:(FailureBlock)failureBlock;
+
+
 @end

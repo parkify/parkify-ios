@@ -15,13 +15,21 @@ typedef void(^FailureBlock)(NSError*);
 
 typedef NSString* (^Formatter)(double val);
 
-#define ADMIN_VER false
+#define ADMIN_VER true
+
+#define TARGET_SERVER_NORMAL @"parkify-rails.herokuapp.com"
+
+#define TARGET_SERVER TARGET_SERVER_NORMAL //@"192.168.1.132:3000"
 
 @protocol PriceStore <NSObject>
 - (NSArray*) findPricesInRange:(double)startTime endTime:(double)endTime;
 @end
 
+@protocol NameIdMappingDelegate <NSObject>
 
+- (int) idForName:(NSString *)name;
+
+@end
 
 
 #endif

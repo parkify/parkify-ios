@@ -93,6 +93,8 @@
 
 @property (strong, nonatomic) NSObject<PriceStore>*  priceSource;
 
+@property CGPoint lastTouchedPoint;
+
 
 -(double)xForValue:(double)value;
 -(double)valueForX:(double)x;
@@ -133,6 +135,8 @@
 @synthesize scrollVel = _scrollVel;
 
 @synthesize priceSource = _priceSource;
+
+@synthesize lastTouchedPoint = _lastTouchedPoint;
 
 - (RangeBar*)initWithFrame:(CGRect)frame minVal:(double)minVal maxVal:(double)maxVal minRange:(double)minRange displayedRange:(double)displayedRange selectedMinVal:(double)selectedMinVal selectedMaxVal:(double)selectedMaxVal withTimeFormatter:(Formatter)timeFormatter withPriceFormatter:(Formatter)priceFormatter withPriceSource:(NSObject<PriceStore>*)  priceSource{
     self = [super initWithFrame:frame];
@@ -180,6 +184,8 @@
         CGRect bubbleRect = CGRectMake(0,0,[self bubbleWidth], self.trackRect.size.height);
         
         self.trackBubbles = [[NSMutableArray alloc] init];
+        
+        
         for (int i = 0; i< self.numDisplayedBubbles; i++) {
             double minVal = self.minimumValue + (bubbleRange*i);
             double maxVal = self.minimumValue + (bubbleRange*(i+1));
@@ -190,8 +196,12 @@
             [self addSubview:bubble];
             [self.trackBubbles addObject:bubble];
         }
+        [UIView animateWithDuration:1.0
+                         animations:^{
+                             [self adjustBubbles];
+                         }
+                         completion:^(BOOL finished) {}];
         
-        [self adjustBubbles];
     
 
         
@@ -298,78 +308,52 @@
 
 
 - (void) doTouchHandler:(CGPoint)touchPoint {
-    //we don't allow moving this one for now.
-    //Also, be careful: this case is deprecated...
-    
     
     double leftScrollDist = touchPoint.x;
     double rightScrollDist = self.frame.size.width - touchPoint.x;
     
+    self.lastTouchedPoint = touchPoint;
     
     if ([self hasMoreBubblesLeft] && leftScrollDist < SCROLL_RANGE) {
         leftScrollDist = MAX(leftScrollDist, 0);
         double unitVel = - (MIN_SCROLL_SPEED + LIN_SCROLL_RATE * (SCROLL_RANGE - leftScrollDist));
         self.scrollVel = self.minimumRange * unitVel;
         [self animateBubbles];
-        return;
     } else if ([self hasMoreBubblesRight] && rightScrollDist < SCROLL_RANGE) {
         rightScrollDist = MAX(rightScrollDist, 0);
         double unitVel = MIN_SCROLL_SPEED + LIN_SCROLL_RATE * (SCROLL_RANGE - rightScrollDist);
         self.scrollVel = self.minimumRange * unitVel;
         [self animateBubbles];
-        return;
     } else {
         self.scrollVel = 0;
     }
     
-    if(false){
-        
-        double oldVal = self.selectedMinimumValue;
-        double delVal = [self valueForX:touchPoint.x] - oldVal;
-        
-        if(delVal >= 0) {
-            delVal = delVal + self.minimumRange/2.0 - fmodf(delVal+self.minimumRange/2.0, self.minimumRange); //snap to nearest one
-        } else {
-            delVal = delVal - self.minimumRange/2.0 - fmodf(delVal-self.minimumRange/2.0, self.minimumRange);
-        }
-        
-        double newVal = oldVal + delVal;
-        
-        
-        newVal = MAX(newVal, self.minimumValue);
-        newVal = MIN(newVal, self.selectedMaximumValue - self.minimumRange);
-        
-        self.minThumb.center = CGPointMake([self xForValue:newVal], self.minThumb.center.y);
-        
-        self.selectedMinimumValue = newVal;
+    [self updateSelectedValueFromTap:touchPoint];
+    
+    [self setNeedsDisplay];
+}
+
+
+- (void) updateSelectedValueFromTap:(CGPoint)touchPoint {
+    double lowVal = self.selectedMinimumValue;
+    double delVal = [self valueForX:touchPoint.x] - lowVal;
+
+    if(delVal >= 0) {
+        delVal = delVal + self.minimumRange/2.0 - fmodf(delVal+self.minimumRange/2.0, self.minimumRange); //snap to nearest one
+    } else {
+        delVal = delVal - self.minimumRange/2.0 - fmodf(delVal-self.minimumRange/2.0, self.minimumRange);
+    }
+
+    double newVal = lowVal + delVal;
+    newVal = MIN(newVal, self.maximumValue);
+    newVal = MAX(newVal, self.selectedMinimumValue + self.minimumRange);
+
+    if(newVal <= self.maximumValue) {
+        self.maxThumb.center = CGPointMake([self xForValue:newVal], self.maxThumb.center.y);
+        self.selectedMaximumValue = newVal;
         [self updateTrackHighlight];
         [self sendActionsForControlEvents:UIControlEventValueChanged];
     }
-    //if(self.maxThumbOn){
-    if(true){
-        double lowVal = self.selectedMinimumValue;
-        double delVal = [self valueForX:touchPoint.x] - lowVal;
-        
-        if(delVal >= 0) {
-            delVal = delVal + self.minimumRange/2.0 - fmodf(delVal+self.minimumRange/2.0, self.minimumRange); //snap to nearest one
-        } else {
-            delVal = delVal - self.minimumRange/2.0 - fmodf(delVal-self.minimumRange/2.0, self.minimumRange);
-        }
-        
-        double newVal = lowVal + delVal;
-        newVal = MIN(newVal, self.maximumValue);
-        newVal = MAX(newVal, self.selectedMinimumValue + self.minimumRange);
-        
-        if(newVal <= self.maximumValue) {
-            self.maxThumb.center = CGPointMake([self xForValue:newVal], self.maxThumb.center.y);
-            self.selectedMaximumValue = newVal;
-            [self updateTrackHighlight];
-            [self sendActionsForControlEvents:UIControlEventValueChanged];
-        }
-    }
-    //NSLog(@"diff:%f", [self valueForY:self.maxThumb.center.y]-[self valueForY:self.minThumb.center.y]);
-    //NSLog(@"Min: %f, Max: %f", [self valueForY:self.minThumb.center.y], [self valueForY:self.maxThumb.center.y]);
-    [self setNeedsDisplay];
 }
 
 - (void)updateTrackHighlight{
@@ -452,8 +436,13 @@
         }
         
         
-        [UIView animateWithDuration:period animations:^{
+        [UIView animateWithDuration:period
+                              delay:0.0
+                            options:UIViewAnimationOptionCurveLinear
+                         animations:^{
             [self adjustBubbles];
+            [self updateSelectedValueFromTap:self.lastTouchedPoint];
+            
         }
         completion:^(BOOL finished) {
             self.animating = false;

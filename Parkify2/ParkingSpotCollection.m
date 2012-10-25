@@ -149,8 +149,6 @@
         NSDictionary* spot = [root objectForKey:@"spot"];
         idIn = [[spot objectForKey:@"id"] intValue];
         
-        
-        
         ParkingSpot* actualSpot = [newParkingSpots objectForKey:[[NSNumber alloc] initWithInt:idIn]];
         BOOL bInCollection = (actualSpot != nil);
         if(!bInCollection) {

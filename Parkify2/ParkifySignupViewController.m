@@ -135,9 +135,11 @@
 
 - (void)setUpLabels:(UILabel*) label {
     
+    /*
     CGAffineTransform squish = [TextFormatter transformForSignupViewText];
     
     label.transform = squish;
+     */
 }
 
 - (void)setUpTextField:(UITextField*) tf {
@@ -145,6 +147,8 @@
     tf.layer.masksToBounds=YES;
     tf.layer.borderColor=[TEXTFIELD_BORDER_COLOR CGColor];
     tf.layer.borderWidth=2.0f;
+    
+    tf.layer.backgroundColor=[[UIColor colorWithWhite:0.5 alpha:1] CGColor];
 }
 
 //Does not work as expected.
