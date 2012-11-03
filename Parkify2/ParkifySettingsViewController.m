@@ -104,20 +104,19 @@
                                               otherButtonTitles: nil];
         [error show];
     } else {
-    
-        
-        
-    ParkifyAboutViewController* accountSettings = [self.tabBarController.viewControllers objectAtIndex:2];
-    
-    
-    accountSettings.url = [NSString stringWithFormat:@"https://%@/profile?&auth_token=%@", TARGET_SERVER, authToken];
-
-    self.tabBarController.selectedViewController =     accountSettings;
-         
-        /*
-        NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"https://api.parkify.me/profile?&auth_token=%@", authToken]];
-        [[UIApplication sharedApplication] openURL:url];
-         */
+        User* u = [[User alloc] init];
+        [u updateFromServerWithSuccess:^(NSDictionary * d) {
+            
+            AccountSettingsNavigationViewController* accountSettings = [self.tabBarController.viewControllers objectAtIndex:2];
+            
+            accountSettings.user = u;
+            
+            self.tabBarController.selectedViewController = accountSettings;
+            
+        } withFailure:^(NSError * e) {
+            UIAlertView *Error=[[UIAlertView alloc] initWithTitle:@"Error" message:@"Cannot reach server?" delegate:self cancelButtonTitle:@"Ok" otherButtonTitles: nil];
+            [Error show];
+        }];
     }
 }
 
@@ -157,27 +156,6 @@
     ((CompletionBlock)[self.tableOnTap objectAtIndex:indexPath.row])();
     
     
-}
-
-
-- (IBAction)testTapped:(id)sender {
-    User* u = [[User alloc] init];
-    [u updateFromServerWithSuccess:^(NSDictionary * d) {
-        
-        AccountSettingsNavigationViewController* accountSettings = [self.tabBarController.viewControllers objectAtIndex:3];
-        
-        
-        
-        //AccountSettingsTableViewController* accountSettings = [self.tabBarController.viewControllers objectAtIndex:3];
-        
-        
-        accountSettings.user = u;
-        
-        self.tabBarController.selectedViewController = accountSettings;
-        
-    } withFailure:^(NSError * e) {
-        ;
-    }];
 }
 
 - (IBAction)callParkify:(UIButton *)sender {

@@ -9,6 +9,8 @@
 #import "AccountSettingsTableViewController.h"
 #import "AccountSettingsNavigationViewController.h"
 #import "CreditCardCollectionTableViewController.h"
+#import "CarCollectionTableViewController.h"
+#import "PromoCollectionTableViewController.h"
 
 @interface AccountSettingsTableViewController ()
 
@@ -19,6 +21,11 @@
 @implementation AccountSettingsTableViewController
 
 @synthesize userModel = _userModel;
+
+-(User*) userModel {
+  ;
+  return _userModel;
+}
 
 - (id)initWithStyle:(UITableViewStyle)style
 {
@@ -203,29 +210,14 @@
             switch (indexPath.row) {
                 case 0: {
                     [self performSegueWithIdentifier:@"CreditCardCollection" sender:self];
-                    
-                    CreditCardCollectionTableViewController* detailViewController = [[CreditCardCollectionTableViewController alloc] initWithNibName:@"CreditCardCollectionVC" bundle:nil];
-                    
-                    detailViewController.creditCards = self.userModel.credit_cards;
-                    
-                    
-                    [self.navigationController pushViewController:detailViewController animated:YES];
                     return;
                 }
                 case 1: {
-                    CreditCardCollectionTableViewController* detailViewController = [[CreditCardCollectionTableViewController alloc] initWithNibName:@"CreditCardCollectionTableViewController" bundle:nil];
-                    
-                    detailViewController.creditCards = self.userModel.credit_cards;
-                    
-                    [self.navigationController pushViewController:detailViewController animated:YES];
+                    [self performSegueWithIdentifier:@"CarCollection" sender:self];
                     return;
                 }
                 case 2: {
-                    CreditCardCollectionTableViewController* detailViewController = [[CreditCardCollectionTableViewController alloc] initWithNibName:@"CreditCardCollectionTableViewController" bundle:nil];
-                    
-                    detailViewController.creditCards = self.userModel.credit_cards;
-                    
-                    [self.navigationController pushViewController:detailViewController animated:YES];
+                    [self performSegueWithIdentifier:@"PromoCollection" sender:self];
                     return;
                 }
                 default:
@@ -233,13 +225,8 @@
             }
             break;
         case 2: {
-            CreditCardCollectionTableViewController* detailViewController = [[CreditCardCollectionTableViewController alloc] initWithNibName:@"CreditCardCollectionTableViewController" bundle:nil];
-            
-            detailViewController.creditCards = self.userModel.credit_cards;
-            
-            [self.navigationController pushViewController:detailViewController animated:YES];
-            return;
-        }
+          [self performSegueWithIdentifier:@"Password" sender:self];
+          return;        }
         default:
             return;
     }
@@ -312,8 +299,13 @@
 
 -(void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
     if([segue.identifier isEqualToString:@"CreditCardCollection"]) {
-        
-        ((CreditCardCollectionTableViewController*)segue.destinationViewController).creditCards = self.userModel.credit_cards;
+        ((CreditCardCollectionTableViewController*)segue.destinationViewController).creditCardsSource = self.userModel;
+    }
+    if([segue.identifier isEqualToString:@"CarCollection"]) {
+        ((CarCollectionTableViewController*)segue.destinationViewController).carSource = self.userModel;
+    }
+    if([segue.identifier isEqualToString:@"PromoCollection"]) {
+        ((PromoCollectionTableViewController*)segue.destinationViewController).promoSource = self.userModel;
     }
 }
 @end

@@ -24,6 +24,8 @@
 
 @property BOOL active;
 
+- (id)init;
+
 - (void)updateFromDictionary:(NSDictionary*)dictIn;
 
 - (void)pushToServerWithSuccess:(SuccessBlock)successBlock

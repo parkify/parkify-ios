@@ -29,6 +29,9 @@
 @property (weak, nonatomic) IBOutlet UILabel *greetingLabel;
 
 - (IBAction)logoutButtonPressed:(UIButton *)sender;
+@property (weak, nonatomic) IBOutlet UIButton *forgotPasswordButton;
+- (IBAction)forgotPasswordButtonTapped:(id)sender;
+@property (weak, nonatomic) IBOutlet UILabel *forgotPasswordLabel;
 
 - (IBAction)callParkify:(UIButton *)sender;
 @end

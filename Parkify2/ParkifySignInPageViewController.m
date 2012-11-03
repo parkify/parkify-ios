@@ -63,17 +63,35 @@
     
     
     self.greetingLabel.hidden = true;
+    self.forgotPasswordButton.enabled = true;
     
     if (![Persistance retrieveAuthToken]) {
         //logged out
-        self.emailField.alpha = 1;
-        self.passwordField.alpha = 1;
-        self.emailLabel.alpha = 1;
-        self.passwordLabel.alpha = 1;
-        self.signUpButton.alpha = 1;
-        self.signUpLabel.alpha = 1;
-        self.loginLabel.text = @"Log in";
-        
+      
+        if(self.forgotPasswordButton.selected == false) {
+          self.emailField.alpha = 1;
+          self.passwordField.alpha = 1;
+          self.emailLabel.alpha = 1;
+          self.passwordLabel.alpha = 1;
+          self.signUpButton.alpha = 1;
+          self.signUpLabel.alpha = 1;
+          self.loginLabel.text = @"Log in";
+          
+          self.forgotPasswordLabel.alpha = 0.5;
+          self.forgotPasswordButton.alpha = 0.5;
+        } else {
+          self.emailField.alpha = 1;
+          self.passwordField.alpha = 0;
+          self.emailLabel.alpha = 1;
+          self.passwordLabel.alpha = 0;
+          self.signUpButton.alpha = 1;
+          self.signUpLabel.alpha = 1;
+          self.loginLabel.text = @"Send Reset Email";
+          
+          self.forgotPasswordLabel.alpha = 1;
+          self.forgotPasswordButton.alpha = 1;
+        }
+      
         
         self.greetingLabel.hidden = true;
         
@@ -89,6 +107,10 @@
         self.greetingLabel.text = [NSString stringWithFormat:@"Hello, %@. Thank you for using Parkify!", [Persistance retrieveFirstName]];
         self.greetingLabel.hidden = false;
         self.loginLabel.text = @"Log out";
+      
+        self.forgotPasswordLabel.alpha = 0;
+        self.forgotPasswordButton.alpha = 0;
+      self.forgotPasswordButton.enabled = false;
     }
     
     //Setup delegates
@@ -109,7 +131,7 @@
     }
     
     //[PlacedAgent logPageView:@"LoginView"];
-    
+    [self.forgotPasswordButton setSelected:false];
     
     [self updatePage];
     
@@ -141,6 +163,8 @@
     [self setPasswordLabel:nil];
     [self setLoginLabel:nil];
     [self setGreetingLabel:nil];
+    [self setForgotPasswordButton:nil];
+    [self setForgotPasswordLabel:nil];
     [super viewDidUnload];
     // Release any retained subviews of the main view.
 }
@@ -192,15 +216,29 @@
 - (IBAction)loginButtonPressed:(UIButton *)sender {
     
     if (![Persistance retrieveAuthToken]) {
+      if(self.forgotPasswordButton.selected) {
+        [Api resetPasswordWithEmail:self.emailField.text withSuccess:^(NSDictionary * d) {
+          UIAlertView* success = [[UIAlertView alloc] initWithTitle:@"Success" message:[d objectForKey:@"message"] delegate:self cancelButtonTitle:@"OK"
+                                                otherButtonTitles: nil];
+          [success show];
+        } withFailure:^(NSError * e) {
+          UIAlertView* error = [[UIAlertView alloc] initWithTitle:@"Error" message:@"" delegate:self cancelButtonTitle:@"OK"
+                                                  otherButtonTitles: nil];
+          [error show];
+        }];
+      } else {
         [Api loginWithEmail:self.emailField.text
                withPassword:self.passwordField.text
                 withSuccess:^(NSDictionary * result) {
-                    [self handleLoginSuccess:result];
+                  [self handleLoginSuccess:result];
                 }
                 withFailure:^(NSError * result) {
-                    [self handleLoginFailure:result];
+                  [self handleLoginFailure:result];
                 }
          ];
+
+      }
+      
     } else {
         [self logoutButtonPressed:nil];
         [self updatePage];
@@ -245,6 +283,8 @@
     self.tabBarController.selectedViewController = [self.tabBarController.viewControllers objectAtIndex:1];   
 }
 
+
+
 - (IBAction)cancelButtonPressed:(UIBarButtonItem *)sender {
     //Escape from modal
     NSDictionary* results = [NSDictionary dictionaryWithObjectsAndKeys:@"cancel",@"exit", nil];
@@ -260,6 +300,14 @@
     /** TODO: also tell server to logout if can **/
     [Persistance saveAuthToken:nil];
     [Persistance saveUserID:[NSNumber numberWithInt:-1]];
+}
+
+- (IBAction)forgotPasswordButtonTapped:(id)sender {
+  [self.forgotPasswordButton setSelected:!self.forgotPasswordButton.selected];
+  [UIView animateWithDuration:0.3 animations:^{
+    [self updatePage];
+  }];
+  
 }
 
 - (IBAction)callParkify:(UIButton *)sender {

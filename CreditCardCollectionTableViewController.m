@@ -7,6 +7,7 @@
 //
 
 #import "CreditCardCollectionTableViewController.h"
+#import "AccountSettingsNavigationViewController.h"
 
 @interface CreditCardCollectionTableViewController ()
 @property BOOL updating;
@@ -15,6 +16,15 @@
 @implementation CreditCardCollectionTableViewController
 @synthesize creditCards = _creditCards;
 @synthesize updating = _updating;
+@synthesize creditCardsSource = _creditCardsSource;
+
+-(void) setCreditCards:(NSArray *)creditCards {
+    _creditCards = [creditCards sortedArrayUsingComparator:^NSComparisonResult(id obj1, id obj2) {
+        NSNumber* mID1 = [NSNumber numberWithInt:((CreditCard*)obj1).mId];
+        NSNumber* mID2 = [NSNumber numberWithInt:((CreditCard*)obj2).mId];
+        return (NSComparisonResult)[mID1 compare:mID2];
+    }];
+}
 
 - (id)initWithStyle:(UITableViewStyle)style
 {
@@ -30,14 +40,17 @@
     [super viewDidLoad];
     
     self.updating = false;
-    
-    if(!self.creditCards) self.creditCards = [[NSArray alloc] init];
 
     // Uncomment the following line to preserve selection between presentations.
     // self.clearsSelectionOnViewWillAppear = NO;
  
     // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
     // self.navigationItem.rightBarButtonItem = self.editButtonItem;
+}
+
+- (void)viewWillAppear:(BOOL)animated {
+    self.creditCards = [self.creditCardsSource.credit_cards copy];
+    [self.tableView reloadData];
 }
 
 - (void)didReceiveMemoryWarning
@@ -132,19 +145,32 @@
         self.updating = true;
         [card pushChangesToServerWithSuccess:^(NSDictionary * d) {
             //clean out the other card
+            /*
             for(CreditCard* otherCard in self.creditCards) {
                 if(otherCard != card && otherCard.active) {
                     otherCard.active = false;
                 }
+            }*/
+            [((AccountSettingsNavigationViewController*)self.navigationController).user updateFromServerWithSuccess:^(NSDictionary * d){
+              
+              self.creditCards = [self.creditCardsSource.credit_cards copy];
+                self.updating = false;
+                [self.tableView reloadData];
             }
-            self.updating = false;
+            withFailure:^(NSError * e) {
+                NSString* errorString = [e.userInfo objectForKey:@"message"];
+                UIAlertView* error = [[UIAlertView alloc] initWithTitle:@"Error" message:errorString delegate:self cancelButtonTitle:@"OK" otherButtonTitles: nil];
+                [error show];
+                self.updating = false;
+            }];
+            
         } withFailure:^(NSError * e) {
             NSString* errorString = [e.userInfo objectForKey:@"message"];
             UIAlertView* error = [[UIAlertView alloc] initWithTitle:@"Error" message:errorString delegate:self cancelButtonTitle:@"OK" otherButtonTitles: nil];
             [error show];
             self.updating = false;
         }];
-        [self.tableView reloadData];
+        
     }
     
 }

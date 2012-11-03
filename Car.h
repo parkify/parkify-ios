@@ -15,7 +15,9 @@
 
 @property (strong, nonatomic) NSString* license_plate_number;
 
+- (id)init;
 
+- (NSDictionary*)asDictionary;
 
 - (void)updateFromDictionary:(NSDictionary*)dictIn;
 
@@ -25,4 +27,5 @@
 - (void)pushChangesToServerWithSuccess:(SuccessBlock)successBlock
                 withFailure:(FailureBlock)failureBlock;
 
++(void) pushChangesForCars:(NSArray*)cars toServerWithSuccess:(SuccessBlock)success withFailure:(FailureBlock)failure;
 @end

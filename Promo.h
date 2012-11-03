@@ -11,9 +11,14 @@
 
 @interface Promo : NSObject
 
+@property int mId;
+
 @property (strong, nonatomic) NSString* code_text;
 
 @property (strong, nonatomic) NSString* description;
+@property (strong, nonatomic) NSString* name;
+
+-(id)init;
 
 - (void)updateFromDictionary:(NSDictionary*)dictIn;
 

@@ -31,5 +31,25 @@ typedef NSString* (^Formatter)(double val);
 
 @end
 
+@protocol CreditCardsSource <NSObject>
+
+@property (strong, nonatomic) NSArray* credit_cards;
+
+@end
+
+@protocol CarSource <NSObject>
+
+@property (strong, nonatomic) NSArray* cars;
+
+@end
+
+
+@protocol PromoSource <NSObject>
+
+@property (strong, nonatomic) NSArray* promos;
+
+@end
+
+
 
 #endif

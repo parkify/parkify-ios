@@ -24,6 +24,11 @@
 @synthesize cars = _cars;
 @synthesize promos = _promos;
 
+-(NSArray*)credit_cards {
+  ;
+  return _credit_cards;
+}
+
 
 
 - (void)updateFromDictionary:(NSDictionary*)dictIn {
@@ -42,13 +47,13 @@
         [credit_cards addObject:credit_card];
     }
     self.credit_cards = [credit_cards copy];
-    /*
+    
     //Cars
     NSMutableArray* cars = [[NSMutableArray alloc] init];
     for( NSDictionary* car_dict in [dictIn objectForKey:@"cars"]) {
         Car* car = [[Car alloc] init];
         [car updateFromDictionary:car_dict];
-        [credit_cards addObject:car];
+        [cars addObject:car];
     }
     self.cars = [cars copy];
     
@@ -61,7 +66,7 @@
     }
     self.promos = [promos copy];
      
-     */
+     
 }
 
 - (void)updateFromServerWithSuccess:(SuccessBlock)successBlock

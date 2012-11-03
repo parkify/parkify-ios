@@ -10,7 +10,7 @@
 
 #import "ExtraTypes.h"
 
-@interface User : NSObject
+@interface User : NSObject<CreditCardsSource, CarSource, PromoSource>
 
 @property (strong, nonatomic) NSString* first_name;
 @property (strong, nonatomic) NSString* last_name;

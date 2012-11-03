@@ -32,6 +32,15 @@ withPasswordConfirmation:(NSString*)passwordConfirmation
             withSuccess:(SuccessBlock)successBlock
             withFailure:(FailureBlock)failureBlock ;
 
+//Called for card creation
++ (void)registerCardWithCreditCardNumber:(NSString*)ccn
+                withCVC:(NSString*)cvc
+    withExpirationMonth:(NSNumber*)expMonth
+     withExpirationYear:(NSNumber*)expYear
+            withZipCode:(NSString*)zipCode
+            withSuccess:(SuccessBlock)successBlock
+            withFailure:(FailureBlock)failureBlock ;
+
 //Called for user login
 + (void)loginWithEmail:(NSString*)email
           withPassword:(NSString*)password 
@@ -74,6 +83,29 @@ withFailure:(FailureBlock)failureBlock;
 + (void)updateUserProfileWithDict:(NSDictionary*)dicIn
                       withSuccess:(SuccessBlock)successBlock
                       withFailure:(FailureBlock)failureBlock;
++ (void)activateCard:(int)mId
+         withSuccess:(SuccessBlock)successBlock
+         withFailure:(FailureBlock)failureBlock;
 
++ (void)udateCars:(NSArray*)cars
+      withSuccess:(SuccessBlock)successBlock
+      withFailure:(FailureBlock)failureBlock;
 
++ (void)addCar:(NSString*)license_plate_number
+   withSuccess:(SuccessBlock)successBlock
+   withFailure:(FailureBlock)failureBlock;
+
++ (void)addPromo:(NSString*)code_text
+     withSuccess:(SuccessBlock)successBlock
+     withFailure:(FailureBlock)failureBlock;
+
++ (void)updatePassword:(NSString*)password
+  passwordConfirmation:(NSString*)passwordConf
+          origPassword:(NSString*)origPassword
+           withSuccess:(SuccessBlock)successBlock
+           withFailure:(FailureBlock)failureBlock;
+
++ (void)resetPasswordWithEmail:(NSString*)email
+          withSuccess:(SuccessBlock)successBlock
+          withFailure:(FailureBlock)failureBlock;
 @end

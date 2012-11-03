@@ -23,6 +23,8 @@
 		8C6AAD8115DE5B590006A1CE /* BSForwardGeocoder.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C6AAD7B15DE5A0E0006A1CE /* BSForwardGeocoder.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		8C6AAD8215DE5B590006A1CE /* BSGoogleV3KmlParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C6AAD7D15DE5A0E0006A1CE /* BSGoogleV3KmlParser.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		8C6AAD8315DE5B590006A1CE /* BSKmlResult.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C6AAD7F15DE5A0E0006A1CE /* BSKmlResult.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		8C6FBA14163ACED800D68790 /* ExtraDetailTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C6FBA13163ACED800D68790 /* ExtraDetailTableViewCell.m */; };
+		8C6FBA18163AD21600D68790 /* PromoTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C6FBA17163AD21600D68790 /* PromoTableViewController.m */; };
 		8C74008C15AF9D9A00007F63 /* Persistance.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C74008B15AF9D9900007F63 /* Persistance.m */; };
 		8C74009015AFA9D600007F63 /* ParkifyFrontPageViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C74008F15AFA9D600007F63 /* ParkifyFrontPageViewController.m */; };
 		8C74009F15AFEDAA00007F63 /* Stripe.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C74009E15AFEDA000007F63 /* Stripe.m */; };
@@ -99,6 +101,10 @@
 		8C930F6C16396C25003C53A9 /* ELCTextfieldCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C930F6B1639688A003C53A9 /* ELCTextfieldCell.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		8C930F6F1639775B003C53A9 /* AccountSettingsNavigationViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C930F6E1639775A003C53A9 /* AccountSettingsNavigationViewController.m */; };
 		8C930F73163984EA003C53A9 /* CreditCardCollectionTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C930F72163984EA003C53A9 /* CreditCardCollectionTableViewController.m */; };
+		8C930F7616399E3E003C53A9 /* CreditCardTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C930F7516399E3E003C53A9 /* CreditCardTableViewController.m */; };
+		8C930F79163A5F0A003C53A9 /* CarCollectionTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C930F78163A5F08003C53A9 /* CarCollectionTableViewController.m */; };
+		8C930F7C163A773C003C53A9 /* CarTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C930F7B163A773A003C53A9 /* CarTableViewController.m */; };
+		8C930F7F163AC695003C53A9 /* PromoCollectionTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C930F7E163AC692003C53A9 /* PromoCollectionTableViewController.m */; };
 		8CA7A1E115A3DC980051567D /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8CA7A1E015A3DC980051567D /* UIKit.framework */; };
 		8CA7A1E315A3DC980051567D /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8CA7A1E215A3DC980051567D /* Foundation.framework */; };
 		8CA7A1E515A3DC980051567D /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8CA7A1E415A3DC980051567D /* CoreGraphics.framework */; };
@@ -145,13 +151,14 @@
 		8CB12B5B15FFC0EE00551C0B /* cog_old.png in Resources */ = {isa = PBXBuildFile; fileRef = 8CB12B5A15FFC0EE00551C0B /* cog_old.png */; };
 		8CB12B5D15FFC0F900551C0B /* location_finder_old.png in Resources */ = {isa = PBXBuildFile; fileRef = 8CB12B5C15FFC0F800551C0B /* location_finder_old.png */; };
 		8CB12B6B16049F5B00551C0B /* splash.png in Resources */ = {isa = PBXBuildFile; fileRef = 8CB12B6A16049F5B00551C0B /* splash.png */; };
-		8CB12B6D1604ADA600551C0B /* Default@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 8CB12B6C1604ADA600551C0B /* Default@2x.png */; };
 		8CB12B6F1604AE4600551C0B /* Default.png in Resources */ = {isa = PBXBuildFile; fileRef = 8CB12B6E1604AE4500551C0B /* Default.png */; };
 		8CB12B711604B72800551C0B /* info_envelope_background.png in Resources */ = {isa = PBXBuildFile; fileRef = 8CB12B701604B72800551C0B /* info_envelope_background.png */; };
 		8CB16DB815C0AF4100B2ECA3 /* TextFormatter.m in Sources */ = {isa = PBXBuildFile; fileRef = 8CB16DB715C0AF4100B2ECA3 /* TextFormatter.m */; };
 		8CB8262615F4ACBC0089B664 /* new_cog.png in Resources */ = {isa = PBXBuildFile; fileRef = 8CB8262515F4ACBC0089B664 /* new_cog.png */; };
 		8CB8262815F4ACC30089B664 /* new_location_finder.png in Resources */ = {isa = PBXBuildFile; fileRef = 8CB8262715F4ACC30089B664 /* new_location_finder.png */; };
 		8CB8262E15F673B50089B664 /* NoPic.png in Resources */ = {isa = PBXBuildFile; fileRef = 8CB8262D15F673B50089B664 /* NoPic.png */; };
+		8CDD2A1B163F3AD70000E47C /* Default@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 8CDD2A1A163F3AD70000E47C /* Default@2x.png */; };
+		8CDD2A1E163F454A0000E47C /* PasswordTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8CDD2A1D163F45490000E47C /* PasswordTableViewController.m */; };
 		8CDF6D3E162B6676004B6A37 /* maskImage.png in Resources */ = {isa = PBXBuildFile; fileRef = 8CDF6D3D162B6676004B6A37 /* maskImage.png */; };
 		8CDF6D46162D904A004B6A37 /* info_page_middle_bar.png in Resources */ = {isa = PBXBuildFile; fileRef = 8CDF6D43162D904A004B6A37 /* info_page_middle_bar.png */; };
 		8CDF6D47162D904A004B6A37 /* overlay_gradient_old.png in Resources */ = {isa = PBXBuildFile; fileRef = 8CDF6D44162D904A004B6A37 /* overlay_gradient_old.png */; };
@@ -210,6 +217,10 @@
 		8C6AAD7D15DE5A0E0006A1CE /* BSGoogleV3KmlParser.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = BSGoogleV3KmlParser.m; path = "../../../../Downloads/bjornsallarp-BSForwardGeocoder-5f1f811/Forward Geocoder/BSGoogleV3KmlParser.m"; sourceTree = "<group>"; };
 		8C6AAD7E15DE5A0E0006A1CE /* BSKmlResult.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = BSKmlResult.h; path = "../../../../Downloads/bjornsallarp-BSForwardGeocoder-5f1f811/Forward Geocoder/BSKmlResult.h"; sourceTree = "<group>"; };
 		8C6AAD7F15DE5A0E0006A1CE /* BSKmlResult.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = BSKmlResult.m; path = "../../../../Downloads/bjornsallarp-BSForwardGeocoder-5f1f811/Forward Geocoder/BSKmlResult.m"; sourceTree = "<group>"; };
+		8C6FBA12163ACED800D68790 /* ExtraDetailTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ExtraDetailTableViewCell.h; sourceTree = "<group>"; };
+		8C6FBA13163ACED800D68790 /* ExtraDetailTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ExtraDetailTableViewCell.m; sourceTree = "<group>"; };
+		8C6FBA16163AD21600D68790 /* PromoTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PromoTableViewController.h; sourceTree = "<group>"; };
+		8C6FBA17163AD21600D68790 /* PromoTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PromoTableViewController.m; sourceTree = "<group>"; };
 		8C74008A15AF9D9900007F63 /* Persistance.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Persistance.h; sourceTree = "<group>"; };
 		8C74008B15AF9D9900007F63 /* Persistance.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Persistance.m; sourceTree = "<group>"; };
 		8C74008E15AFA9D600007F63 /* ParkifyFrontPageViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ParkifyFrontPageViewController.h; sourceTree = "<group>"; };
@@ -326,6 +337,14 @@
 		8C930F6E1639775A003C53A9 /* AccountSettingsNavigationViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AccountSettingsNavigationViewController.m; sourceTree = "<group>"; };
 		8C930F71163984EA003C53A9 /* CreditCardCollectionTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CreditCardCollectionTableViewController.h; sourceTree = "<group>"; };
 		8C930F72163984EA003C53A9 /* CreditCardCollectionTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CreditCardCollectionTableViewController.m; sourceTree = "<group>"; };
+		8C930F7416399E3D003C53A9 /* CreditCardTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CreditCardTableViewController.h; sourceTree = "<group>"; };
+		8C930F7516399E3E003C53A9 /* CreditCardTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CreditCardTableViewController.m; sourceTree = "<group>"; };
+		8C930F77163A5F07003C53A9 /* CarCollectionTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CarCollectionTableViewController.h; sourceTree = "<group>"; };
+		8C930F78163A5F08003C53A9 /* CarCollectionTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CarCollectionTableViewController.m; sourceTree = "<group>"; };
+		8C930F7A163A7738003C53A9 /* CarTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CarTableViewController.h; path = Parkify2/CarTableViewController.h; sourceTree = "<group>"; };
+		8C930F7B163A773A003C53A9 /* CarTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CarTableViewController.m; path = Parkify2/CarTableViewController.m; sourceTree = "<group>"; };
+		8C930F7D163AC690003C53A9 /* PromoCollectionTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PromoCollectionTableViewController.h; sourceTree = "<group>"; };
+		8C930F7E163AC692003C53A9 /* PromoCollectionTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PromoCollectionTableViewController.m; sourceTree = "<group>"; };
 		8CA7A1DC15A3DC980051567D /* Parkify.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Parkify.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		8CA7A1E015A3DC980051567D /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		8CA7A1E215A3DC980051567D /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -463,7 +482,6 @@
 		8CB12B5A15FFC0EE00551C0B /* cog_old.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = cog_old.png; sourceTree = "<group>"; };
 		8CB12B5C15FFC0F800551C0B /* location_finder_old.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = location_finder_old.png; sourceTree = "<group>"; };
 		8CB12B6A16049F5B00551C0B /* splash.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = splash.png; sourceTree = "<group>"; };
-		8CB12B6C1604ADA600551C0B /* Default@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default@2x.png"; sourceTree = "<group>"; };
 		8CB12B6E1604AE4500551C0B /* Default.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Default.png; sourceTree = "<group>"; };
 		8CB12B701604B72800551C0B /* info_envelope_background.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = info_envelope_background.png; sourceTree = "<group>"; };
 		8CB16DB615C0AF4100B2ECA3 /* TextFormatter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TextFormatter.h; sourceTree = "<group>"; };
@@ -471,6 +489,9 @@
 		8CB8262515F4ACBC0089B664 /* new_cog.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = new_cog.png; sourceTree = "<group>"; };
 		8CB8262715F4ACC30089B664 /* new_location_finder.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = new_location_finder.png; sourceTree = "<group>"; };
 		8CB8262D15F673B50089B664 /* NoPic.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = NoPic.png; sourceTree = "<group>"; };
+		8CDD2A1A163F3AD70000E47C /* Default@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default@2x.png"; sourceTree = "<group>"; };
+		8CDD2A1C163F45470000E47C /* PasswordTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PasswordTableViewController.h; path = Parkify2/PasswordTableViewController.h; sourceTree = "<group>"; };
+		8CDD2A1D163F45490000E47C /* PasswordTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PasswordTableViewController.m; path = Parkify2/PasswordTableViewController.m; sourceTree = "<group>"; };
 		8CDF6D3D162B6676004B6A37 /* maskImage.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = maskImage.png; sourceTree = "<group>"; };
 		8CDF6D43162D904A004B6A37 /* info_page_middle_bar.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = info_page_middle_bar.png; sourceTree = "<group>"; };
 		8CDF6D44162D904A004B6A37 /* overlay_gradient_old.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = overlay_gradient_old.png; sourceTree = "<group>"; };
@@ -797,6 +818,20 @@
 		8CA7A1D115A3DC980051567D = {
 			isa = PBXGroup;
 			children = (
+				8CDD2A1C163F45470000E47C /* PasswordTableViewController.h */,
+				8CDD2A1D163F45490000E47C /* PasswordTableViewController.m */,
+				8C930F7416399E3D003C53A9 /* CreditCardTableViewController.h */,
+				8C930F7516399E3E003C53A9 /* CreditCardTableViewController.m */,
+				8C6FBA16163AD21600D68790 /* PromoTableViewController.h */,
+				8C6FBA17163AD21600D68790 /* PromoTableViewController.m */,
+				8C6FBA12163ACED800D68790 /* ExtraDetailTableViewCell.h */,
+				8C6FBA13163ACED800D68790 /* ExtraDetailTableViewCell.m */,
+				8C930F7D163AC690003C53A9 /* PromoCollectionTableViewController.h */,
+				8C930F7E163AC692003C53A9 /* PromoCollectionTableViewController.m */,
+				8C930F77163A5F07003C53A9 /* CarCollectionTableViewController.h */,
+				8C930F78163A5F08003C53A9 /* CarCollectionTableViewController.m */,
+				8C930F7A163A7738003C53A9 /* CarTableViewController.h */,
+				8C930F7B163A773A003C53A9 /* CarTableViewController.m */,
 				8C930F70163984A6003C53A9 /* Settings Controllers */,
 				8C930F6816393BC3003C53A9 /* Settings Models */,
 				8C930F1B1637FBD2003C53A9 /* test.html */,
@@ -1063,7 +1098,6 @@
 				8CE703C5160545610021DF4A /* about_icon.png */,
 				8CB12B701604B72800551C0B /* info_envelope_background.png */,
 				8CB12B6E1604AE4500551C0B /* Default.png */,
-				8CB12B6C1604ADA600551C0B /* Default@2x.png */,
 				8CB12B6A16049F5B00551C0B /* splash.png */,
 				8CB12B5C15FFC0F800551C0B /* location_finder_old.png */,
 				8CB12B5A15FFC0EE00551C0B /* cog_old.png */,
@@ -1134,6 +1168,7 @@
 				8CDF6D45162D904A004B6A37 /* start_label_container.png */,
 				8CDF6D3D162B6676004B6A37 /* maskImage.png */,
 				8CE81F011624D2DF004260CC /* layout_spot_detail_page.png */,
+				8CDD2A1A163F3AD70000E47C /* Default@2x.png */,
 			);
 			name = "Design 9";
 			sourceTree = "<group>";
@@ -1272,7 +1307,6 @@
 				8CB12B5B15FFC0EE00551C0B /* cog_old.png in Resources */,
 				8CB12B5D15FFC0F900551C0B /* location_finder_old.png in Resources */,
 				8CB12B6B16049F5B00551C0B /* splash.png in Resources */,
-				8CB12B6D1604ADA600551C0B /* Default@2x.png in Resources */,
 				8CB12B6F1604AE4600551C0B /* Default.png in Resources */,
 				8CB12B711604B72800551C0B /* info_envelope_background.png in Resources */,
 				8CE703C6160545610021DF4A /* about_icon.png in Resources */,
@@ -1314,6 +1348,7 @@
 				8C930F1E1638AAAF003C53A9 /* checkmark.png in Resources */,
 				8C930F201638BFF7003C53A9 /* info_page_splash.png in Resources */,
 				8C930F221638FA8F003C53A9 /* glyphicons_203_lock.png in Resources */,
+				8CDD2A1B163F3AD70000E47C /* Default@2x.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1394,6 +1429,13 @@
 				8C930F6716393729003C53A9 /* Promo.m in Sources */,
 				8C930F6F1639775B003C53A9 /* AccountSettingsNavigationViewController.m in Sources */,
 				8C930F73163984EA003C53A9 /* CreditCardCollectionTableViewController.m in Sources */,
+				8C930F7616399E3E003C53A9 /* CreditCardTableViewController.m in Sources */,
+				8C930F79163A5F0A003C53A9 /* CarCollectionTableViewController.m in Sources */,
+				8C930F7C163A773C003C53A9 /* CarTableViewController.m in Sources */,
+				8C930F7F163AC695003C53A9 /* PromoCollectionTableViewController.m in Sources */,
+				8C6FBA14163ACED800D68790 /* ExtraDetailTableViewCell.m in Sources */,
+				8C6FBA18163AD21600D68790 /* PromoTableViewController.m in Sources */,
+				8CDD2A1E163F454A0000E47C /* PasswordTableViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

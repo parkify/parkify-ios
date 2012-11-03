@@ -15,6 +15,11 @@
 @implementation AccountSettingsNavigationViewController
 @synthesize user = _user;
 
+-(User*) user {
+  ;
+  return _user;
+}
+
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
