@@ -14,8 +14,6 @@
 @interface ParkifySpotViewController : UIViewController <ParkingSpotObserver, UIAlertViewDelegate>
 @property (weak, nonatomic) IBOutlet UILabel *flashingSign;
 
-@property (nonatomic, strong) ParkingSpotCollection* parkingSpots;
-
 @property (strong, nonatomic) ParkingSpot* spot;
 
 @property double currentLat;

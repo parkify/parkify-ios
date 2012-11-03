@@ -16,6 +16,7 @@
 #import "Persistance.h"
 #import "iToast.h"
 #import "ParkifyWebViewWrapperController.h"
+#import "ErrorTransformer.h"
 
 #define TESTING_V1 true
 
@@ -159,26 +160,7 @@ withPasswordConfirmation:(NSString*)passwordConfirmation
                 
                 successBlock(root);
             } else {
-                NSString* message = @"";
-                
-                NSDictionary* errorDescription = [root objectForKey:@"error"];
-                
-                for( NSString* key in errorDescription.allKeys) {
-                    for( NSString* val in [errorDescription objectForKey:key]) {
-                        message = [NSString stringWithFormat:@"%@%@ %@\n", message, key, val] ;
-                    }
-                    //NSString* object = [[NSString stringWithFormat:@"%@",[errorDescription objectForKey:key]]stringByReplacingOccurrencesOfString:@"\n" withString:@""];
-                }
-                
-                NSDictionary* userInfo;
-                if(![message isEqualToString:@""]) {
-                    userInfo = [NSDictionary dictionaryWithObjectsAndKeys:message,@"message", nil];
-                }
-                else {
-                    NSLog(@"WARNING: Error from server not handled well: %@", responseString);
-                    userInfo = [NSDictionary dictionaryWithObjectsAndKeys:@"error from server not formatted correctly",@"message", nil];
-                }
-                NSError* error = [NSError errorWithDomain:@"UserRegistration" code:0 userInfo:userInfo];
+                NSError* error = [ErrorTransformer apiErrorToNSError:[root objectForKey:@"error"]];
                 failureBlock(error);
             }
         }];
@@ -263,26 +245,7 @@ withPasswordConfirmation:(NSString*)passwordConfirmation
         if(success) {
             successBlock(root);
         } else {
-            NSString* message = @"";
-            
-            NSDictionary* errorDescription = [root objectForKey:@"error"];
-            
-            for( NSString* key in errorDescription.allKeys) {
-                for( NSString* val in [errorDescription objectForKey:key]) {
-                    message = [NSString stringWithFormat:@"%@%@ %@\n", message, key, val] ;
-                }
-                //NSString* object = [[NSString stringWithFormat:@"%@",[errorDescription objectForKey:key]]stringByReplacingOccurrencesOfString:@"\n" withString:@""];
-            }
-            
-            NSDictionary* userInfo;
-            if(![message isEqualToString:@""]) {
-                userInfo = [NSDictionary dictionaryWithObjectsAndKeys:message,@"message", nil];
-            }
-            else {
-                NSLog(@"WARNING: Error from server not handled well: %@", responseString);
-                userInfo = [NSDictionary dictionaryWithObjectsAndKeys:@"error from server not formatted correctly",@"message", nil];
-            }
-            NSError* error = [NSError errorWithDomain:@"CardRegistration" code:0 userInfo:userInfo];
+            NSError* error = [ErrorTransformer apiErrorToNSError:[root objectForKey:@"error"]];
             failureBlock(error);
         }
     }];
@@ -305,11 +268,8 @@ withPasswordConfirmation:(NSString*)passwordConfirmation
     [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
     
     NSURL *url;
-    if(TESTING_V1) {
-        url = [NSURL URLWithString:[NSString stringWithFormat:@"https://%@/api/v1/users/sign_in.json", TARGET_SERVER]];
-    } else {
-        url = [NSURL URLWithString:@"https://swooplot.herokuapp.com/api/users/sign_in.json"];
-    }
+    url = [NSURL URLWithString:[NSString stringWithFormat:@"https://%@/api/v1/users/sign_in.json", TARGET_SERVER]];
+    
     //NSLog(@"%@", [userRequest JSONRepresentation]);
     
     id loginRequest = [Authentication makeUserLoginRequest:email withPassword:password];
@@ -340,26 +300,7 @@ withPasswordConfirmation:(NSString*)passwordConfirmation
             [Persistance saveLastName:[[root objectForKey:@"user"] objectForKey:@"last_name"]];
             successBlock(root);
         } else {
-            NSString* message = @"";
-            
-            NSDictionary* errorDescription = [root objectForKey:@"error"];
-            
-            for( NSString* key in errorDescription.allKeys) {
-                for( NSString* val in [errorDescription objectForKey:key]) {
-                    message = [NSString stringWithFormat:@"%@%@ %@\n", message, key, val] ;
-                }
-                //NSString* object = [[NSString stringWithFormat:@"%@",[errorDescription objectForKey:key]]stringByReplacingOccurrencesOfString:@"\n" withString:@""];
-            }
-            
-            NSDictionary* userInfo;
-            if(![message isEqualToString:@""]) {
-                userInfo = [NSDictionary dictionaryWithObjectsAndKeys:message,@"message", nil];
-            }
-            else {
-                NSLog(@"WARNING: Error from server not handled well: %@", responseString);
-                userInfo = [NSDictionary dictionaryWithObjectsAndKeys:@"error from server not formatted correctly",@"message", nil];
-            }
-            NSError* error = [NSError errorWithDomain:@"UserLogin" code:0 userInfo:userInfo];
+            NSError* error = [ErrorTransformer apiErrorToNSError:[root objectForKey:@"error"]];
             failureBlock(error);
         }
     }];
@@ -435,7 +376,12 @@ withPasswordConfirmation:(NSString*)passwordConfirmation
     [request setCompletionBlock:^{
         NSString *responseString = [request responseString];
         NSDictionary * root = [responseString JSONValue];
-        successBlock(root);
+        if([[root objectForKey:@"success"] boolValue]) {
+            successBlock(root);
+        } else {
+            NSError* error = [ErrorTransformer apiErrorToNSError:[root objectForKey:@"error"]];
+            failureBlock(error);
+        }
     }];
     [request setFailedBlock:^{
         failureBlock([request error]);
@@ -471,7 +417,12 @@ withPasswordConfirmation:(NSString*)passwordConfirmation
     [request setCompletionBlock:^{
         NSString *responseString = [request responseString];
         NSDictionary * root = [responseString JSONValue];
-        successBlock(root);
+        if([[root objectForKey:@"success"] boolValue]) {
+            successBlock(root);
+        } else {
+            NSError* error = [ErrorTransformer apiErrorToNSError:[root objectForKey:@"error"]];
+            failureBlock(error);
+        }
     }];
     [request setFailedBlock:^{
         failureBlock([request error]);
@@ -506,7 +457,11 @@ withPasswordConfirmation:(NSString*)passwordConfirmation
          [root setObject:image forKey:@"image"];*/
         NSData* image = [request rawResponseData];
         NSMutableDictionary * root = [NSMutableDictionary dictionaryWithObject:image forKey:@"image"];
-        successBlock(root);
+        if(root.count != 0) {
+            successBlock(root);
+        } else {
+            failureBlock(nil);
+        }
     }];
     [request setFailedBlock:^{
         failureBlock([request error]);
@@ -544,7 +499,12 @@ withPasswordConfirmation:(NSString*)passwordConfirmation
     [request setCompletionBlock:^{
         NSString *responseString = [request responseString];
         NSDictionary * root = [responseString JSONValue];
-        successBlock(root);
+        if([[root objectForKey:@"success"] boolValue]) {
+            successBlock([root objectForKey:@"user"]);
+        } else {
+            NSError* error = [ErrorTransformer apiErrorToNSError:[root objectForKey:@"error"]];
+            failureBlock(error);
+        }
     }];
     [request setFailedBlock:^{
         failureBlock([request error]);
@@ -581,28 +541,9 @@ withPasswordConfirmation:(NSString*)passwordConfirmation
         BOOL success = [[root objectForKey:@"success"] boolValue];
         
         if(success) {
-            successBlock(root);
+            successBlock([root objectForKey:@"user"]);
         } else {
-            NSString* message = @"";
-            
-            NSDictionary* errorDescription = [root objectForKey:@"error"];
-            
-            for( NSString* key in errorDescription.allKeys) {
-                for( NSString* val in [errorDescription objectForKey:key]) {
-                    message = [NSString stringWithFormat:@"%@%@ %@\n", message, key, val] ;
-                }
-                //NSString* object = [[NSString stringWithFormat:@"%@",[errorDescription objectForKey:key]]stringByReplacingOccurrencesOfString:@"\n" withString:@""];
-            }
-            
-            NSDictionary* userInfo;
-            if(![message isEqualToString:@""]) {
-                userInfo = [NSDictionary dictionaryWithObjectsAndKeys:message,@"message", nil];
-            }
-            else {
-                NSLog(@"WARNING: Error from server not handled well: %@", responseString);
-                userInfo = [NSDictionary dictionaryWithObjectsAndKeys:@"error from server not formatted correctly",@"message", nil];
-            }
-            NSError* error = [NSError errorWithDomain:@"UserUpdate" code:0 userInfo:userInfo];
+            NSError* error = [ErrorTransformer apiErrorToNSError:[root objectForKey:@"error"]];
             failureBlock(error);
         }
     }];
@@ -624,7 +565,8 @@ withPasswordConfirmation:(NSString*)passwordConfirmation
     if(!authToken) {
         //NSError* error = [[NSError errorWithDomain:@"Auth" code:0 userInfo:[NSDictionary dictionaryWithObject:<#(id)#> forKey:<#(id<NSCopying>)#>]]]
         //TODO: GIVE BETTER ERROR
-        failureBlock(nil);
+        NSError* error = [ErrorTransformer apiErrorToNSError:[NSDictionary dictionaryWithObject:@"should be logged in" forKey:@"user"]];
+        failureBlock(error);
         return;
     }
     NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"https://%@/api/v1/account/activate_card.json?&auth_token=%@", TARGET_SERVER, authToken]];
@@ -646,28 +588,8 @@ withPasswordConfirmation:(NSString*)passwordConfirmation
         if(success) {
             successBlock([root objectForKey:@"user"]);
         } else {
-            NSString* message = @"";
-            
-            NSDictionary* errorDescription = [root objectForKey:@"error"];
-            
-            for( NSString* key in errorDescription.allKeys) {
-                for( NSString* val in [errorDescription objectForKey:key]) {
-                    message = [NSString stringWithFormat:@"%@%@ %@\n", message, key, val] ;
-                }
-                //NSString* object = [[NSString stringWithFormat:@"%@",[errorDescription objectForKey:key]]stringByReplacingOccurrencesOfString:@"\n" withString:@""];
-            }
-            
-            NSDictionary* userInfo;
-            if(![message isEqualToString:@""]) {
-                userInfo = [NSDictionary dictionaryWithObjectsAndKeys:message,@"message", nil];
-            }
-            else {
-                NSLog(@"WARNING: Error from server not handled well: %@", responseString);
-                userInfo = [NSDictionary dictionaryWithObjectsAndKeys:@"error from server not formatted correctly",@"message", nil];
-            }
-            NSError* error = [NSError errorWithDomain:@"UserUpdate" code:0 userInfo:userInfo];
-            failureBlock(error);
-        }
+            NSError* error = [ErrorTransformer apiErrorToNSError:[root objectForKey:@"error"]];
+            failureBlock(error);        }
     }];
     
     [request setFailedBlock:^{
@@ -708,26 +630,7 @@ withPasswordConfirmation:(NSString*)passwordConfirmation
         if(success) {
             successBlock(root);
         } else {
-            NSString* message = @"";
-            
-            NSDictionary* errorDescription = [root objectForKey:@"error"];
-            
-            for( NSString* key in errorDescription.allKeys) {
-                for( NSString* val in [errorDescription objectForKey:key]) {
-                    message = [NSString stringWithFormat:@"%@%@ %@\n", message, key, val] ;
-                }
-                //NSString* object = [[NSString stringWithFormat:@"%@",[errorDescription objectForKey:key]]stringByReplacingOccurrencesOfString:@"\n" withString:@""];
-            }
-            
-            NSDictionary* userInfo;
-            if(![message isEqualToString:@""]) {
-                userInfo = [NSDictionary dictionaryWithObjectsAndKeys:message,@"message", nil];
-            }
-            else {
-                NSLog(@"WARNING: Error from server not handled well: %@", responseString);
-                userInfo = [NSDictionary dictionaryWithObjectsAndKeys:@"error from server not formatted correctly",@"message", nil];
-            }
-            NSError* error = [NSError errorWithDomain:@"UserUpdate" code:0 userInfo:userInfo];
+            NSError* error = [ErrorTransformer apiErrorToNSError:[root objectForKey:@"error"]];
             failureBlock(error);
         }
     }];
@@ -771,26 +674,7 @@ withPasswordConfirmation:(NSString*)passwordConfirmation
         if(success) {
             successBlock([root objectForKey:@"promo"]);
         } else {
-            NSString* message = @"";
-            
-            NSDictionary* errorDescription = [root objectForKey:@"error"];
-            
-            for( NSString* key in errorDescription.allKeys) {
-                for( NSString* val in [errorDescription objectForKey:key]) {
-                    message = [NSString stringWithFormat:@"%@%@ %@\n", message, key, val] ;
-                }
-                //NSString* object = [[NSString stringWithFormat:@"%@",[errorDescription objectForKey:key]]stringByReplacingOccurrencesOfString:@"\n" withString:@""];
-            }
-            
-            NSDictionary* userInfo;
-            if(![message isEqualToString:@""]) {
-                userInfo = [NSDictionary dictionaryWithObjectsAndKeys:message,@"message", nil];
-            }
-            else {
-                NSLog(@"WARNING: Error from server not handled well: %@", responseString);
-                userInfo = [NSDictionary dictionaryWithObjectsAndKeys:@"error from server not formatted correctly",@"message", nil];
-            }
-            NSError* error = [NSError errorWithDomain:@"UserUpdate" code:0 userInfo:userInfo];
+            NSError* error = [ErrorTransformer apiErrorToNSError:[root objectForKey:@"error"]];
             failureBlock(error);
         }
     }];
@@ -835,26 +719,7 @@ withPasswordConfirmation:(NSString*)passwordConfirmation
         if(success) {
             successBlock([root objectForKey:@"user"]);
         } else {
-            NSString* message = @"";
-            
-            NSDictionary* errorDescription = [root objectForKey:@"error"];
-            
-            for( NSString* key in errorDescription.allKeys) {
-                for( NSString* val in [errorDescription objectForKey:key]) {
-                    message = [NSString stringWithFormat:@"%@%@ %@\n", message, key, val] ;
-                }
-                //NSString* object = [[NSString stringWithFormat:@"%@",[errorDescription objectForKey:key]]stringByReplacingOccurrencesOfString:@"\n" withString:@""];
-            }
-            
-            NSDictionary* userInfo;
-            if(![message isEqualToString:@""]) {
-                userInfo = [NSDictionary dictionaryWithObjectsAndKeys:message,@"message", nil];
-            }
-            else {
-                NSLog(@"WARNING: Error from server not handled well: %@", responseString);
-                userInfo = [NSDictionary dictionaryWithObjectsAndKeys:@"error from server not formatted correctly",@"message", nil];
-            }
-            NSError* error = [NSError errorWithDomain:@"UserUpdate" code:0 userInfo:userInfo];
+            NSError* error = [ErrorTransformer apiErrorToNSError:[root objectForKey:@"error"]];
             failureBlock(error);
         }
     }];
@@ -903,27 +768,8 @@ origPassword:(NSString*)origPassword
       [Persistance saveAuthToken:[root objectForKey:@"auth_token"]];
       successBlock([root objectForKey:@"user"]);
     } else {
-      NSString* message = @"";
-      
-      NSDictionary* errorDescription = [root objectForKey:@"error"];
-      
-      for( NSString* key in errorDescription.allKeys) {
-        for( NSString* val in [errorDescription objectForKey:key]) {
-          message = [NSString stringWithFormat:@"%@%@ %@\n", message, key, val] ;
-        }
-        //NSString* object = [[NSString stringWithFormat:@"%@",[errorDescription objectForKey:key]]stringByReplacingOccurrencesOfString:@"\n" withString:@""];
-      }
-      
-      NSDictionary* userInfo;
-      if(![message isEqualToString:@""]) {
-        userInfo = [NSDictionary dictionaryWithObjectsAndKeys:message,@"message", nil];
-      }
-      else {
-        NSLog(@"WARNING: Error from server not handled well: %@", responseString);
-        userInfo = [NSDictionary dictionaryWithObjectsAndKeys:@"error from server not formatted correctly",@"message", nil];
-      }
-      NSError* error = [NSError errorWithDomain:@"UserUpdate" code:0 userInfo:userInfo];
-      failureBlock(error);
+        NSError* error = [ErrorTransformer apiErrorToNSError:[root objectForKey:@"error"]];
+        failureBlock(error);
     }
   }];
   
@@ -960,27 +806,8 @@ origPassword:(NSString*)origPassword
     if(success) {
       successBlock(root);
     } else {
-      NSString* message = @"";
-      
-      NSDictionary* errorDescription = [root objectForKey:@"error"];
-      
-      for( NSString* key in errorDescription.allKeys) {
-        for( NSString* val in [errorDescription objectForKey:key]) {
-          message = [NSString stringWithFormat:@"%@%@ %@\n", message, key, val] ;
-        }
-        //NSString* object = [[NSString stringWithFormat:@"%@",[errorDescription objectForKey:key]]stringByReplacingOccurrencesOfString:@"\n" withString:@""];
-      }
-      
-      NSDictionary* userInfo;
-      if(![message isEqualToString:@""]) {
-        userInfo = [NSDictionary dictionaryWithObjectsAndKeys:message,@"message", nil];
-      }
-      else {
-        NSLog(@"WARNING: Error from server not handled well: %@", responseString);
-        userInfo = [NSDictionary dictionaryWithObjectsAndKeys:@"error from server not formatted correctly",@"message", nil];
-      }
-      NSError* error = [NSError errorWithDomain:@"UserUpdate" code:0 userInfo:userInfo];
-      failureBlock(error);
+        NSError* error = [ErrorTransformer apiErrorToNSError:[root objectForKey:@"error"]];
+        failureBlock(error);
     }
   }];
   

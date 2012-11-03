@@ -6,7 +6,7 @@
 //  Copyright (c) 2012 __MyCompanyName__. All rights reserved.
 //
 #import "Persistance.h"
-#import "Parkify2AppDelegate.h"
+#import "ParkifyAppDelegate.h"
 
 @interface  Persistance()
 + (void) saveUserRecord:(id)record withName:(NSString*)name;

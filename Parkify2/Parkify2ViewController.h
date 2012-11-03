@@ -10,9 +10,8 @@
 #import <MapKit/MapKit.h>
 #import "MKMapView+ZoomLevel.h"
 #import <CoreLocation/CoreLocation.h>
-#import "ParkingSpot.h"
-#import "ParkingSpotCollection.h"
 #import "BSForwardGeocoder.h"
+#import "UIViewController+AppData_ParkingSpotCollection.h"
 
 #define METERS_PER_MILE 1609.344
 
@@ -22,7 +21,7 @@
 
 @end
 
-@interface Parkify2ViewController : UIViewController <MKMapViewDelegate, CLLocationManagerDelegate,ParkingSpotObserver, UISearchBarDelegate, BSForwardGeocoderDelegate, VCNavigationDelegate>
+@interface Parkify2ViewController : UIViewController <MKMapViewDelegate, CLLocationManagerDelegate,ParkingSpotObserver, UISearchBarDelegate, BSForwardGeocoderDelegate>
 {
     CLLocationManager *_locationManager;
     double _currentLat;

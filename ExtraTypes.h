@@ -15,7 +15,7 @@ typedef void(^FailureBlock)(NSError*);
 
 typedef NSString* (^Formatter)(double val);
 
-#define ADMIN_VER true
+#define ADMIN_VER false
 
 #define TARGET_SERVER_NORMAL @"parkify-rails.herokuapp.com"
 
@@ -31,6 +31,7 @@ typedef NSString* (^Formatter)(double val);
 
 @end
 
+/*
 @protocol CreditCardsSource <NSObject>
 
 @property (strong, nonatomic) NSArray* credit_cards;
@@ -49,7 +50,7 @@ typedef NSString* (^Formatter)(double val);
 @property (strong, nonatomic) NSArray* promos;
 
 @end
-
+*/
 
 
 #endif

@@ -87,7 +87,7 @@ typedef struct STargetLocation {
 
 @synthesize annotations = _annotations;
 
-@synthesize parkingSpots = _parkingSpots;
+//@synthesize parkingSpots = _parkingSpots;
 
 @synthesize forwardGeocoder = _forwardGeocoder;
 
@@ -105,7 +105,7 @@ typedef struct STargetLocation {
 
 @synthesize spotsWereUpdatedCallback = _spotsWereUpdatedCallback;
 
-
+/*
 - (ParkingSpotCollection*)parkingSpots {
     if(!_parkingSpots) {
         _parkingSpots = [[ParkingSpotCollection alloc] init];
@@ -113,6 +113,7 @@ typedef struct STargetLocation {
     _parkingSpots.observerDelegate = self;
     return _parkingSpots;
 }
+*/
 
 - (BSForwardGeocoder*)forwardGeocoder {
     if(_forwardGeocoder == nil) {
@@ -177,7 +178,7 @@ typedef struct STargetLocation {
         
         [self.confirmationButton setHidden:true];
     if(self.targetLocation.type != TARGET_NONE) {
-        double distanceToSpot = [self.parkingSpots distanceToClosestAvailableSpotToCoord:self.targetLocation.location];
+        double distanceToSpot = [[self getParkingSpots] distanceToClosestAvailableSpotToCoord:self.targetLocation.location];
         if(distanceToSpot <= 5) {
             self.bottomBarLabel.text = [NSString stringWithFormat:@"Closest spot is %@ away.", [TextFormatter formatDistanceClose:distanceToSpot]];
         } else {
@@ -216,11 +217,7 @@ typedef struct STargetLocation {
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    
-    
 	// Do any additional setup after loading the view, typically from a nib.
-    
-    
 }
 
 - (void)viewDidUnload
@@ -299,9 +296,6 @@ typedef struct STargetLocation {
             self.currentLong = self.locationManager.location.coordinate.longitude;
             initTarget.type = TARGET_CURRENT_LOCATION;
         }
-        
-        
-        
         
         CLLocationCoordinate2D initCoord;
         initCoord.latitude = self.currentLat;
@@ -409,6 +403,12 @@ typedef struct STargetLocation {
         target.type = TARGET_CURRENT_LOCATION;
         target.location = newLocation.coordinate;
         self.targetLocation = target;
+    } else if (self.targetLocation.type == TARGET_NONE) {
+        STargetLocation target;
+        target.type = TARGET_CURRENT_LOCATION;
+        target.location = newLocation.coordinate;
+        self.targetLocation = target;
+        [self goToCoord:target.location handleZoom:true viewNearestSpot:true];
     }
     
     [self updateBottomBar];
@@ -430,8 +430,8 @@ typedef struct STargetLocation {
         [self.mapView deselectAnnotation:selectedAnnotation animated:false];
     }
     
-    ParkingSpot* closest = [self.parkingSpots closestAvailableSpotToCoord:target];
-    double distanceToSpot = [self.parkingSpots distanceToClosestAvailableSpotToCoord:self.targetLocation.location];
+    ParkingSpot* closest = [[self getParkingSpots] closestAvailableSpotToCoord:target];
+    double distanceToSpot = [[self getParkingSpots] distanceToClosestAvailableSpotToCoord:self.targetLocation.location];
     if(bNearestSpot && closest && (distanceToSpot <= 5)) {
         double minLat = MIN(target.latitude, closest.mLat);
         double minLong = MIN(target.longitude, closest.mLong);
@@ -643,12 +643,13 @@ typedef struct STargetLocation {
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
     if ([segue.identifier isEqualToString:@"ViewSpot"]) {
         
-        double distanceToSpot = [self.parkingSpots distanceToClosestAvailableSpotToCoord:self.targetLocation.location];
+        double distanceToSpot = [[self getParkingSpots] distFromSpot:self.targetSpot toCoord:self.targetLocation.location];
         
         
         ParkifySpotViewController *newController = segue.destinationViewController;
-        newController.parkingSpots = self.parkingSpots;
-        self.parkingSpots.observerDelegate = newController;
+        [self getParkingSpots].observerDelegate = nil;
+        //newController.parkingSpots = self.parkingSpots;
+        //self.parkingSpots.observerDelegate = newController;
         newController.spot = self.targetSpot;
         newController.currentLat = self.currentLat;
         newController.currentLong = self.currentLong;
@@ -679,12 +680,14 @@ typedef struct STargetLocation {
     //**  **//
     
     
-    self.targetSpot = [self.parkingSpots parkingSpotForID:spotID];
+    self.targetSpot = [[self getParkingSpots] parkingSpotForID:spotID];
     if(!self.targetSpot) {
         self.targetSpot = [[ParkingSpot alloc]init];
         self.targetSpot.mID = spotID;
     }
-    self.targetSpot.parentCollection = self.parkingSpots;
+    [self getParkingSpots].observerDelegate = nil;
+    // self.targetSpot.parentCollection = self.parkingSpots;
+    
     self.spotsWereUpdatedCallback = ^(void){
         /*
         self.targetSpot = [self.parkingSpots parkingSpotForID:spotID];
@@ -713,6 +716,7 @@ typedef struct STargetLocation {
 
 - (void)openSpotViewControllerWithSpot:(int)spotID {
     [self stopPolling];
+    
     //** Set up waitingMask **//
     CGRect waitingMaskFrame = self.view.frame;
     waitingMaskFrame.origin.x = 0;
@@ -722,9 +726,9 @@ typedef struct STargetLocation {
     [self.view addSubview:self.waitingMask];
     //**  **//
         
-    self.targetSpot = [self.parkingSpots parkingSpotForID:spotID];
+    self.targetSpot = [[self getParkingSpots] parkingSpotForID:spotID];
     self.spotsWereUpdatedCallback = ^(void){
-        self.targetSpot = [self.parkingSpots parkingSpotForID:spotID];
+        self.targetSpot = [[self getParkingSpots] parkingSpotForID:spotID];
         if(self.targetSpot) {
             self.navigationController.modalPresentationStyle = UIModalPresentationCurrentContext;
             [self performSegueWithIdentifier:@"ViewSpot" sender:self];
@@ -774,7 +778,7 @@ typedef struct STargetLocation {
 {
     [self updateBottomBar];
     NSMutableArray* annotations = [[NSMutableArray alloc] init ];
-    for (ParkingSpot* spot in [self.parkingSpots.parkingSpots allValues]) {
+    for (ParkingSpot* spot in [[self getParkingSpots].parkingSpots allValues]) {
         [annotations addObject:[ParkingSpotAnnotation annotationForSpot:spot]];
     }
     self.annotations = annotations;
@@ -787,7 +791,7 @@ typedef struct STargetLocation {
     
     if(ADMIN_VER) {
     NSMutableArray* ids = [[NSMutableArray alloc] init ];
-    for (ParkingSpot* spot in [self.parkingSpots.parkingSpots allValues]) {
+    for (ParkingSpot* spot in [[self getParkingSpots].parkingSpots allValues]) {
         
         [ids addObject:[NSNumber numberWithInt:(spot.mID - 90000)]];
     }
@@ -850,7 +854,7 @@ typedef struct STargetLocation {
 
 - (void)refreshSpots
 {
-    [self.parkingSpots updateWithRequest:[NSDictionary dictionaryWithObject:@"low" forKey:@"level_of_detail"]];
+    [[self getParkingSpots] updateWithRequest:[NSDictionary dictionaryWithObject:@"low" forKey:@"level_of_detail"]];
 }
 
 
@@ -993,7 +997,7 @@ typedef struct STargetLocation {
 - (IBAction)parkMeNowButtonTapped:(UIButton *)sender {
     //Testing modal stuff
     
-    ParkingSpot* parkMeNowSpot = [self.parkingSpots closestAvailableSpotToCoord:self.targetLocation.location];
+    ParkingSpot* parkMeNowSpot = [[self getParkingSpots] closestAvailableSpotToCoord:self.targetLocation.location];
     if(parkMeNowSpot) {
         [self openSpotViewControllerWithSpot:parkMeNowSpot.mID];
     } else {

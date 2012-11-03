@@ -621,7 +621,13 @@
         end.latitude = self.spot.mLat;
         end.longitude = self.spot.mLong;
         
-        NSArray* addressComponents = [self.spot.mAddress componentsSeparatedByString:@", "];
+        
+        NSArray* addressComponents = [self.spot.mAddress componentsSeparatedByString:@","];
+        NSMutableArray* trimmedAddressComponents = [[NSMutableArray alloc] init];
+        for (NSString* str in addressComponents) {
+            [trimmedAddressComponents addObject:[str stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]]];
+        }
+        
         
         NSArray* addressKeysAll = [NSArray arrayWithObjects:kABPersonAddressStreetKey,
             kABPersonAddressCityKey,
@@ -635,7 +641,7 @@
         matchedRange.length = [addressComponents count];
         
                 
-        NSDictionary* addressDictionary = [NSDictionary dictionaryWithObjects:addressComponents forKeys:[addressKeysAll subarrayWithRange:matchedRange]];
+        NSDictionary* addressDictionary = [NSDictionary dictionaryWithObjects:trimmedAddressComponents forKeys:[addressKeysAll subarrayWithRange:matchedRange]];
         
         // NSDictionary addressDictionary =
         

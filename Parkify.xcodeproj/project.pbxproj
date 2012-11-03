@@ -26,7 +26,6 @@
 		8C6FBA14163ACED800D68790 /* ExtraDetailTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C6FBA13163ACED800D68790 /* ExtraDetailTableViewCell.m */; };
 		8C6FBA18163AD21600D68790 /* PromoTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C6FBA17163AD21600D68790 /* PromoTableViewController.m */; };
 		8C74008C15AF9D9A00007F63 /* Persistance.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C74008B15AF9D9900007F63 /* Persistance.m */; };
-		8C74009015AFA9D600007F63 /* ParkifyFrontPageViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C74008F15AFA9D600007F63 /* ParkifyFrontPageViewController.m */; };
 		8C74009F15AFEDAA00007F63 /* Stripe.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C74009E15AFEDA000007F63 /* Stripe.m */; };
 		8C7400A315B2E09300007F63 /* UIViewController+overView.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C7400A215B2E09300007F63 /* UIViewController+overView.m */; };
 		8C7489D415A4102B00D7C167 /* ParkingSpot.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C7489D315A4102B00D7C167 /* ParkingSpot.m */; };
@@ -110,7 +109,7 @@
 		8CA7A1E515A3DC980051567D /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8CA7A1E415A3DC980051567D /* CoreGraphics.framework */; };
 		8CA7A1EB15A3DC980051567D /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 8CA7A1E915A3DC980051567D /* InfoPlist.strings */; };
 		8CA7A1ED15A3DC980051567D /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 8CA7A1EC15A3DC980051567D /* main.m */; };
-		8CA7A1F115A3DC980051567D /* Parkify2AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 8CA7A1F015A3DC980051567D /* Parkify2AppDelegate.m */; };
+		8CA7A1F115A3DC980051567D /* ParkifyAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 8CA7A1F015A3DC980051567D /* ParkifyAppDelegate.m */; };
 		8CA7A1F415A3DC980051567D /* MainStoryboard_iPhone.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 8CA7A1F215A3DC980051567D /* MainStoryboard_iPhone.storyboard */; };
 		8CA7A1F715A3DC980051567D /* MainStoryboard_iPad.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 8CA7A1F515A3DC980051567D /* MainStoryboard_iPad.storyboard */; };
 		8CA7A1FA15A3DC980051567D /* Parkify2ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8CA7A1F915A3DC980051567D /* Parkify2ViewController.m */; };
@@ -159,6 +158,9 @@
 		8CB8262E15F673B50089B664 /* NoPic.png in Resources */ = {isa = PBXBuildFile; fileRef = 8CB8262D15F673B50089B664 /* NoPic.png */; };
 		8CDD2A1B163F3AD70000E47C /* Default@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 8CDD2A1A163F3AD70000E47C /* Default@2x.png */; };
 		8CDD2A1E163F454A0000E47C /* PasswordTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8CDD2A1D163F45490000E47C /* PasswordTableViewController.m */; };
+		8CDD2A29164512B50000E47C /* UIViewController+AppData_User.m in Sources */ = {isa = PBXBuildFile; fileRef = 8CDD2A28164512B50000E47C /* UIViewController+AppData_User.m */; };
+		8CDD2A2D16452A860000E47C /* UIViewController+AppData_ParkingSpotCollection.m in Sources */ = {isa = PBXBuildFile; fileRef = 8CDD2A2C16452A840000E47C /* UIViewController+AppData_ParkingSpotCollection.m */; };
+		8CDD2A3016458D020000E47C /* ErrorTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = 8CDD2A2F16458CFE0000E47C /* ErrorTransformer.m */; };
 		8CDF6D3E162B6676004B6A37 /* maskImage.png in Resources */ = {isa = PBXBuildFile; fileRef = 8CDF6D3D162B6676004B6A37 /* maskImage.png */; };
 		8CDF6D46162D904A004B6A37 /* info_page_middle_bar.png in Resources */ = {isa = PBXBuildFile; fileRef = 8CDF6D43162D904A004B6A37 /* info_page_middle_bar.png */; };
 		8CDF6D47162D904A004B6A37 /* overlay_gradient_old.png in Resources */ = {isa = PBXBuildFile; fileRef = 8CDF6D44162D904A004B6A37 /* overlay_gradient_old.png */; };
@@ -223,8 +225,6 @@
 		8C6FBA17163AD21600D68790 /* PromoTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PromoTableViewController.m; sourceTree = "<group>"; };
 		8C74008A15AF9D9900007F63 /* Persistance.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Persistance.h; sourceTree = "<group>"; };
 		8C74008B15AF9D9900007F63 /* Persistance.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Persistance.m; sourceTree = "<group>"; };
-		8C74008E15AFA9D600007F63 /* ParkifyFrontPageViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ParkifyFrontPageViewController.h; sourceTree = "<group>"; };
-		8C74008F15AFA9D600007F63 /* ParkifyFrontPageViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ParkifyFrontPageViewController.m; sourceTree = "<group>"; };
 		8C74009C15AFEDA000007F63 /* prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = prefix.pch; sourceTree = "<group>"; };
 		8C74009D15AFEDA000007F63 /* Stripe.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Stripe.h; sourceTree = "<group>"; };
 		8C74009E15AFEDA000007F63 /* Stripe.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Stripe.m; sourceTree = "<group>"; };
@@ -353,8 +353,8 @@
 		8CA7A1EA15A3DC980051567D /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		8CA7A1EC15A3DC980051567D /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		8CA7A1EE15A3DC980051567D /* Parkify-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Parkify-Prefix.pch"; sourceTree = "<group>"; };
-		8CA7A1EF15A3DC980051567D /* Parkify2AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Parkify2AppDelegate.h; sourceTree = "<group>"; };
-		8CA7A1F015A3DC980051567D /* Parkify2AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Parkify2AppDelegate.m; sourceTree = "<group>"; };
+		8CA7A1EF15A3DC980051567D /* ParkifyAppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ParkifyAppDelegate.h; sourceTree = "<group>"; };
+		8CA7A1F015A3DC980051567D /* ParkifyAppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ParkifyAppDelegate.m; sourceTree = "<group>"; };
 		8CA7A1F315A3DC980051567D /* en */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = en; path = en.lproj/MainStoryboard_iPhone.storyboard; sourceTree = "<group>"; };
 		8CA7A1F615A3DC980051567D /* en */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = en; path = en.lproj/MainStoryboard_iPad.storyboard; sourceTree = "<group>"; };
 		8CA7A1F815A3DC980051567D /* Parkify2ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Parkify2ViewController.h; sourceTree = "<group>"; };
@@ -492,6 +492,12 @@
 		8CDD2A1A163F3AD70000E47C /* Default@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default@2x.png"; sourceTree = "<group>"; };
 		8CDD2A1C163F45470000E47C /* PasswordTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PasswordTableViewController.h; path = Parkify2/PasswordTableViewController.h; sourceTree = "<group>"; };
 		8CDD2A1D163F45490000E47C /* PasswordTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PasswordTableViewController.m; path = Parkify2/PasswordTableViewController.m; sourceTree = "<group>"; };
+		8CDD2A27164512B50000E47C /* UIViewController+AppData_User.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIViewController+AppData_User.h"; sourceTree = "<group>"; };
+		8CDD2A28164512B50000E47C /* UIViewController+AppData_User.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIViewController+AppData_User.m"; sourceTree = "<group>"; };
+		8CDD2A2B16452A820000E47C /* UIViewController+AppData_ParkingSpotCollection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIViewController+AppData_ParkingSpotCollection.h"; sourceTree = "<group>"; };
+		8CDD2A2C16452A840000E47C /* UIViewController+AppData_ParkingSpotCollection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIViewController+AppData_ParkingSpotCollection.m"; sourceTree = "<group>"; };
+		8CDD2A2E16458CFA0000E47C /* ErrorTransformer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ErrorTransformer.h; sourceTree = "<group>"; };
+		8CDD2A2F16458CFE0000E47C /* ErrorTransformer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ErrorTransformer.m; sourceTree = "<group>"; };
 		8CDF6D3D162B6676004B6A37 /* maskImage.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = maskImage.png; sourceTree = "<group>"; };
 		8CDF6D43162D904A004B6A37 /* info_page_middle_bar.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = info_page_middle_bar.png; sourceTree = "<group>"; };
 		8CDF6D44162D904A004B6A37 /* overlay_gradient_old.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = overlay_gradient_old.png; sourceTree = "<group>"; };
@@ -763,7 +769,7 @@
 			name = TBXML;
 			sourceTree = "<group>";
 		};
-		8C930F6816393BC3003C53A9 /* Settings Models */ = {
+		8C930F6816393BC3003C53A9 /* Account Settings Models */ = {
 			isa = PBXGroup;
 			children = (
 				8C930F6516393728003C53A9 /* Promo.h */,
@@ -775,7 +781,8 @@
 				8C930F5C16392EA5003C53A9 /* User.h */,
 				8C930F5D16392EA5003C53A9 /* User.m */,
 			);
-			name = "Settings Models";
+			name = "Account Settings Models";
+			path = ..;
 			sourceTree = "<group>";
 		};
 		8C930F6916396876003C53A9 /* ELC */ = {
@@ -787,17 +794,22 @@
 			name = ELC;
 			sourceTree = "<group>";
 		};
-		8C930F70163984A6003C53A9 /* Settings Controllers */ = {
+		8C930F70163984A6003C53A9 /* Account Settings Controllers */ = {
 			isa = PBXGroup;
 			children = (
 				8C930F6D16397759003C53A9 /* AccountSettingsNavigationViewController.h */,
 				8C930F6E1639775A003C53A9 /* AccountSettingsNavigationViewController.m */,
 				8C930F5916392D8C003C53A9 /* AccountSettingsTableViewController.h */,
 				8C930F5A16392D8C003C53A9 /* AccountSettingsTableViewController.m */,
-				8C930F71163984EA003C53A9 /* CreditCardCollectionTableViewController.h */,
-				8C930F72163984EA003C53A9 /* CreditCardCollectionTableViewController.m */,
+				8CDD2A1F1645009C0000E47C /* CreditCard */,
+				8CDD2A20164500B60000E47C /* Car */,
+				8CDD2A21164500EA0000E47C /* Promo */,
+				8CDD2A22164501080000E47C /* Password */,
+				8C6FBA12163ACED800D68790 /* ExtraDetailTableViewCell.h */,
+				8C6FBA13163ACED800D68790 /* ExtraDetailTableViewCell.m */,
 			);
-			name = "Settings Controllers";
+			name = "Account Settings Controllers";
+			path = ..;
 			sourceTree = "<group>";
 		};
 		8C958CFC15A4FA6F00870E8C /* BSForwardGeocoder */ = {
@@ -818,22 +830,6 @@
 		8CA7A1D115A3DC980051567D = {
 			isa = PBXGroup;
 			children = (
-				8CDD2A1C163F45470000E47C /* PasswordTableViewController.h */,
-				8CDD2A1D163F45490000E47C /* PasswordTableViewController.m */,
-				8C930F7416399E3D003C53A9 /* CreditCardTableViewController.h */,
-				8C930F7516399E3E003C53A9 /* CreditCardTableViewController.m */,
-				8C6FBA16163AD21600D68790 /* PromoTableViewController.h */,
-				8C6FBA17163AD21600D68790 /* PromoTableViewController.m */,
-				8C6FBA12163ACED800D68790 /* ExtraDetailTableViewCell.h */,
-				8C6FBA13163ACED800D68790 /* ExtraDetailTableViewCell.m */,
-				8C930F7D163AC690003C53A9 /* PromoCollectionTableViewController.h */,
-				8C930F7E163AC692003C53A9 /* PromoCollectionTableViewController.m */,
-				8C930F77163A5F07003C53A9 /* CarCollectionTableViewController.h */,
-				8C930F78163A5F08003C53A9 /* CarCollectionTableViewController.m */,
-				8C930F7A163A7738003C53A9 /* CarTableViewController.h */,
-				8C930F7B163A773A003C53A9 /* CarTableViewController.m */,
-				8C930F70163984A6003C53A9 /* Settings Controllers */,
-				8C930F6816393BC3003C53A9 /* Settings Models */,
 				8C930F1B1637FBD2003C53A9 /* test.html */,
 				8C271912160C8F8A00923857 /* AddressBook.framework */,
 				8CF0744A15EA47C0002ABE82 /* testsplashwhite.png */,
@@ -870,16 +866,20 @@
 			children = (
 				8CA7A1F215A3DC980051567D /* MainStoryboard_iPhone.storyboard */,
 				8CA7A1F515A3DC980051567D /* MainStoryboard_iPad.storyboard */,
-				8CF0744315EA3985002ABE82 /* Modal Controllers */,
+				8CF0744315EA3985002ABE82 /* Settings Controllers */,
+				8C930F70163984A6003C53A9 /* Account Settings Controllers */,
+				8C930F6816393BC3003C53A9 /* Account Settings Models */,
 				8C607E8715DDC5BD00928DAD /* ParkingSpot */,
 				8C900FD315B66EE800B44AA5 /* ExtraTypes.h */,
 				8C76882815A43B590035E7B4 /* MKMapView+ZoomLevel.m */,
 				8C76882715A43B590035E7B4 /* MKMapView+ZoomLevel.h */,
-				8CA7A1EF15A3DC980051567D /* Parkify2AppDelegate.h */,
-				8CA7A1F015A3DC980051567D /* Parkify2AppDelegate.m */,
+				8CDD2A2B16452A820000E47C /* UIViewController+AppData_ParkingSpotCollection.h */,
+				8CDD2A2C16452A840000E47C /* UIViewController+AppData_ParkingSpotCollection.m */,
+				8CDD2A27164512B50000E47C /* UIViewController+AppData_User.h */,
+				8CDD2A28164512B50000E47C /* UIViewController+AppData_User.m */,
+				8CA7A1EF15A3DC980051567D /* ParkifyAppDelegate.h */,
+				8CA7A1F015A3DC980051567D /* ParkifyAppDelegate.m */,
 				8CA7A1E715A3DC980051567D /* Supporting Files */,
-				8C74008E15AFA9D600007F63 /* ParkifyFrontPageViewController.h */,
-				8C74008F15AFA9D600007F63 /* ParkifyFrontPageViewController.m */,
 				8CA7A1F815A3DC980051567D /* Parkify2ViewController.h */,
 				8CA7A1F915A3DC980051567D /* Parkify2ViewController.m */,
 				8C79E1C915A8F20D00B49D73 /* ParkifySpotViewController.h */,
@@ -910,6 +910,8 @@
 				8C930F1016379EC6003C53A9 /* MultiImageViewer.m */,
 				8C930F161637AFE3003C53A9 /* DirectionsControl.h */,
 				8C930F171637AFE3003C53A9 /* DirectionsControl.m */,
+				8CDD2A2E16458CFA0000E47C /* ErrorTransformer.h */,
+				8CDD2A2F16458CFE0000E47C /* ErrorTransformer.m */,
 			);
 			path = Parkify2;
 			sourceTree = "<group>";
@@ -1120,6 +1122,48 @@
 			name = "Design Amoeba";
 			sourceTree = "<group>";
 		};
+		8CDD2A1F1645009C0000E47C /* CreditCard */ = {
+			isa = PBXGroup;
+			children = (
+				8C930F71163984EA003C53A9 /* CreditCardCollectionTableViewController.h */,
+				8C930F72163984EA003C53A9 /* CreditCardCollectionTableViewController.m */,
+				8C930F7416399E3D003C53A9 /* CreditCardTableViewController.h */,
+				8C930F7516399E3E003C53A9 /* CreditCardTableViewController.m */,
+			);
+			name = CreditCard;
+			sourceTree = "<group>";
+		};
+		8CDD2A20164500B60000E47C /* Car */ = {
+			isa = PBXGroup;
+			children = (
+				8C930F77163A5F07003C53A9 /* CarCollectionTableViewController.h */,
+				8C930F78163A5F08003C53A9 /* CarCollectionTableViewController.m */,
+				8C930F7A163A7738003C53A9 /* CarTableViewController.h */,
+				8C930F7B163A773A003C53A9 /* CarTableViewController.m */,
+			);
+			name = Car;
+			sourceTree = "<group>";
+		};
+		8CDD2A21164500EA0000E47C /* Promo */ = {
+			isa = PBXGroup;
+			children = (
+				8C930F7D163AC690003C53A9 /* PromoCollectionTableViewController.h */,
+				8C930F7E163AC692003C53A9 /* PromoCollectionTableViewController.m */,
+				8C6FBA16163AD21600D68790 /* PromoTableViewController.h */,
+				8C6FBA17163AD21600D68790 /* PromoTableViewController.m */,
+			);
+			name = Promo;
+			sourceTree = "<group>";
+		};
+		8CDD2A22164501080000E47C /* Password */ = {
+			isa = PBXGroup;
+			children = (
+				8CDD2A1C163F45470000E47C /* PasswordTableViewController.h */,
+				8CDD2A1D163F45490000E47C /* PasswordTableViewController.m */,
+			);
+			name = Password;
+			sourceTree = "<group>";
+		};
 		8CE703C816054D7C0021DF4A /* Vendor */ = {
 			isa = PBXGroup;
 			children = (
@@ -1184,7 +1228,7 @@
 			name = RangeBar;
 			sourceTree = "<group>";
 		};
-		8CF0744315EA3985002ABE82 /* Modal Controllers */ = {
+		8CF0744315EA3985002ABE82 /* Settings Controllers */ = {
 			isa = PBXGroup;
 			children = (
 				8C900FCF15B66B2100B44AA5 /* ModalSettingsController.h */,
@@ -1200,7 +1244,7 @@
 				8CB12B4415FD916C00551C0B /* ParkifyWebViewWrapperController.h */,
 				8CB12B4515FD916C00551C0B /* ParkifyWebViewWrapperController.m */,
 			);
-			name = "Modal Controllers";
+			name = "Settings Controllers";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -1380,7 +1424,7 @@
 				8CA7A2BF15A3ECA00051567D /* ASINetworkQueue.m in Sources */,
 				8CA7A2C015A3ECA00051567D /* Reachability.m in Sources */,
 				8CA7A1ED15A3DC980051567D /* main.m in Sources */,
-				8CA7A1F115A3DC980051567D /* Parkify2AppDelegate.m in Sources */,
+				8CA7A1F115A3DC980051567D /* ParkifyAppDelegate.m in Sources */,
 				8CA7A1FA15A3DC980051567D /* Parkify2ViewController.m in Sources */,
 				8CA7A21D15A3E6DA0051567D /* NSObject+SBJson.m in Sources */,
 				8CA7A21E15A3E6DA0051567D /* SBJsonParser.m in Sources */,
@@ -1401,7 +1445,6 @@
 				8C78D3A515AABDC000B4D929 /* ParkifyConfirmationViewController.m in Sources */,
 				8C78946315AE5F3100576C4D /* Authentication.m in Sources */,
 				8C74008C15AF9D9A00007F63 /* Persistance.m in Sources */,
-				8C74009015AFA9D600007F63 /* ParkifyFrontPageViewController.m in Sources */,
 				8C7400A315B2E09300007F63 /* UIViewController+overView.m in Sources */,
 				8C862BEB15B5188300769F43 /* Api.m in Sources */,
 				8C8A48A115B65833006E411E /* UITabBarController+Hide.m in Sources */,
@@ -1436,6 +1479,9 @@
 				8C6FBA14163ACED800D68790 /* ExtraDetailTableViewCell.m in Sources */,
 				8C6FBA18163AD21600D68790 /* PromoTableViewController.m in Sources */,
 				8CDD2A1E163F454A0000E47C /* PasswordTableViewController.m in Sources */,
+				8CDD2A29164512B50000E47C /* UIViewController+AppData_User.m in Sources */,
+				8CDD2A2D16452A860000E47C /* UIViewController+AppData_ParkingSpotCollection.m in Sources */,
+				8CDD2A3016458D020000E47C /* ErrorTransformer.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

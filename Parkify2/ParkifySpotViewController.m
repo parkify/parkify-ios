@@ -18,6 +18,8 @@
 #import "WaitingMask.h"
 #import "RangeBubble.h"
 #import "MultiImageViewer.h"
+#import "UIViewController+AppData_ParkingSpotCollection.h"
+#import "ErrorTransformer.h"
 //#import "PlacedAgent.h"
 
 @interface ParkifySpotViewController ()
@@ -39,7 +41,6 @@
 @synthesize titleLable = _titleLable;
 
 @synthesize flashingSign = _flashingSign;
-@synthesize parkingSpots = _parkingSpots;
 @synthesize spot = _spot;
 @synthesize infoScrollView = _infoScrollView;
 @synthesize infoWebView = _infoWebView;
@@ -73,14 +74,6 @@
     [self updateInfo];
 }
 */
-
-- (ParkingSpotCollection*)parkingSpots {
-    if(!_parkingSpots) {
-        _parkingSpots = [[ParkingSpotCollection alloc] init];
-        _parkingSpots.observerDelegate = self;
-    }
-    return _parkingSpots;
-}
 
 - (void)setSpot:(ParkingSpot*)parkingSpot {
     _spot = parkingSpot;
@@ -131,10 +124,18 @@
         [dateFormatter setDateFormat:@"ha"];
         return [dateFormatter stringFromDate:time]; };
     
-    double maxVal = prevHourMark + 120*60*60;
+    
+    
+    
+
+    double maxVal = self.spot.endTime;
     
     self.rangeBar = [[RangeBar alloc] initWithFrame:[self.rangeBarContainer bounds] minVal:prevHourMark maxVal:maxVal minRange:30*60 displayedRange:numHours*60*60 selectedMinVal:currentTime selectedMaxVal:currentTime + 1800 withTimeFormatter:timeFormatter withPriceFormatter:^NSString *(double val) {
-        return [NSString stringWithFormat:@"$%0.0f", val];
+        if(fmod(val,1.0) >= 0.01) {
+            return [NSString stringWithFormat:@"$%0.2f", val];
+        } else {
+            return [NSString stringWithFormat:@"$%0.0f", val];
+        }
     } withPriceSource:self.spot];
     
     
@@ -197,7 +198,7 @@
 }
 
 - (void)spotsWereUpdatedWithCount:(NSString *)count withLevelOfDetail:(NSString *)lod withSpot:(int)spotID {
-    self.spot = [self.parkingSpots parkingSpotForID:self.spot.mID];
+    self.spot = [[self getParkingSpots] parkingSpotForID:self.spot.mID];
 }
 
 /*
@@ -287,7 +288,7 @@
                              "</body></html>",
                              styleString,
                              self.distanceString,
-                             self.spot.mAddress,
+                             [TextFormatter formatSecuredAddressString:self.spot.mAddress],
                              layoutString,
                              coverageString,
                              [self.spot currentPrice],
@@ -475,7 +476,7 @@
         //[UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
         NSString *responseString = [request responseString];
         NSDictionary * root = [responseString JSONValue];
-        if([root objectForKey:@"success"]) {
+        if([[root objectForKey:@"success"] boolValue]) {
             //Needs to happen on success
             NSString* paymentInfoDetails = [[root objectForKey:@"acceptance"] objectForKey:@"details"];
             [Persistance saveLastPaymentInfoDetails:paymentInfoDetails];
@@ -485,13 +486,9 @@
             //[self performSegueWithIdentifier:@"ViewConfirmation" sender:self];
             //NSLog(@"TEST");
         } else {
+            NSError* error = [ErrorTransformer apiErrorToNSError:[root objectForKey:@"error"]];
+            [ErrorTransformer errorToAlert:error withDelegate:self];
             
-            UIAlertView* error = [[UIAlertView alloc] initWithTitle:@"Error" message:[root objectForKey:@"error"] delegate:self cancelButtonTitle:@"Ok"
-                                                  otherButtonTitles: nil];
-            [error show];
-            
-            //self.errorLabel.text = [root objectForKey:@"error"];
-            //self.errorLabel.hidden = false;
             [self.waitingMask removeFromSuperview];
             self.waitingMask = nil;
         }
@@ -567,7 +564,7 @@
             self.waitingMask = nil;
             
             UIAlertView* areYouSure = [[UIAlertView alloc] initWithTitle:@"Are you sure?"
-                                                                 message:[root objectForKey:@"price_string"]
+                                                                 message:[[root objectForKey:@"message"] objectForKey:@"price_string"]
                                                                 delegate:self
                                                        cancelButtonTitle:@"Cancel"
                                                        otherButtonTitles:@"Yes", nil];
@@ -577,9 +574,8 @@
             //NSLog(@"TEST");
         } else {
             
-            UIAlertView* error = [[UIAlertView alloc] initWithTitle:@"Error" message:[root objectForKey:@"price_string"] delegate:self cancelButtonTitle:@"Ok"
-                                                  otherButtonTitles: nil];
-            [error show];
+            NSError* error = [ErrorTransformer apiErrorToNSError:[root objectForKey:@"error"]];
+            [ErrorTransformer errorToAlert:error withDelegate:self];
             
             //self.errorLabel.text = [root objectForKey:@"error"];
             //self.errorLabel.hidden = false;
@@ -659,7 +655,8 @@
 
 - (void)refreshSpots
 {
-    [self.parkingSpots updateWithRequest:[NSDictionary dictionaryWithObject:@"all" forKey:@"level_of_detail"]];
+    [self.spot updateAsynchronouslyWithLevelOfDetail:@"all"];
+    //[[self getParkingSpots] updateWithRequest:[NSDictionary dictionaryWithObject:@"all" forKey:@"level_of_detail"]];
 }
 
 
