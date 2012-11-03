@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<VariablesViewState
+   version = "1.0">
+   <ContextStates>
+      <ContextState
+         contextName = "-[AccountSettingsTableViewController configureCell:atIndexPath:]:AccountSettingsTableViewController.m">
+      </ContextState>
+      <ContextState
+         contextName = "-[CalloutView initWithFrame:withXOffset:withCornerRadius:withInnerView:]:CalloutView.m">
+      </ContextState>
+      <ContextState
+         contextName = "-[CreditCard updateFromDictionary:]:CreditCard.m">
+      </ContextState>
+      <ContextState
+         contextName = "-[RangeBar adjustBubbles]:RangeBar.m">
+      </ContextState>
+      <ContextState
+         contextName = "-[RangeBar initWithFrame:minVal:maxVal:minRange:selectedMaxVal:withValueFormatter:]:RangeBar.m">
+      </ContextState>
+      <ContextState
+         contextName = "-[ParkingSpotAnnotation coordinate]:ParkingSpot.m">
+      </ContextState>
+      <ContextState
+         contextName = "-[RangeBubble xForValue:]:RangeBubble.m">
+         <PersistentStrings>
+            <PersistentString
+               value = "(double)self-&gt;_minimumValue">
+            </PersistentString>
+            <PersistentString
+               value = "(double)(self-&gt;_selectedmaximumValue/3600)">
+            </PersistentString>
+            <PersistentString
+               value = "(double)(self-&gt;_maximumValue/3600)">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "-[RangeBubble updateTrackHighlight]:RangeBubble.m">
+      </ContextState>
+      <ContextState
+         contextName = "-[RangeBar addMoreBubblesIfNeeded]:RangeBar.m">
+      </ContextState>
+      <ContextState
+         contextName = "__block_global_0:CreditCardCollectionTableViewController.m">
+         <PersistentStrings>
+            <PersistentString
+               value = "((AccountSettingsNavigationViewController*)self.navigationController).user.creditCards">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "__77-[CreditCardCollectionTableViewController tableView:didSelectRowAtIndexPath:]_block_invoke_0:CreditCardCollectionTableViewController.m">
+      </ContextState>
+      <ContextState
+         contextName = "-[RangeBar initWithFrame:minVal:maxVal:minRange:displayedRange:selectedMinVal:selectedMaxVal:withValueFormatter:]:RangeBar.m">
+      </ContextState>
+      <ContextState
+         contextName = "-[ParkifyConfirmationViewController viewDidLoad]:ParkifyConfirmationViewController.m">
+      </ContextState>
+      <ContextState
+         contextName = "-[CreditCardCollectionTableViewController tableView:didSelectRowAtIndexPath:]:CreditCardCollectionTableViewController.m">
+      </ContextState>
+      <ContextState
+         contextName = "-[Parkify2ViewController spotsWereUpdated]:Parkify2ViewController.m">
+         <PersistentStrings>
+            <PersistentString
+               value = "self.parkingSpots.parkingSpots">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "-[ParkifyConfirmationViewController finishSettingUp]:ParkifyConfirmationViewController.m">
+      </ContextState>
+      <ContextState
+         contextName = "main:main.m">
+      </ContextState>
+      <ContextState
+         contextName = "-[ParkingSpotCollection updateFromJSONString:]:ParkingSpot.m">
+         <PersistentStrings>
+            <PersistentString
+               value = "[newParkingSpots objectForKey:[[NSNumber alloc] initWithInt:2]]">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "-[RangeBar updateTrackHighlight]:RangeBar.m">
+      </ContextState>
+      <ContextState
+         contextName = "-[User updateFromDictionary:]:User.m">
+      </ContextState>
+      <ContextState
+         contextName = "-[RangeBar doTouchHandler:]:RangeBar.m">
+      </ContextState>
+      <ContextState
+         contextName = "__48-[User updateFromServerWithSuccess:withFailure:]_block_invoke_0:User.m">
+      </ContextState>
+   </ContextStates>
+</VariablesViewState>
