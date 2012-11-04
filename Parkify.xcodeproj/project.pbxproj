@@ -110,10 +110,10 @@
 		8CB12B5715FFBD2600551C0B /* spot_view_page_layout_1.png in Resources */ = {isa = PBXBuildFile; fileRef = 8CB12B5615FFBD2500551C0B /* spot_view_page_layout_1.png */; };
 		8CB16DB815C0AF4100B2ECA3 /* TextFormatter.m in Sources */ = {isa = PBXBuildFile; fileRef = 8CB16DB715C0AF4100B2ECA3 /* TextFormatter.m */; };
 		8CB8262E15F673B50089B664 /* NoPic.png in Resources */ = {isa = PBXBuildFile; fileRef = 8CB8262D15F673B50089B664 /* NoPic.png */; };
-		8CBE7DD11645F7F700467C12 /* BSAddressComponent.m in Sources */ = {isa = PBXBuildFile; fileRef = 8CBE7DCA1645F7F700467C12 /* BSAddressComponent.m */; };
-		8CBE7DD21645F7F700467C12 /* BSForwardGeocoder.m in Sources */ = {isa = PBXBuildFile; fileRef = 8CBE7DCC1645F7F700467C12 /* BSForwardGeocoder.m */; };
-		8CBE7DD31645F7F700467C12 /* BSGoogleV3KmlParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 8CBE7DCE1645F7F700467C12 /* BSGoogleV3KmlParser.m */; };
-		8CBE7DD41645F7F700467C12 /* BSKmlResult.m in Sources */ = {isa = PBXBuildFile; fileRef = 8CBE7DD01645F7F700467C12 /* BSKmlResult.m */; };
+		8CBE7DD11645F7F700467C12 /* BSAddressComponent.m in Sources */ = {isa = PBXBuildFile; fileRef = 8CBE7DCA1645F7F700467C12 /* BSAddressComponent.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		8CBE7DD21645F7F700467C12 /* BSForwardGeocoder.m in Sources */ = {isa = PBXBuildFile; fileRef = 8CBE7DCC1645F7F700467C12 /* BSForwardGeocoder.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		8CBE7DD31645F7F700467C12 /* BSGoogleV3KmlParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 8CBE7DCE1645F7F700467C12 /* BSGoogleV3KmlParser.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		8CBE7DD41645F7F700467C12 /* BSKmlResult.m in Sources */ = {isa = PBXBuildFile; fileRef = 8CBE7DD01645F7F700467C12 /* BSKmlResult.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		8CDD2A1B163F3AD70000E47C /* Default@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 8CDD2A1A163F3AD70000E47C /* Default@2x.png */; };
 		8CDD2A1E163F454A0000E47C /* PasswordTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8CDD2A1D163F45490000E47C /* PasswordTableViewController.m */; };
 		8CDD2A29164512B50000E47C /* UIViewController+AppData_User.m in Sources */ = {isa = PBXBuildFile; fileRef = 8CDD2A28164512B50000E47C /* UIViewController+AppData_User.m */; };

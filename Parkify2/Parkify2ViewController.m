@@ -946,11 +946,14 @@ typedef struct STargetLocation {
     southwest.longitude = center.longitude - 3;
     northeast.latitude = center.latitude + 3;
     northeast.longitude = center.longitude +3;
+    
+    /* Failed to find this symbol (BSForwardGeocoderCoordinateBounds) when I pushed the BSGeocoder library into the project directory.
     BSForwardGeocoderCoordinateBounds *bounds = [BSForwardGeocoderCoordinateBounds boundsWithSouthWest:southwest northEast:northeast];
-
+     */
     
     NSLog(@"Searching for: %@", searchBar.text);
-    [self.forwardGeocoder forwardGeocodeWithQuery:searchBar.text regionBiasing:nil viewportBiasing:bounds];
+    [self.forwardGeocoder forwardGeocodeWithQuery:searchBar.text regionBiasing:nil];
+
     [self expandAddressBar:false];
     [searchBar resignFirstResponder]; //close the keyboard
 }
