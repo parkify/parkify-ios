@@ -8,6 +8,8 @@
 
 #import "CreditCardCollectionTableViewController.h"
 #import "AccountSettingsNavigationViewController.h"
+#import "UIViewController+AppData_User.h"
+#import "ErrorTransformer.h"
 
 @interface CreditCardCollectionTableViewController ()
 @property BOOL updating;
@@ -16,7 +18,6 @@
 @implementation CreditCardCollectionTableViewController
 @synthesize creditCards = _creditCards;
 @synthesize updating = _updating;
-@synthesize creditCardsSource = _creditCardsSource;
 
 -(void) setCreditCards:(NSArray *)creditCards {
     _creditCards = [creditCards sortedArrayUsingComparator:^NSComparisonResult(id obj1, id obj2) {
@@ -49,7 +50,7 @@
 }
 
 - (void)viewWillAppear:(BOOL)animated {
-    self.creditCards = [self.creditCardsSource.credit_cards copy];
+    self.creditCards = [self getUser].credit_cards;
     [self.tableView reloadData];
 }
 
@@ -151,23 +152,19 @@
                     otherCard.active = false;
                 }
             }*/
-            [((AccountSettingsNavigationViewController*)self.navigationController).user updateFromServerWithSuccess:^(NSDictionary * d){
+            [[self getUser] updateFromServerWithSuccess:^(NSDictionary * d){
               
-              self.creditCards = [self.creditCardsSource.credit_cards copy];
+              self.creditCards = [[self getUser].credit_cards copy];
                 self.updating = false;
                 [self.tableView reloadData];
             }
             withFailure:^(NSError * e) {
-                NSString* errorString = [e.userInfo objectForKey:@"message"];
-                UIAlertView* error = [[UIAlertView alloc] initWithTitle:@"Error" message:errorString delegate:self cancelButtonTitle:@"OK" otherButtonTitles: nil];
-                [error show];
+                [ErrorTransformer errorToAlert:e withDelegate:self];
                 self.updating = false;
             }];
             
         } withFailure:^(NSError * e) {
-            NSString* errorString = [e.userInfo objectForKey:@"message"];
-            UIAlertView* error = [[UIAlertView alloc] initWithTitle:@"Error" message:errorString delegate:self cancelButtonTitle:@"OK" otherButtonTitles: nil];
-            [error show];
+            [ErrorTransformer errorToAlert:e withDelegate:self];
             self.updating = false;
         }];
         

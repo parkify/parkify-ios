@@ -12,6 +12,7 @@
 #import "Api.h"
 #import "iToast.h"
 #import "ParkingSpotCollection.h"
+#import "TextFormatter.h"
 
 @implementation ParkingSpot
 
@@ -159,8 +160,11 @@ standardImageIDs:(NSDictionary*)standardImageIDs
 }
 
 - (double) endTime {
-    Offer* lastOffer = [self.offers objectAtIndex:self.offers.count-1];
-    return lastOffer.endTime;
+    double toRtn = 0;
+    for (Offer* offer in self.offers) {
+        toRtn = MAX(toRtn, offer.endTime);
+    }
+    return toRtn;
 }
 
 - (double) priceFromNowForDurationInSeconds:(double)duration {
@@ -342,15 +346,14 @@ standardImageIDs:(NSDictionary*)standardImageIDs
     return [NSString stringWithFormat:@"%@ Spot", self.spot.mSpotType];
 }
 - (NSString *)subtitle {
-    NSString* adminExtra = @"";
     
     if (ADMIN_VER) {
-        adminExtra = [NSString stringWithFormat:@" <#%d>", self.spot.mID];
+        NSString* adminExtra = [NSString stringWithFormat:@" <#%d>", self.spot.mID];
+        return [NSString stringWithFormat:@"%@%@", self.spot.mLocationName, adminExtra];
     }
-    
-    return [NSString stringWithFormat:@"%@%@", self.spot.mLocationName, adminExtra];
+    return [NSString stringWithFormat:@"%@", [TextFormatter formatSecuredAddressString:self.spot.mLocationName]];
 }
-
+   
 - (BOOL)updateAnnotationWith:(id)annotation onlyifIDsAreSame:(BOOL)boolIDsSame
 {
     if (![annotation isKindOfClass:[ParkingSpotAnnotation class]]) {

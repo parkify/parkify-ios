@@ -9,5 +9,5 @@
 #import <UIKit/UIKit.h>
 #import "User.h"
 @interface AccountSettingsNavigationViewController : UINavigationController
-@property (strong, nonatomic) User* user;
+
 @end

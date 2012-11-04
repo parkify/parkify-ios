@@ -10,7 +10,8 @@
 #import "Car.h"
 #import "ELCTextfieldCell.h"
 #import "AccountSettingsNavigationViewController.h"
-
+#import "UIViewController+AppData_User.h"
+#import "ErrorTransformer.h"
 
 @interface CarCollectionTableViewController ()
 
@@ -19,7 +20,6 @@
 @implementation CarCollectionTableViewController
 
 @synthesize cars = _cars;
-@synthesize carSource = _carSource;
 
 -(void) setCars:(NSArray *)cars{
     _cars = [cars sortedArrayUsingComparator:^NSComparisonResult(id obj1, id obj2) {
@@ -50,7 +50,7 @@
 }
 
 - (void)viewWillAppear:(BOOL)animated {
-    self.cars = self.carSource.cars;
+    self.cars = [self getUser].cars;
     [self.tableView reloadData];
 }
 
@@ -181,26 +181,21 @@
 - (IBAction)saveButtonTapped:(id)sender {
     [Car pushChangesForCars:self.cars toServerWithSuccess:^(NSDictionary * d) {
         
-        [((AccountSettingsNavigationViewController*)self.navigationController).user
-         updateFromServerWithSuccess:^(NSDictionary * d){
-            self.cars = self.carSource.cars;
+        [[self getUser] updateFromServerWithSuccess:^(NSDictionary * d){
+            self.cars = [self getUser].cars;
             [self.tableView reloadData];
             
             UIAlertView* success = [[UIAlertView alloc] initWithTitle:@"Success" message:@"Vehicle settings changed." delegate:self cancelButtonTitle:@"OK" otherButtonTitles: nil];
             [success show];
         }
          withFailure:^(NSError * e) {
-             NSString* errorString = [e.userInfo objectForKey:@"message"];
-             UIAlertView* error = [[UIAlertView alloc] initWithTitle:@"Error" message:errorString delegate:self cancelButtonTitle:@"OK" otherButtonTitles: nil];
-             [error show];
+             [ErrorTransformer errorToAlert:e withDelegate:self];
          }];
         
         
     } withFailure:^(NSError * e) {
         
-        NSString* errorString = [e.userInfo objectForKey:@"message"];
-        UIAlertView* error = [[UIAlertView alloc] initWithTitle:@"Error" message:errorString delegate:self cancelButtonTitle:@"OK" otherButtonTitles: nil];
-        [error show];
+        [ErrorTransformer errorToAlert:e withDelegate:self];
     }];
 }
 

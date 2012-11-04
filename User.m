@@ -99,4 +99,15 @@
     } withFailure:failureBlock ];
 }
 
+- (void)clear {
+  self.first_name = @"";
+  self.last_name = @"";
+  self.email = @"";
+  self.phone_number = @"";
+  self.credit = 0;
+  self.credit_cards = [[NSArray alloc] init];
+  self.cars = [[NSArray alloc] init];
+  self.promos = [[NSArray alloc] init];
+}
+
 @end

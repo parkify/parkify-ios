@@ -22,6 +22,6 @@
 
 - (double)distanceToClosestAvailableSpotToCoord:(CLLocationCoordinate2D)coord;
 @property (nonatomic, strong) ParkingSpot* currentSpot;
-
+-(double) distFromSpot:(ParkingSpot*)spot toCoord:(CLLocationCoordinate2D)b;
 
 @end

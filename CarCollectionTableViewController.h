@@ -11,5 +11,4 @@
 
 @interface CarCollectionTableViewController : UITableViewController
 @property (strong, nonatomic) NSArray* cars;
-@property (strong, nonatomic) id<CarSource> carSource;
 @end

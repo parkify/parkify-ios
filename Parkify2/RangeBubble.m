@@ -25,6 +25,7 @@
 @property (strong, nonatomic) UIImageView * vertBar;
 @property (strong, nonatomic) UILabel * priceLabel;
 @property (strong, nonatomic) UILabel * timeLabel;
+@property (strong, nonatomic) UILabel * dateLabel;
 @property CGRect mainRect;
 @property (strong, nonatomic) UIColor * selectedColor;
 @property (strong, nonatomic) UIColor * unselectedColor;
@@ -188,13 +189,44 @@
         self.timeLabel.textAlignment = UITextAlignmentLeft;
         
         self.timeLabel.frame = CGRectMake(3,text_height,w-3,text_height);
-        
         [self addSubview:self.timeLabel];
         
-        self.priceLabel = [[UILabel alloc] initWithFrame:CGRectMake(0,0,w,12)];
+        
+        Formatter dateFormatter = ^(double val) {
+            NSDate* time = [[NSDate alloc] initWithTimeIntervalSince1970:val];
+            
+            NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+            [dateFormatter setDateFormat:@"ha"];
+            
+            if([[dateFormatter stringFromDate:time] isEqualToString:@"12AM"]) {
+                [dateFormatter setDateFormat:@"EEEE"];
+                NSString* a = [dateFormatter stringFromDate:time];
+                return a;
+            } else {
+                return @"";
+            }
+            
+        };
+        
+        
+        self.dateLabel = [[UILabel alloc] initWithFrame:CGRectMake(5,0,(2*w)-5,text_height)];
+        self.dateLabel.textColor = self.selectedColor;
+        self.dateLabel.backgroundColor = [UIColor clearColor];
+        self.dateLabel.font = [UIFont fontWithName:@"HelveticaNeue-Bold" size:text_height*1.2];
+        self.dateLabel.text = dateFormatter(self.minimumValue);
+        self.dateLabel.textAlignment = UITextAlignmentLeft;
+        
+        
+        self.dateLabel.frame = CGRectMake(3,0,(2*w)-3,text_height);
+        
+        [self addSubview:self.dateLabel];
+        
+        self.priceLabel = [[UILabel alloc] initWithFrame:CGRectMake(1,0,w-1,12)];
         self.priceLabel.textColor = self.selectedColor;
         self.priceLabel.backgroundColor = [UIColor clearColor];
         self.priceLabel.font = [UIFont fontWithName:@"HelveticaNeue-Bold" size:12];
+        self.priceLabel.minimumFontSize = 9;
+        [self.priceLabel setAdjustsFontSizeToFitWidth:true];
         self.priceLabel.text = [self priceString]; //self.timeFormatter(self.maximumValue);
         self.priceLabel.textAlignment = UITextAlignmentCenter;
         self.priceLabel.center = CGPointMake(w/2, (h-(3*h_main/4)));        self.priceLabel.shadowOffset = CGSizeMake(0,-1);
@@ -279,10 +311,12 @@
     
     if(end-begin > 0) {
         self.timeLabel.textColor = self.selectedColor;
+        self.dateLabel.textColor = self.selectedColor;
         self.priceLabel.textColor = [UIColor whiteColor];
         self.priceLabel.shadowColor = [UIColor blackColor];
     } else {
         self.timeLabel.textColor = self.unselectedColor;
+        self.dateLabel.textColor = self.unselectedColor;
         self.priceLabel.textColor = self.unselectedColor;
         self.priceLabel.shadowColor = [UIColor clearColor];
     }

@@ -8,6 +8,7 @@
 
 #import "PromoCollectionTableViewController.h"
 #import "ExtraDetailTableViewCell.h"
+#import "UIViewController+AppData_User.h"
 
 @interface PromoCollectionTableViewController ()
 
@@ -15,7 +16,6 @@
 
 @implementation PromoCollectionTableViewController
 @synthesize promos = _promos;
-@synthesize promoSource = _promoSource;
 
 -(void) setPromos:(NSArray *)promos{
     _promos = [promos sortedArrayUsingComparator:^NSComparisonResult(id obj1, id obj2) {
@@ -45,7 +45,7 @@
 }
 
 - (void)viewWillAppear:(BOOL)animated {
-    self.promos = self.promoSource.promos;
+    self.promos = [[self getUser].promos copy];
     [self.tableView reloadData];
 }
 
@@ -82,6 +82,7 @@
     Promo* p = [self.promos objectAtIndex:indexPath.row];
     cell.textLabel.text = p.name;
     cell.detailTextLabel.text = p.description;
+    cell.selectionStyle = UITableViewCellEditingStyleNone;
 
     
     

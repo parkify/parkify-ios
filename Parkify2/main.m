@@ -8,11 +8,11 @@
 
 #import <UIKit/UIKit.h>
 
-#import "Parkify2AppDelegate.h"
+#import "ParkifyAppDelegate.h"
 
 int main(int argc, char *argv[])
 {
     @autoreleasepool {
-        return UIApplicationMain(argc, argv, nil, NSStringFromClass([Parkify2AppDelegate class]));
+        return UIApplicationMain(argc, argv, nil, NSStringFromClass([ParkifyAppDelegate class]));
     }
 }

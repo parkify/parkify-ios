@@ -250,7 +250,11 @@
     return bestDistYet*0.000621371;
 }
 
-
-
+-(double) distFromSpot:(ParkingSpot*)spot toCoord:(CLLocationCoordinate2D)b {
+    CLLocationCoordinate2D spotCoord;
+    spotCoord.latitude = spot.mLat;
+    spotCoord.longitude = spot.mLong;
+    return [[self locFromCoord:spotCoord] distanceFromLocation:[self locFromCoord:b]]*0.000621371;
+}
 
 @end

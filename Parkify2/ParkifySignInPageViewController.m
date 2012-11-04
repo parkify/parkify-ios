@@ -15,6 +15,7 @@
 #import "UITabBarController+Hide.h"
 #import "ModalSettingsController.h"
 #import "TextFormatter.h"
+#import "ErrorTransformer.h"
 //#import "PlacedAgent.h"
 
 
@@ -193,21 +194,17 @@
 - (void)handleLoginFailure:(NSError*)result {
     NSLog(@"Error: %@; %@", result.localizedDescription, [result.userInfo objectForKey:@"message"]);
     
-    if (result.domain && [result.domain isEqualToString:@"UserLogin"]) {
+    if (result.domain && [result.domain isEqualToString:API_ERROR_DOMAIN]) {
         /* Handle user registratin error here */
         
-        UIAlertView* error = [[UIAlertView alloc] initWithTitle:@"Error" message:[result.userInfo objectForKey:@"message"] delegate:self cancelButtonTitle:@"Ok"
-                                              otherButtonTitles: nil];
-        [error show];
+       [ErrorTransformer errorToAlert:result withDelegate:self];
         
         //self.errorLabel.text = [result.userInfo objectForKey:@"message"];
         //self.errorLabel.hidden = false;
     } else {
         /* Handle network error here */
         
-        UIAlertView* error = [[UIAlertView alloc] initWithTitle:@"Error" message:@"Cannot connect to server." delegate:self cancelButtonTitle:@"Ok"
-                                              otherButtonTitles: nil];
-        [error show];
+        [ErrorTransformer errorToAlert:result withDelegate:self];
         //self.errorLabel.text = @"Error with your login or password";
         //self.errorLabel.hidden = false;
     }
@@ -222,9 +219,7 @@
                                                 otherButtonTitles: nil];
           [success show];
         } withFailure:^(NSError * e) {
-          UIAlertView* error = [[UIAlertView alloc] initWithTitle:@"Error" message:@"" delegate:self cancelButtonTitle:@"OK"
-                                                  otherButtonTitles: nil];
-          [error show];
+          [ErrorTransformer errorToAlert:e withDelegate:self];
         }];
       } else {
         [Api loginWithEmail:self.emailField.text

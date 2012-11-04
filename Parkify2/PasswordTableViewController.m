@@ -10,6 +10,8 @@
 #import "ELCTextfieldCell.h"
 #import "Api.h"
 #import "AccountSettingsNavigationViewController.h"
+#import "UIViewController+AppData_User.h"
+#import "ErrorTransformer.h"
 
 @interface PasswordTableViewController ()
 
@@ -100,16 +102,16 @@
   // Configure the cell...
   switch (indexPath.row) {
     case 0:
-      cell.leftLabel.text = @"Current Password";
+      cell.leftLabel.text = @"Current";
       cell.rightTextField.placeholder = @"xxxxxx";
       
       break;
     case 1:
-      cell.leftLabel.text = @"Password";
+      cell.leftLabel.text = @"New";
       cell.rightTextField.placeholder = @"xxxxxx";
       break;
     case 2:
-      cell.leftLabel.text = @"Password Confirmation";
+      cell.leftLabel.text = @"Re-type new";
       cell.rightTextField.placeholder = @"xxxxxx";
       break;
     default:
@@ -222,19 +224,16 @@
     
     
     //refresh parent
-    [((AccountSettingsNavigationViewController*)(self.navigationController)).user updateFromServerWithSuccess:^(NSDictionary * d) {
+    [[self getUser] updateFromServerWithSuccess:^(NSDictionary * d) {
       [self.navigationController popViewControllerAnimated:true];
     } withFailure:^(NSError * e) {
       NSString* errorString = [e.userInfo objectForKey:@"message"];
-      UIAlertView* error = [[UIAlertView alloc] initWithTitle:@"Error" message:errorString delegate:self cancelButtonTitle:@"OK" otherButtonTitles: nil];
-      [error show];
+      [ErrorTransformer errorToAlert:e withDelegate:self];
     }];
     
   } withFailure:^(NSError * e) {
     
-    NSString* errorString = [e.userInfo objectForKey:@"message"];
-    UIAlertView* error = [[UIAlertView alloc] initWithTitle:@"Error" message:errorString delegate:self cancelButtonTitle:@"OK" otherButtonTitles: nil];
-    [error show];
+    [ErrorTransformer errorToAlert:e withDelegate:self];
     
   }];
   

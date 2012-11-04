@@ -11,6 +11,8 @@
 #import "CreditCardCollectionTableViewController.h"
 #import "CarCollectionTableViewController.h"
 #import "PromoCollectionTableViewController.h"
+#import "UIViewController+AppData_User.h"
+#import "ErrorTransformer.h"
 
 @interface AccountSettingsTableViewController ()
 
@@ -20,12 +22,7 @@
 
 @implementation AccountSettingsTableViewController
 
-@synthesize userModel = _userModel;
 
--(User*) userModel {
-  ;
-  return _userModel;
-}
 
 - (id)initWithStyle:(UITableViewStyle)style
 {
@@ -39,9 +36,7 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    self.userModel = ((AccountSettingsNavigationViewController*)(self.navigationController)).user;
-    
-    
+        
     // Uncomment the following line to preserve selection between presentations.
     // self.clearsSelectionOnViewWillAppear = NO;
  
@@ -114,31 +109,32 @@
     
     //Disables UITableViewCell from accidentally becoming selected.
     cell.selectionStyle = UITableViewCellEditingStyleNone;
+    
     cell.rightTextField.placeholder = @"";
     
     // Configure the cell...
     switch (indexPath.row) {
         case 0:
             cell.leftLabel.text = @"First Name";
-            cell.rightTextField.text = self.userModel.first_name;
+            cell.rightTextField.text = [self getUser].first_name;
             break;
         case 1:
             cell.leftLabel.text = @"Last Name";
-            cell.rightTextField.text = self.userModel.last_name;
+            cell.rightTextField.text = [self getUser].last_name;
             break;
         case 2:
             cell.leftLabel.text = @"Email";
-            cell.rightTextField.text = self.userModel.email;
+            cell.rightTextField.text = [self getUser].email;
             [cell.rightTextField setKeyboardType:UIKeyboardTypeEmailAddress];
             break;
         case 3:
             cell.leftLabel.text = @"Phone";
-            cell.rightTextField.text = self.userModel.phone_number;
+            cell.rightTextField.text = [self getUser].phone_number;
             [cell.rightTextField setKeyboardType:UIKeyboardTypeNumberPad];
             break;
         case 4:
             cell.leftLabel.text = @"Credits";
-            cell.rightTextField.text = [NSString stringWithFormat:@"$%0.2f", self.userModel.credit/100.0];
+            cell.rightTextField.text = [NSString stringWithFormat:@"$%0.2f", [self getUser].credit/100.0];
             [cell.rightTextField setEnabled:false];
             break;
         default:
@@ -264,16 +260,16 @@
     // Configure the cell...
     switch (indexPath.row) {
         case 0:
-            self.userModel.first_name = string;
+            [self getUser].first_name = string;
             break;
         case 1:
-            self.userModel.last_name = string;
+            [self getUser].last_name = string;
             break;
         case 2:
-            self.userModel.email = string;
+            [self getUser].email = string;
             break;
         case 3:
-            self.userModel.phone_number = string;
+            [self getUser].phone_number = string;
             break;
         default:
             break;
@@ -286,26 +282,25 @@
 }
 
 - (IBAction)saveButtonTapped:(id)sender {
-    [self.userModel pushChangesToServerWithSuccess:^(NSDictionary * d) {
+    [[self getUser] pushChangesToServerWithSuccess:^(NSDictionary * d) {
         UIAlertView* success = [[UIAlertView alloc] initWithTitle:@"Success" message:@"Account settings changed." delegate:self cancelButtonTitle:@"OK" otherButtonTitles: nil];
         [success show];
+        [self.tableView reloadData];
     } withFailure:^(NSError * e) {
         
-        NSString* errorString = [e.userInfo objectForKey:@"message"];
-        UIAlertView* error = [[UIAlertView alloc] initWithTitle:@"Error" message:errorString delegate:self cancelButtonTitle:@"OK" otherButtonTitles: nil];
-        [error show];
+        [ErrorTransformer errorToAlert:e withDelegate:self];
     }];
 }
 
 -(void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
     if([segue.identifier isEqualToString:@"CreditCardCollection"]) {
-        ((CreditCardCollectionTableViewController*)segue.destinationViewController).creditCardsSource = self.userModel;
+      ;
     }
     if([segue.identifier isEqualToString:@"CarCollection"]) {
-        ((CarCollectionTableViewController*)segue.destinationViewController).carSource = self.userModel;
+      ;
     }
     if([segue.identifier isEqualToString:@"PromoCollection"]) {
-        ((PromoCollectionTableViewController*)segue.destinationViewController).promoSource = self.userModel;
+      ;
     }
 }
 @end

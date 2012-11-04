@@ -997,6 +997,12 @@ typedef struct STargetLocation {
 - (IBAction)parkMeNowButtonTapped:(UIButton *)sender {
     //Testing modal stuff
     
+    double dist = [[self getParkingSpots] distanceToClosestAvailableSpotToCoord:self.targetLocation.location];
+    
+    if(dist > 5) {
+        [[[iToast makeText:@"No spot within 5 miles."] setGravity:iToastGravityBottom ] show];
+        return;
+    }
     ParkingSpot* parkMeNowSpot = [[self getParkingSpots] closestAvailableSpotToCoord:self.targetLocation.location];
     if(parkMeNowSpot) {
         [self openSpotViewControllerWithSpot:parkMeNowSpot.mID];

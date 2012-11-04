@@ -10,7 +10,7 @@
 
 #import "ExtraTypes.h"
 
-@interface User : NSObject<CreditCardsSource, CarSource, PromoSource>
+@interface User : NSObject
 
 @property (strong, nonatomic) NSString* first_name;
 @property (strong, nonatomic) NSString* last_name;
@@ -36,5 +36,7 @@
 
 - (void)pushChangesToServerWithSuccess:(SuccessBlock)successBlock
                 withFailure:(FailureBlock)failureBlock;
+
+- (void)clear;
 
 @end

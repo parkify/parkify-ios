@@ -9,6 +9,8 @@
 #import "CarTableViewController.h"
 #import "ELCTextfieldCell.h"
 #import "AccountSettingsNavigationViewController.h"
+#import "UIViewController+AppData_User.h"
+#import "ErrorTransformer.h"
 
 @interface CarTableViewController ()
 
@@ -176,18 +178,14 @@
         [success show];
         
         //refresh parent
-        [((AccountSettingsNavigationViewController*)(self.navigationController)).user updateFromServerWithSuccess:^(NSDictionary * d) {
+        [[self getUser] updateFromServerWithSuccess:^(NSDictionary * d) {
             [self.navigationController popViewControllerAnimated:true];
         } withFailure:^(NSError * e) {
-            NSString* errorString = [e.userInfo objectForKey:@"message"];
-            UIAlertView* error = [[UIAlertView alloc] initWithTitle:@"Error" message:errorString delegate:self cancelButtonTitle:@"OK" otherButtonTitles: nil];
-            [error show];
+            [ErrorTransformer errorToAlert:e withDelegate:self];
         }];
     } withFailure:^(NSError * e) {
         
-        NSString* errorString = [e.userInfo objectForKey:@"message"];
-        UIAlertView* error = [[UIAlertView alloc] initWithTitle:@"Error" message:errorString delegate:self cancelButtonTitle:@"OK" otherButtonTitles: nil];
-        [error show];
+        [ErrorTransformer errorToAlert:e withDelegate:self];
         
     }];
 }

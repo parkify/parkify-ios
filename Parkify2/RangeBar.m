@@ -373,7 +373,8 @@
 
 // gives the width of each bubble given the current track parameters.
 - (double) bubbleWidth {
-    return self.trackRect.size.width/ self.numDisplayedBubbles;
+    return [self xForValue:(self.minimumValue+self.minimumRange*NUM_INTERVALS_PER_BUBBLE)] - [self xForValue:self.minimumValue];
+    //return self.trackRect.size.width/ self.numDisplayedBubbles;
 }
 
 // gives the frame origin for the corresponding bubble.
@@ -399,6 +400,8 @@
     }
     
     double bubbleRange = self.minimumRange*NUM_INTERVALS_PER_BUBBLE;
+    
+    double bubbleWidth = [self xForValue:(self.minimumValue+bubbleRange)] - [self xForValue:self.minimumValue];
     CGRect bubbleRect = CGRectMake(0,0,[self bubbleWidth], self.trackRect.size.height);
 
     

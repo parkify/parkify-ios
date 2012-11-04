@@ -15,6 +15,9 @@
 #import "User.h"
 #import "AccountSettingsTableViewController.h"
 #import "AccountSettingsNavigationViewController.h"
+#import "UIViewController+AppData_User.h"
+#import "ErrorTransformer.h"
+
 //#import "PlacedAgent.h"
 
 @interface ParkifySettingsViewController ()
@@ -67,7 +70,6 @@
     self.tableImages = [NSArray arrayWithObjects:loginLogoutIconString, @"glyphicons_003_user.png", @"glyphicons_195_circle_info.png", nil];
     
     [self.tableView reloadData];
-    
 }
 
 - (void)viewDidUnload
@@ -104,18 +106,16 @@
                                               otherButtonTitles: nil];
         [error show];
     } else {
-        User* u = [[User alloc] init];
-        [u updateFromServerWithSuccess:^(NSDictionary * d) {
+        [[self getUser] clear];
+        [[self getUser] updateFromServerWithSuccess:^(NSDictionary * d) {
             
             AccountSettingsNavigationViewController* accountSettings = [self.tabBarController.viewControllers objectAtIndex:2];
             
-            accountSettings.user = u;
             
             self.tabBarController.selectedViewController = accountSettings;
             
         } withFailure:^(NSError * e) {
-            UIAlertView *Error=[[UIAlertView alloc] initWithTitle:@"Error" message:@"Cannot reach server?" delegate:self cancelButtonTitle:@"Ok" otherButtonTitles: nil];
-            [Error show];
+            [ErrorTransformer errorToAlert:e withDelegate:self];
         }];
     }
 }

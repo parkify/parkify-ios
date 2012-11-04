@@ -17,6 +17,7 @@
 #import "ModalSettingsController.h"
 #import "TextFormatter.h"
 #import "WaitingMask.h"
+#import "ErrorTransformer.h"
 //#import "PlacedAgent.h"
 
 @interface ParkifySignupViewController ()
@@ -242,35 +243,25 @@ bottomBoundary:(BOOL)bBound leftBoundary:(BOOL)lBound rightBoundary:(BOOL)rBound
     
     self.signUpButton.enabled = true;
     
-    if (result.domain && [result.domain isEqualToString:@"UserRegistration"]) {
+    if (result.domain && [result.domain isEqualToString:API_ERROR_DOMAIN]) {
         /* Handle user registratin error here */
         
-        UIAlertView* error = [[UIAlertView alloc] initWithTitle:@"Error" message:[result.userInfo objectForKey:@"message"] delegate:self cancelButtonTitle:@"Ok"
-                                              otherButtonTitles: nil];
-        [error show];
+        [ErrorTransformer errorToAlert:result withDelegate:self];
         
-        
-        //self.errorLabel.text = [result.userInfo objectForKey:@"message"];
-        //self.errorLabel.hidden = false;
     }
     else if (result.domain && [result.domain isEqualToString:@"Stripe"]) {
         /* Handle stipe error here */
         
-        UIAlertView* error = [[UIAlertView alloc] initWithTitle:@"Error" message:[result.userInfo objectForKey:@"message"] delegate:self cancelButtonTitle:@"Ok"
-                                              otherButtonTitles: nil];
-        [error show];
+        [ErrorTransformer errorToAlert:result withDelegate:self];
         
-        //self.errorLabel.text = [result.userInfo objectForKey:@"message"];
-        //self.errorLabel.hidden = false;
         
     } else {
         /* Handle network error here */
+        
+        //TODO: standard Network-error-maker in ErrorTransformer.h
         UIAlertView* error = [[UIAlertView alloc] initWithTitle:@"Error" message:@"Could not reach server" delegate:self cancelButtonTitle:@"Ok"
                                               otherButtonTitles: nil];
         [error show];
-        
-        //self.errorLabel.text = @"Could not reach server";
-        //self.errorLabel.hidden = false;
     }
 }
 

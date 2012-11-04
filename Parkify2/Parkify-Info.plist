@@ -19,7 +19,7 @@
 				<string>Default@2x.png</string>
 				<string>Default@2x.png</string>
 				<string>Default@2x.png</string>
-				<string>app_icon_highres.png</string>
+				<string>icon_highres.png</string>
 				<string>app_icon_lowres.png</string>
 				<string>Default@2x.png</string>
 				<string>Default.png</string>
@@ -41,7 +41,7 @@
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>
-	<string>1.0</string>
+	<string>1.4</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>UIMainStoryboardFile</key>

@@ -12,7 +12,6 @@
 
 @interface AccountSettingsTableViewController : UITableViewController <ELCTextFieldDelegate>
 
-@property (strong, nonatomic) User* userModel;
 - (IBAction)backButtonTapped:(id)sender;
 - (IBAction)saveButtonTapped:(id)sender;
 
