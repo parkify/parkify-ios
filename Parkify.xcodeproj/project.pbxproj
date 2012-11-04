@@ -13,10 +13,6 @@
 		8C607E7E15D9B1A000928DAD /* UITextFieldWithNavigationBar.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C607E7D15D9B1A000928DAD /* UITextFieldWithNavigationBar.m */; };
 		8C607E8215DBF5D900928DAD /* Offer.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C607E8115DBF5D900928DAD /* Offer.m */; };
 		8C607E8A15DDCC5400928DAD /* ParkingSpotCollection.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C607E8915DDCC5400928DAD /* ParkingSpotCollection.m */; };
-		8C6AAD8015DE5B590006A1CE /* BSAddressComponent.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C6AAD7915DE5A0E0006A1CE /* BSAddressComponent.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
-		8C6AAD8115DE5B590006A1CE /* BSForwardGeocoder.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C6AAD7B15DE5A0E0006A1CE /* BSForwardGeocoder.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
-		8C6AAD8215DE5B590006A1CE /* BSGoogleV3KmlParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C6AAD7D15DE5A0E0006A1CE /* BSGoogleV3KmlParser.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
-		8C6AAD8315DE5B590006A1CE /* BSKmlResult.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C6AAD7F15DE5A0E0006A1CE /* BSKmlResult.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		8C6FBA14163ACED800D68790 /* ExtraDetailTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C6FBA13163ACED800D68790 /* ExtraDetailTableViewCell.m */; };
 		8C6FBA18163AD21600D68790 /* PromoTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C6FBA17163AD21600D68790 /* PromoTableViewController.m */; };
 		8C74008C15AF9D9A00007F63 /* Persistance.m in Sources */ = {isa = PBXBuildFile; fileRef = 8C74008B15AF9D9900007F63 /* Persistance.m */; };
@@ -114,6 +110,10 @@
 		8CB12B5715FFBD2600551C0B /* spot_view_page_layout_1.png in Resources */ = {isa = PBXBuildFile; fileRef = 8CB12B5615FFBD2500551C0B /* spot_view_page_layout_1.png */; };
 		8CB16DB815C0AF4100B2ECA3 /* TextFormatter.m in Sources */ = {isa = PBXBuildFile; fileRef = 8CB16DB715C0AF4100B2ECA3 /* TextFormatter.m */; };
 		8CB8262E15F673B50089B664 /* NoPic.png in Resources */ = {isa = PBXBuildFile; fileRef = 8CB8262D15F673B50089B664 /* NoPic.png */; };
+		8CBE7DD11645F7F700467C12 /* BSAddressComponent.m in Sources */ = {isa = PBXBuildFile; fileRef = 8CBE7DCA1645F7F700467C12 /* BSAddressComponent.m */; };
+		8CBE7DD21645F7F700467C12 /* BSForwardGeocoder.m in Sources */ = {isa = PBXBuildFile; fileRef = 8CBE7DCC1645F7F700467C12 /* BSForwardGeocoder.m */; };
+		8CBE7DD31645F7F700467C12 /* BSGoogleV3KmlParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 8CBE7DCE1645F7F700467C12 /* BSGoogleV3KmlParser.m */; };
+		8CBE7DD41645F7F700467C12 /* BSKmlResult.m in Sources */ = {isa = PBXBuildFile; fileRef = 8CBE7DD01645F7F700467C12 /* BSKmlResult.m */; };
 		8CDD2A1B163F3AD70000E47C /* Default@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 8CDD2A1A163F3AD70000E47C /* Default@2x.png */; };
 		8CDD2A1E163F454A0000E47C /* PasswordTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8CDD2A1D163F45490000E47C /* PasswordTableViewController.m */; };
 		8CDD2A29164512B50000E47C /* UIViewController+AppData_User.m in Sources */ = {isa = PBXBuildFile; fileRef = 8CDD2A28164512B50000E47C /* UIViewController+AppData_User.m */; };
@@ -160,14 +160,6 @@
 		8C607E8115DBF5D900928DAD /* Offer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Offer.m; sourceTree = "<group>"; };
 		8C607E8815DDCC5400928DAD /* ParkingSpotCollection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ParkingSpotCollection.h; sourceTree = "<group>"; };
 		8C607E8915DDCC5400928DAD /* ParkingSpotCollection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ParkingSpotCollection.m; sourceTree = "<group>"; };
-		8C6AAD7815DE5A0E0006A1CE /* BSAddressComponent.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = BSAddressComponent.h; path = "../../../../Downloads/bjornsallarp-BSForwardGeocoder-5f1f811/Forward Geocoder/BSAddressComponent.h"; sourceTree = "<group>"; };
-		8C6AAD7915DE5A0E0006A1CE /* BSAddressComponent.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = BSAddressComponent.m; path = "../../../../Downloads/bjornsallarp-BSForwardGeocoder-5f1f811/Forward Geocoder/BSAddressComponent.m"; sourceTree = "<group>"; };
-		8C6AAD7A15DE5A0E0006A1CE /* BSForwardGeocoder.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = BSForwardGeocoder.h; path = "../../../../Downloads/bjornsallarp-BSForwardGeocoder-5f1f811/Forward Geocoder/BSForwardGeocoder.h"; sourceTree = "<group>"; };
-		8C6AAD7B15DE5A0E0006A1CE /* BSForwardGeocoder.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = BSForwardGeocoder.m; path = "../../../../Downloads/bjornsallarp-BSForwardGeocoder-5f1f811/Forward Geocoder/BSForwardGeocoder.m"; sourceTree = "<group>"; };
-		8C6AAD7C15DE5A0E0006A1CE /* BSGoogleV3KmlParser.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = BSGoogleV3KmlParser.h; path = "../../../../Downloads/bjornsallarp-BSForwardGeocoder-5f1f811/Forward Geocoder/BSGoogleV3KmlParser.h"; sourceTree = "<group>"; };
-		8C6AAD7D15DE5A0E0006A1CE /* BSGoogleV3KmlParser.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = BSGoogleV3KmlParser.m; path = "../../../../Downloads/bjornsallarp-BSForwardGeocoder-5f1f811/Forward Geocoder/BSGoogleV3KmlParser.m"; sourceTree = "<group>"; };
-		8C6AAD7E15DE5A0E0006A1CE /* BSKmlResult.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = BSKmlResult.h; path = "../../../../Downloads/bjornsallarp-BSForwardGeocoder-5f1f811/Forward Geocoder/BSKmlResult.h"; sourceTree = "<group>"; };
-		8C6AAD7F15DE5A0E0006A1CE /* BSKmlResult.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = BSKmlResult.m; path = "../../../../Downloads/bjornsallarp-BSForwardGeocoder-5f1f811/Forward Geocoder/BSKmlResult.m"; sourceTree = "<group>"; };
 		8C6FBA12163ACED800D68790 /* ExtraDetailTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ExtraDetailTableViewCell.h; sourceTree = "<group>"; };
 		8C6FBA13163ACED800D68790 /* ExtraDetailTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ExtraDetailTableViewCell.m; sourceTree = "<group>"; };
 		8C6FBA16163AD21600D68790 /* PromoTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PromoTableViewController.h; sourceTree = "<group>"; };
@@ -402,6 +394,14 @@
 		8CB16DB615C0AF4100B2ECA3 /* TextFormatter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TextFormatter.h; sourceTree = "<group>"; };
 		8CB16DB715C0AF4100B2ECA3 /* TextFormatter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TextFormatter.m; sourceTree = "<group>"; };
 		8CB8262D15F673B50089B664 /* NoPic.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = NoPic.png; sourceTree = "<group>"; };
+		8CBE7DC91645F7F700467C12 /* BSAddressComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BSAddressComponent.h; sourceTree = "<group>"; };
+		8CBE7DCA1645F7F700467C12 /* BSAddressComponent.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BSAddressComponent.m; sourceTree = "<group>"; };
+		8CBE7DCB1645F7F700467C12 /* BSForwardGeocoder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BSForwardGeocoder.h; sourceTree = "<group>"; };
+		8CBE7DCC1645F7F700467C12 /* BSForwardGeocoder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BSForwardGeocoder.m; sourceTree = "<group>"; };
+		8CBE7DCD1645F7F700467C12 /* BSGoogleV3KmlParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BSGoogleV3KmlParser.h; sourceTree = "<group>"; };
+		8CBE7DCE1645F7F700467C12 /* BSGoogleV3KmlParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BSGoogleV3KmlParser.m; sourceTree = "<group>"; };
+		8CBE7DCF1645F7F700467C12 /* BSKmlResult.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BSKmlResult.h; sourceTree = "<group>"; };
+		8CBE7DD01645F7F700467C12 /* BSKmlResult.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BSKmlResult.m; sourceTree = "<group>"; };
 		8CDD2A1A163F3AD70000E47C /* Default@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default@2x.png"; sourceTree = "<group>"; };
 		8CDD2A1C163F45470000E47C /* PasswordTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PasswordTableViewController.h; path = Parkify2/PasswordTableViewController.h; sourceTree = "<group>"; };
 		8CDD2A1D163F45490000E47C /* PasswordTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PasswordTableViewController.m; path = Parkify2/PasswordTableViewController.m; sourceTree = "<group>"; };
@@ -579,6 +579,7 @@
 		8C8625F115C4BDED00F97308 /* Vendor */ = {
 			isa = PBXGroup;
 			children = (
+				8CBE7DC81645F7F700467C12 /* Forward Geocoder */,
 				8C930F6916396876003C53A9 /* ELC */,
 				8C930F121637AEC1003C53A9 /* TBXML */,
 				8C8626A215D1DF3A00F97308 /* ResizeImage */,
@@ -589,7 +590,6 @@
 				8C78D3AE15AAEE9500B4D929 /* iToast */,
 				8C78D3A715AADCD600B4D929 /* TPKeyboardAvoiding */,
 				8C79D2A315AA456D00AF90AB /* QuartzCore.framework */,
-				8C958CFC15A4FA6F00870E8C /* BSForwardGeocoder */,
 				8C76883115A45CE70035E7B4 /* CoreLocation.framework */,
 				8C76882515A43B320035E7B4 /* MKMapViewZoom */,
 				8CA7A24F15A3EA3A0051567D /* libz.1.1.3.dylib */,
@@ -697,21 +697,6 @@
 			);
 			name = "Account Settings Controllers";
 			path = ..;
-			sourceTree = "<group>";
-		};
-		8C958CFC15A4FA6F00870E8C /* BSForwardGeocoder */ = {
-			isa = PBXGroup;
-			children = (
-				8C6AAD7815DE5A0E0006A1CE /* BSAddressComponent.h */,
-				8C6AAD7915DE5A0E0006A1CE /* BSAddressComponent.m */,
-				8C6AAD7A15DE5A0E0006A1CE /* BSForwardGeocoder.h */,
-				8C6AAD7B15DE5A0E0006A1CE /* BSForwardGeocoder.m */,
-				8C6AAD7C15DE5A0E0006A1CE /* BSGoogleV3KmlParser.h */,
-				8C6AAD7D15DE5A0E0006A1CE /* BSGoogleV3KmlParser.m */,
-				8C6AAD7E15DE5A0E0006A1CE /* BSKmlResult.h */,
-				8C6AAD7F15DE5A0E0006A1CE /* BSKmlResult.m */,
-			);
-			name = BSForwardGeocoder;
 			sourceTree = "<group>";
 		};
 		8CA7A1D115A3DC980051567D = {
@@ -991,6 +976,21 @@
 			name = "Design Amoeba";
 			sourceTree = "<group>";
 		};
+		8CBE7DC81645F7F700467C12 /* Forward Geocoder */ = {
+			isa = PBXGroup;
+			children = (
+				8CBE7DC91645F7F700467C12 /* BSAddressComponent.h */,
+				8CBE7DCA1645F7F700467C12 /* BSAddressComponent.m */,
+				8CBE7DCB1645F7F700467C12 /* BSForwardGeocoder.h */,
+				8CBE7DCC1645F7F700467C12 /* BSForwardGeocoder.m */,
+				8CBE7DCD1645F7F700467C12 /* BSGoogleV3KmlParser.h */,
+				8CBE7DCE1645F7F700467C12 /* BSGoogleV3KmlParser.m */,
+				8CBE7DCF1645F7F700467C12 /* BSKmlResult.h */,
+				8CBE7DD01645F7F700467C12 /* BSKmlResult.m */,
+			);
+			path = "Forward Geocoder";
+			sourceTree = "<group>";
+		};
 		8CDD2A1F1645009C0000E47C /* CreditCard */ = {
 			isa = PBXGroup;
 			children = (
@@ -1224,10 +1224,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				8C930F6C16396C25003C53A9 /* ELCTextfieldCell.m in Sources */,
-				8C6AAD8015DE5B590006A1CE /* BSAddressComponent.m in Sources */,
-				8C6AAD8115DE5B590006A1CE /* BSForwardGeocoder.m in Sources */,
-				8C6AAD8215DE5B590006A1CE /* BSGoogleV3KmlParser.m in Sources */,
-				8C6AAD8315DE5B590006A1CE /* BSKmlResult.m in Sources */,
 				8C74009F15AFEDAA00007F63 /* Stripe.m in Sources */,
 				8C78D3B115AAEEFD00B4D929 /* iToast.m in Sources */,
 				8C78D3AC15AADD2300B4D929 /* TPKeyboardAvoidingScrollView.m in Sources */,
@@ -1302,6 +1298,10 @@
 				8CDD2A29164512B50000E47C /* UIViewController+AppData_User.m in Sources */,
 				8CDD2A2D16452A860000E47C /* UIViewController+AppData_ParkingSpotCollection.m in Sources */,
 				8CDD2A3016458D020000E47C /* ErrorTransformer.m in Sources */,
+				8CBE7DD11645F7F700467C12 /* BSAddressComponent.m in Sources */,
+				8CBE7DD21645F7F700467C12 /* BSForwardGeocoder.m in Sources */,
+				8CBE7DD31645F7F700467C12 /* BSGoogleV3KmlParser.m in Sources */,
+				8CBE7DD41645F7F700467C12 /* BSKmlResult.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
