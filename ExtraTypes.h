@@ -16,10 +16,21 @@ typedef void(^FailureBlock)(NSError*);
 typedef NSString* (^Formatter)(double val);
 
 #define ADMIN_VER false
+#define DEBUGVER
+#ifdef DEBUGVER
+    #define TARGET_SERVER @"parkify-rails.herokuapp.com"
+#else
+    #define TARGET_SERVER @"192.168.1.132:3000"
+#endif
 
-#define TARGET_SERVER_NORMAL @"parkify-rails.herokuapp.com"
+#define kGenericErrorAlertTag 6727
+#define kAlertViewErrorInProblemUpload 9989
+#define kAlertViewSuccessProblemUpload 9990
+#define kAlertViewSuccessButOtherProbem 9991
+#define kAlertViewChoicesForProblems 9992
+//#define TARGET_SERVER_NORMAL @"parkify-rails.herokuapp.com"
 
-#define TARGET_SERVER TARGET_SERVER_NORMAL //@"192.168.1.132:3000"
+//#define TARGET_SERVER TARGET_SERVER_NORMAL //@"192.168.1.132:3000"
 
 @protocol PriceStore <NSObject>
 - (NSArray*) findPricesInRange:(double)startTime endTime:(double)endTime;

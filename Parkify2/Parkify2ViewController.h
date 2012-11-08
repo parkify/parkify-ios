@@ -21,12 +21,13 @@
 
 @end
 
-@interface Parkify2ViewController : UIViewController <MKMapViewDelegate, CLLocationManagerDelegate,ParkingSpotObserver, UISearchBarDelegate, BSForwardGeocoderDelegate>
+@interface Parkify2ViewController : UIViewController <MKMapViewDelegate, CLLocationManagerDelegate,ParkingSpotObserver, UISearchBarDelegate, BSForwardGeocoderDelegate, UIAlertViewDelegate >
 {
     CLLocationManager *_locationManager;
     double _currentLat;
     double _currentLong;
 }
+- (IBAction)launchCameraStuffForG:(id)sender;
 @property (strong, nonatomic) UIViewController * vcToSwitch;
 @property (nonatomic, retain)CLLocationManager *locationManager;
 @property (weak, nonatomic) IBOutlet MKMapView *mapView;
