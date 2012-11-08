@@ -147,6 +147,15 @@
 		8CE81F051625059A004260CC /* RangeBubble.m in Sources */ = {isa = PBXBuildFile; fileRef = 8CE81F0416250599004260CC /* RangeBubble.m */; };
 		8CF0743F15E6E844002ABE82 /* ParkifyAboutControllerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8CF0743E15E6E844002ABE82 /* ParkifyAboutControllerViewController.m */; };
 		8CF0744215E6EC48002ABE82 /* ParkifySettingsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8CF0744115E6EC48002ABE82 /* ParkifySettingsViewController.m */; };
+		F6B34A5116485FC800AF6633 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F6B34A5016485FC800AF6633 /* AVFoundation.framework */; };
+		F6B34A5316485FCC00AF6633 /* ImageIO.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F6B34A5216485FCC00AF6633 /* ImageIO.framework */; };
+		F6B34A5516485FD500AF6633 /* CoreMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F6B34A5416485FD500AF6633 /* CoreMedia.framework */; };
+		F6B34A5716485FDA00AF6633 /* CoreVideo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F6B34A5616485FDA00AF6633 /* CoreVideo.framework */; };
+		F6B34A59164865DD00AF6633 /* AssetsLibrary.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F6B34A58164865DD00AF6633 /* AssetsLibrary.framework */; };
+		F6DF4EAF164733BF00D9B3B9 /* problemSpotViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = F6DF4EAD164733BE00D9B3B9 /* problemSpotViewController.m */; };
+		F6F1EF6D164A13810003D3CB /* AWSiOSSDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F6F1EF6C164A13810003D3CB /* AWSiOSSDK.framework */; };
+		F6F1EF9A164B445F0003D3CB /* UIDevice+IdentifierAddition.m in Sources */ = {isa = PBXBuildFile; fileRef = F6F1EF99164B445F0003D3CB /* UIDevice+IdentifierAddition.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		F6F1EF9D164B4A320003D3CB /* NSString+MD5Addition.m in Sources */ = {isa = PBXBuildFile; fileRef = F6F1EF9C164B4A320003D3CB /* NSString+MD5Addition.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -443,6 +452,18 @@
 		8CF0743E15E6E844002ABE82 /* ParkifyAboutControllerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ParkifyAboutControllerViewController.m; sourceTree = "<group>"; };
 		8CF0744015E6EC48002ABE82 /* ParkifySettingsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ParkifySettingsViewController.h; sourceTree = "<group>"; };
 		8CF0744115E6EC48002ABE82 /* ParkifySettingsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ParkifySettingsViewController.m; sourceTree = "<group>"; };
+		F6B34A5016485FC800AF6633 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
+		F6B34A5216485FCC00AF6633 /* ImageIO.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ImageIO.framework; path = System/Library/Frameworks/ImageIO.framework; sourceTree = SDKROOT; };
+		F6B34A5416485FD500AF6633 /* CoreMedia.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMedia.framework; path = System/Library/Frameworks/CoreMedia.framework; sourceTree = SDKROOT; };
+		F6B34A5616485FDA00AF6633 /* CoreVideo.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreVideo.framework; path = System/Library/Frameworks/CoreVideo.framework; sourceTree = SDKROOT; };
+		F6B34A58164865DD00AF6633 /* AssetsLibrary.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AssetsLibrary.framework; path = System/Library/Frameworks/AssetsLibrary.framework; sourceTree = SDKROOT; };
+		F6DF4EAC164733BE00D9B3B9 /* problemSpotViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = problemSpotViewController.h; sourceTree = "<group>"; };
+		F6DF4EAD164733BE00D9B3B9 /* problemSpotViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = problemSpotViewController.m; sourceTree = "<group>"; };
+		F6F1EF6C164A13810003D3CB /* AWSiOSSDK.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = AWSiOSSDK.framework; sourceTree = "<group>"; };
+		F6F1EF98164B445F0003D3CB /* UIDevice+IdentifierAddition.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIDevice+IdentifierAddition.h"; sourceTree = "<group>"; };
+		F6F1EF99164B445F0003D3CB /* UIDevice+IdentifierAddition.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIDevice+IdentifierAddition.m"; sourceTree = "<group>"; };
+		F6F1EF9B164B4A320003D3CB /* NSString+MD5Addition.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSString+MD5Addition.h"; sourceTree = "<group>"; };
+		F6F1EF9C164B4A320003D3CB /* NSString+MD5Addition.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSString+MD5Addition.m"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -450,6 +471,11 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F6B34A59164865DD00AF6633 /* AssetsLibrary.framework in Frameworks */,
+				F6B34A5716485FDA00AF6633 /* CoreVideo.framework in Frameworks */,
+				F6B34A5516485FD500AF6633 /* CoreMedia.framework in Frameworks */,
+				F6B34A5316485FCC00AF6633 /* ImageIO.framework in Frameworks */,
+				F6B34A5116485FC800AF6633 /* AVFoundation.framework in Frameworks */,
 				8C271913160C8F8C00923857 /* AddressBook.framework in Frameworks */,
 				8C79D2A415AA456D00AF90AB /* QuartzCore.framework in Frameworks */,
 				8C76883215A45CE70035E7B4 /* CoreLocation.framework in Frameworks */,
@@ -461,6 +487,7 @@
 				8CA7A1E115A3DC980051567D /* UIKit.framework in Frameworks */,
 				8CA7A1E315A3DC980051567D /* Foundation.framework in Frameworks */,
 				8CA7A1E515A3DC980051567D /* CoreGraphics.framework in Frameworks */,
+				F6F1EF6D164A13810003D3CB /* AWSiOSSDK.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -579,6 +606,7 @@
 		8C8625F115C4BDED00F97308 /* Vendor */ = {
 			isa = PBXGroup;
 			children = (
+				F6F1EF97164B444C0003D3CB /* UIDeviceID */,
 				8CBE7DC81645F7F700467C12 /* Forward Geocoder */,
 				8C930F6916396876003C53A9 /* ELC */,
 				8C930F121637AEC1003C53A9 /* TBXML */,
@@ -702,12 +730,13 @@
 		8CA7A1D115A3DC980051567D = {
 			isa = PBXGroup;
 			children = (
+				F6F1EF6C164A13810003D3CB /* AWSiOSSDK.framework */,
+				F6B34A58164865DD00AF6633 /* AssetsLibrary.framework */,
 				8CDD2A391645E7220000E47C /* app_icon_lowres.png */,
 				8CDD2A311645DD2A0000E47C /* icon_highres.png */,
 				8CDD2A371645DEF40000E47C /* Default.png */,
 				8CDD2A1A163F3AD70000E47C /* Default@2x.png */,
 				8CDD2A351645DDF40000E47C /* Default-568h@2x.png */,
-				8C271912160C8F8A00923857 /* AddressBook.framework */,
 				8C86260115D1156600F97308 /* Res */,
 				8C8625F115C4BDED00F97308 /* Vendor */,
 				8CA7A1DF15A3DC980051567D /* Frameworks */,
@@ -728,6 +757,11 @@
 		8CA7A1DF15A3DC980051567D /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				F6B34A5616485FDA00AF6633 /* CoreVideo.framework */,
+				F6B34A5416485FD500AF6633 /* CoreMedia.framework */,
+				F6B34A5216485FCC00AF6633 /* ImageIO.framework */,
+				F6B34A5016485FC800AF6633 /* AVFoundation.framework */,
+				8C271912160C8F8A00923857 /* AddressBook.framework */,
 				8CA7A1E015A3DC980051567D /* UIKit.framework */,
 				8CA7A1E215A3DC980051567D /* Foundation.framework */,
 				8CA7A1E415A3DC980051567D /* CoreGraphics.framework */,
@@ -758,6 +792,8 @@
 				8CA7A1F915A3DC980051567D /* Parkify2ViewController.m */,
 				8C79E1C915A8F20D00B49D73 /* ParkifySpotViewController.h */,
 				8C79E1CA15A8F20D00B49D73 /* ParkifySpotViewController.m */,
+				F6DF4EAC164733BE00D9B3B9 /* problemSpotViewController.h */,
+				F6DF4EAD164733BE00D9B3B9 /* problemSpotViewController.m */,
 				8C78D3A315AABDC000B4D929 /* ParkifyConfirmationViewController.h */,
 				8C78D3A415AABDC000B4D929 /* ParkifyConfirmationViewController.m */,
 				8C78946115AE5F3100576C4D /* Authentication.h */,
@@ -1112,6 +1148,17 @@
 			name = "Settings Controllers";
 			sourceTree = "<group>";
 		};
+		F6F1EF97164B444C0003D3CB /* UIDeviceID */ = {
+			isa = PBXGroup;
+			children = (
+				F6F1EF9B164B4A320003D3CB /* NSString+MD5Addition.h */,
+				F6F1EF9C164B4A320003D3CB /* NSString+MD5Addition.m */,
+				F6F1EF98164B445F0003D3CB /* UIDevice+IdentifierAddition.h */,
+				F6F1EF99164B445F0003D3CB /* UIDevice+IdentifierAddition.m */,
+			);
+			name = UIDeviceID;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -1302,6 +1349,9 @@
 				8CBE7DD21645F7F700467C12 /* BSForwardGeocoder.m in Sources */,
 				8CBE7DD31645F7F700467C12 /* BSGoogleV3KmlParser.m in Sources */,
 				8CBE7DD41645F7F700467C12 /* BSKmlResult.m in Sources */,
+				F6DF4EAF164733BF00D9B3B9 /* problemSpotViewController.m in Sources */,
+				F6F1EF9A164B445F0003D3CB /* UIDevice+IdentifierAddition.m in Sources */,
+				F6F1EF9D164B4A320003D3CB /* NSString+MD5Addition.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1391,6 +1441,10 @@
 			buildSettings = {
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1.0.2;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)\"",
+				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Parkify2/Parkify-Prefix.pch";
 				INFOPLIST_FILE = "Parkify2/Parkify-Info.plist";
@@ -1414,6 +1468,10 @@
 				CODE_SIGN_IDENTITY = "iPhone Distribution";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CURRENT_PROJECT_VERSION = 1.0.2;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)\"",
+				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Parkify2/Parkify-Prefix.pch";
 				INFOPLIST_FILE = "Parkify2/Parkify-Info.plist";

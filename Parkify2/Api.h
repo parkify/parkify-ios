@@ -8,13 +8,27 @@
 
 #import <Foundation/Foundation.h>
 #import "ExtraTypes.h"
-
+#import "ASIFormDataRequest.h"
+#import "UIDevice+IdentifierAddition.h"
 #define NO_SERVICE_DEBUG false
 #define NO_SERVICE_DEBUG_SPOTS @"[spots:({\"id\":\"3\",\"location":{\"latitude\":\"37.872654\",\"longitude\":\"-122.266812\"},\"location_name\":\"Mikes Bikes\",\"mLocalID\":\"3\",\"mPrice\":\"1.02\",\"mPhoneNumber\":\"408-421-1194\",\"mDesc\":\"A Fantastic Spot!\",\"mFree\":\"true\"})]"
 #define LOW_PRICE_THRESHOLD 5.01
 #define HIGH_PRICE_THRESHOLD 5.02
+#define kProblemAlertView 9929
+#define ACCESS_KEY_ID          @"AKIAI2S3XWTFZUBVAIRA"
+#define SECRET_KEY             @"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"
+
+
+// Constants for the Bucket and Object name.
+#define PICTURE_BUCKET         @"parkify-primages"
+
+
+#define CREDENTIALS_ERROR_TITLE    @"Missing Credentials"
+#define CREDENTIALS_ERROR_MESSAGE  @"AWS Credentials not configured correctly.  Please review the README file."
+#import <AWSiOSSDK/S3/AmazonS3Client.h>
 
 @interface Api : NSObject
+
 
 //Called for user registration
 + (void)signUpWithEmail:(NSString*)email 
@@ -108,4 +122,10 @@ withFailure:(FailureBlock)failureBlock;
 + (void)resetPasswordWithEmail:(NSString*)email
           withSuccess:(SuccessBlock)successBlock
           withFailure:(FailureBlock)failureBlock;
+
+#pragma mark startGauravMethods
+
++ (void)sendProblemSpotWithText:(NSString *)problem
+                       andImage:(UIImage*)problemImage
+            withASIHTTPDelegate:(id)delegate;
 @end

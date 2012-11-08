@@ -7,7 +7,7 @@
 //
 
 #import "ErrorTransformer.h"
-
+#import "ExtraTypes.h"
 @implementation ErrorTransformer
 
 +(NSError*) apiErrorToNSError:(NSDictionary*)errors {
@@ -77,6 +77,7 @@
 
         
     }
+    alert.tag =kGenericErrorAlertTag;
     [alert show];
 }
 

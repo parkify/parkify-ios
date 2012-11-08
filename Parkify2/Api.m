@@ -17,10 +17,12 @@
 #import "iToast.h"
 #import "ParkifyWebViewWrapperController.h"
 #import "ErrorTransformer.h"
+#import "problemSpotViewController.h"
 
 #define TESTING_V1 true
 
 @interface Api()
+
 + (void)signUpStripeSuccessWithCard:(NSString*)token
                           withEmail:(NSString*)email 
                        withPassword:(NSString*)password
@@ -338,7 +340,6 @@ withPasswordConfirmation:(NSString*)passwordConfirmation
     [parent presentViewController:controller animated:true completion:^{}];
     parent.modalTransitionStyle = style;
 }
-
 //Called to bring up SettingsVC modally
 + (void)webWrapperModallyFrom:(UIViewController*)parent withURL:(NSString*)url {
     UIStoryboard *mainStoryboard = [UIStoryboard storyboardWithName:@"MainStoryboard_iPhone"
@@ -820,6 +821,86 @@ origPassword:(NSString*)origPassword
   
 }
 
+
+#pragma mark Gaurav functions start here
+
+#pragma mark AWS methods
++ (void)processGrandCentralDispatchUpload:(NSData *)imageData withImageName:(NSString*)imageName
+{
+    dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
+    
+    AmazonS3Client *s3 = [[AmazonS3Client alloc] initWithAccessKey:ACCESS_KEY_ID withSecretKey:SECRET_KEY] ;
+    
+    // Create the picture bucket.
+    S3CreateBucketRequest *createBucketRequest = [[S3CreateBucketRequest alloc] initWithName:PICTURE_BUCKET] ;
+    S3CreateBucketResponse *createBucketResponse = [s3 createBucket:createBucketRequest];
+    if(createBucketResponse.error != nil)
+    {
+        NSLog(@"Error: %@", createBucketResponse.error);
+    }
+
+    dispatch_async(queue, ^{
+        
+        // Upload image data.  Remember to set the content type.
+        S3PutObjectRequest *por = [[S3PutObjectRequest alloc] initWithKey:imageName
+                                                                  inBucket:PICTURE_BUCKET] ;
+        por.contentType = @"image/jpeg";
+        por.data        = imageData;
+        por.cannedACL = [S3CannedACL publicRead];
+        // Put the image data into the specified s3 bucket and object.
+        S3PutObjectResponse *putObjectResponse = [s3 putObject:por];
+        
+        dispatch_async(dispatch_get_main_queue(), ^{
+            
+            if(putObjectResponse.error != nil)
+            {
+                NSLog(@"Error: %@", putObjectResponse.error);
+                
+                //[self showAlertMessage:[putObjectResponse.error.userInfo objectForKey:@"message"] withTitle:@"Upload Error"];
+            }
+            else
+            {
+                NSLog(@"Image successfully uploaded");
+//                [self showAlertMessage:@"The image was successfully uploaded." withTitle:@"Upload Completed"];
+            }
+            
+            [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
+        });
+    });
+}
+#pragma mark methods dealing with problem spots
++ (void)sendProblemSpotWithText:(NSString *)problem
+                       andImage:(UIImage*)problemImage
+            withASIHTTPDelegate:(id)delegate;
+{
+    NSString* urlString = [[NSString alloc] initWithFormat:@"https://%@/api/v1/problem_spot.json?auth_token=%@", TARGET_SERVER, [Persistance retrieveAuthToken]];
+    NSURL *url = [NSURL URLWithString:urlString];
+    NSString *filename = [[UIDevice currentDevice] uniqueGlobalDeviceIdentifier];
+    if ( [Persistance retrieveAuthToken]){
+        filename= [filename stringByAppendingFormat:@"_%@_%@", [Persistance retrieveFirstName],[Persistance retrieveLastName]];
+    }
+    
+    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+    [dateFormatter setDateFormat:@"dd.MM.yyyy_HH:mm:ss"];
+    
+    filename = [filename stringByAppendingFormat:@"_%@.png",[dateFormatter stringFromDate:[NSDate date]]];
+   [Api processGrandCentralDispatchUpload:[NSData dataWithData:UIImagePNGRepresentation(problemImage)] withImageName:filename];
+    NSLog(@"Logging new problem with text: %@", problem);
+    NSString *imageurl = [NSString stringWithFormat:@"https://s3.amazonaws.com/%@/%@",PICTURE_BUCKET, filename];
+    NSLog(@"The url is %@", imageurl);
+    ASIFormDataRequest *request = [ASIFormDataRequest requestWithURL:url];
+
+    [request addPostValue:problem forKey:@"problemText"];
+    [request addPostValue:imageurl forKey:@"problemImageURL"];
+    
+    [request addRequestHeader:@"User-Agent" value:@"ASIFormDataRequest"];
+    [request addRequestHeader:@"Content-Type" value:@"application/json"];
+    [request setRequestMethod:@"POST"];
+    request.delegate=delegate;
+      
+    [request startAsynchronous];
+
+}
 
 @end
 
