@@ -21,7 +21,6 @@
 #import "ParkingSpotCollection.h"
 #import "ParkifyConfirmationViewController.h"
 #import "Persistance.h"
-#import "problemSpotViewController.h"
 //#import "PlacedAgent.h"
 
 #define ORIG_ANNOTATION_WIDTH 54
@@ -688,7 +687,7 @@ typedef struct STargetLocation {
     }
     [self getParkingSpots].observerDelegate = nil;
     // self.targetSpot.parentCollection = self.parkingSpots;
-    
+     
     self.spotsWereUpdatedCallback = ^(void){
         /*
         self.targetSpot = [self.parkingSpots parkingSpotForID:spotID];
@@ -1025,7 +1024,9 @@ typedef struct STargetLocation {
                                                                  bundle: nil];
         
         ParkifyConfirmationViewController* controller = [mainStoryboard instantiateViewControllerWithIdentifier: @"ConfirmationVC"];
-        
+    UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:controller];
+    [navController.navigationBar setTintColor:[UIColor blackColor]];
+
     controller.spot = [Persistance retrieveCurrentSpot];
         
         controller.startTime = [Persistance retrieveCurrentStartTime];
@@ -1035,45 +1036,9 @@ typedef struct STargetLocation {
         controller.currentLong = self.currentLong;
         
         self.modalTransitionStyle = UIModalTransitionStyleCoverVertical;
-        [self presentViewController:controller animated:true completion:^{}];
+        [self presentViewController:navController animated:true completion:^{}];
 }
 - (IBAction)searchButtonTapped:(id)sender {
     [self.addressBar becomeFirstResponder];
-}
-- (IBAction)launchCameraStuffForG:(id)sender {
-    UIAlertView *problemWithSpot = [[UIAlertView alloc] initWithTitle:@"Uh-oh" message:@"You have a problem with a spot. Please let us know what kindoff problem it is" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Somebody is in my spot",@"The spot is unusable", @"I cannot find my spot!", nil];
-    [problemWithSpot show];
-    problemWithSpot.tag = kProblemAlertView;
-    
-    
-}
--(void)launchProblemSpotVC:(BOOL)isLicensePlateView{
-    UIStoryboard *mainStoryboard = [UIStoryboard storyboardWithName:@"MainStoryboard_iPhone"
-                                                             bundle: nil];
-    
-    problemSpotViewController* controller = [mainStoryboard instantiateViewControllerWithIdentifier: @"ProblemSpotVC"];
-    controller.isLicensePlateProblem=isLicensePlateView;
-    UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:controller];
-    controller.navigationController.navigationBar.tintColor = [UIColor blackColor];
-    UIModalTransitionStyle style = self.modalTransitionStyle;
-    [self presentViewController:navController animated:true completion:^{}];
-    
-    self.modalTransitionStyle = style;
-
-}
-#pragma mark alert view delegate
--(void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex{
-    if (alertView.tag == kProblemAlertView && buttonIndex != alertView.cancelButtonIndex){
-        if (buttonIndex == 1)
-            [self launchProblemSpotVC:TRUE];
-        else if(buttonIndex==2){
-            [self launchProblemSpotVC:FALSE];
-
-            NSLog(@"Launch without the license plate stuff");
-        }
-        else{
-            NSLog(@"Launch directions");
-        }
-    }
 }
 @end

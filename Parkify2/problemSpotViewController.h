@@ -25,6 +25,7 @@
     __weak IBOutlet UITextField *licensePlateTextField;
     __weak IBOutlet UIView *imagePreviewHolder;
     __weak IBOutlet UIImageView *imagePreviewView;
+    __weak IBOutlet UILabel *txtLabelTakePic;
     
     __weak IBOutlet UITextView *genericProblemTextView;
     __weak IBOutlet UIView *genericProblemView;
@@ -41,3 +42,4 @@
 - (IBAction)captureStillImage:(id)sender;
 
 @end
+

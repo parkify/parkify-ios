@@ -9,7 +9,7 @@
 #import <UIKit/UIKit.h>
 #import "ParkingSpot.h"
 
-@interface ParkifyConfirmationViewController : UIViewController <UIScrollViewDelegate, UIWebViewDelegate>
+@interface ParkifyConfirmationViewController : UIViewController <UIScrollViewDelegate, UIWebViewDelegate, UIAlertViewDelegate   >
 - (IBAction)closeButtonTapped:(id)sender;
 @property (nonatomic, strong) ParkingSpot* spot;
 - (IBAction)directionsButtonTapped:(UIButton *)sender;
@@ -26,6 +26,7 @@
 @property (weak, nonatomic) IBOutlet UIView *topBarView;
 @property (weak, nonatomic) IBOutlet UILabel *topViewLabel;
 
+- (IBAction)launchTroubleAlert:(id)sender;
 
 //TODO: REMOVETHIS
 @property (weak, nonatomic) IBOutlet UIButton *topBarTapped;

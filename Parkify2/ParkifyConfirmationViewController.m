@@ -16,6 +16,9 @@
 #import "MultiImageViewer.h"
 #import "CalloutView.h"
 #import "DirectionsControl.h"
+#import "problemSpotViewController.h"
+#import "troubleFindingSpotViewController.h"
+
 //#import "PlacedAgent.h"
 
 #define CALLOUT_CONTENT_OFFSET 20
@@ -90,7 +93,13 @@
     
     MultiImageViewer* miViewer = [[MultiImageViewer alloc] initWithFrame:CGRectMake(0,0,320,160) withImageIds:self.spot.landscapeConfImageIDs];
     
-    
+    UILabel *titleView = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, 320, 60)];
+    [titleView setFont:[UIFont fontWithName:@"Helvetica Light" size:36.0f]];
+    [titleView setTextColor:[UIColor colorWithRed:197.0f/255.0f green:211.0f/255.0f blue:247.0f/255.0f alpha:1.0f]];
+    [titleView setText:@"Congratulations!"];
+    [titleView sizeToFit];
+    [titleView setBackgroundColor:[UIColor clearColor]];
+    [self.navigationItem setTitleView:titleView];
     
     [self appendSubView:miViewer];
     
@@ -690,4 +699,53 @@
 - (IBAction)topBarButtonTapped:(id)sender {
     [self hideTopBar:0.0];
 }
+#pragma mark Gaurav code for trouble
+-(void)launchProblemSpotVC:(BOOL)isLicensePlateView{
+    UIStoryboard *mainStoryboard = [UIStoryboard storyboardWithName:@"MainStoryboard_iPhone"
+                                                             bundle: nil];
+    
+    problemSpotViewController* controller = [mainStoryboard instantiateViewControllerWithIdentifier: @"ProblemSpotVC"];
+    controller.isLicensePlateProblem=isLicensePlateView;
+    [self.navigationController pushViewController:controller animated:YES];
+//    UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:controller];
+//    controller.navigationController.navigationBar.tintColor = [UIColor blackColor];
+ //   UIModalTransitionStyle style = self.modalTransitionStyle;
+  //  [self presentViewController:navController animated:true completion:^{}];
+    
+  //  self.modalTransitionStyle = style;
+    
+}
+-(void)launchtroubleFindingVC{
+    UIStoryboard *mainStoryboard = [UIStoryboard storyboardWithName:@"MainStoryboard_iPhone"
+                                                             bundle: nil];
+    
+    troubleFindingSpotViewController* controller = [mainStoryboard instantiateViewControllerWithIdentifier: @"troubleFindingVC"];
+    [self.navigationController pushViewController:controller animated:YES];
+    
+}
+#pragma mark alert view delegate
+-(void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex{
+    if (alertView.tag == kProblemAlertView && buttonIndex != alertView.cancelButtonIndex){
+        if (buttonIndex == 1)
+            [self launchProblemSpotVC:TRUE];
+        else if(buttonIndex==2){
+            [self launchProblemSpotVC:FALSE];
+            
+            NSLog(@"Launch without the license plate stuff");
+        }
+        else{
+            [self launchtroubleFindingVC];
+            NSLog(@"Launch directions");
+        }
+    }
+}
+- (IBAction)launchTroubleAlert:(id)sender {
+    UIAlertView *problemWithSpot = [[UIAlertView alloc] initWithTitle:@"Uh-oh" message:@"Please let us know what problem you are having we'll be happy to give you a refund." delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Somebody is in my spot",@"The spot is unusable", @"I cannot find my spot!", nil];
+    [problemWithSpot show];
+    problemWithSpot.tag = kProblemAlertView;
+    
+    
+}
+
+
 @end

@@ -427,7 +427,8 @@
                                                                  bundle: nil];
         
         ParkifyConfirmationViewController* controller = [mainStoryboard instantiateViewControllerWithIdentifier: @"ConfirmationVC"];
-        
+        UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:controller];
+        [navController.navigationBar setTintColor:[UIColor blackColor]];
         controller.spot = self.spot;
         [Persistance saveCurrentSpotId:self.spot.mID];
         controller.startTime = self.rangeBar. selectedMinimumValue;
@@ -443,7 +444,7 @@
         [Persistance saveCurrentSpot:self.spot];
         
         parent.modalTransitionStyle = UIModalTransitionStyleCoverVertical;
-        [parent presentViewController:controller animated:true completion:^{}];
+        [parent presentViewController:navController animated:true completion:^{}];
     }
      ];
 }

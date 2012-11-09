@@ -67,8 +67,6 @@ static void *AVCamFocusModeObserverContext = &AVCamFocusModeObserverContext;
     [titleView sizeToFit];
     [titleView setBackgroundColor:[UIColor clearColor]];
     [self.navigationItem setTitleView:titleView];
-    UIBarButtonItem *cancel = [[UIBarButtonItem alloc] initWithTitle:@"Cancel" style:UIBarButtonItemStyleBordered target:self action:@selector(closeButtonTapped:)];
-    [self.navigationItem setLeftBarButtonItem:cancel];
     
     //check if its for licnese plates or generic problems
     if (!self.isLicensePlateProblem){
@@ -107,9 +105,11 @@ static void *AVCamFocusModeObserverContext = &AVCamFocusModeObserverContext;
 	if (!input) {
 		// Handle the error appropriately.
 		NSLog(@"ERROR: trying to open camera: %@", error);
+        [txtLabelTakePic setText:@"Sorry! We can't access your camera."];
 	}
-	[session addInput:input];
-    
+    else{
+        [session addInput:input];
+    }
     
     /////////////////////////////////////////////////////////////
     // OUTPUT #1: Still Image
@@ -185,6 +185,12 @@ static void *AVCamFocusModeObserverContext = &AVCamFocusModeObserverContext;
     }
     else if(alertView.tag==kAlertViewChoicesForProblems){
     //    UIAlertView* alerter = [[UIAlertView alloc] initWithTitle:@"Sorry" message:@"Please let us know your problem with this spot" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"It is too small",@"There is someone parked here", @"There is some obstruction", @"Other (please describe below", nil];
+        if(buttonIndex==1)
+            [genericProblemTextView setText:@"Spot too small"];
+        else if(buttonIndex==2){
+            [genericProblemTextView setText:@"There is an obstruction: "];
+            
+        }
 
     }
 }
@@ -196,18 +202,18 @@ static void *AVCamFocusModeObserverContext = &AVCamFocusModeObserverContext;
         
         //[self performSegueWithIdentifier:@"ViewConfirmation" sender:self];
         //NSLog(@"TEST");
-        UIAlertView* success = [[UIAlertView alloc] initWithTitle:@"Success" message:@"Your message has successfully been uploaded" delegate:self cancelButtonTitle:@"Ok"
-                                                otherButtonTitles: nil];
+        UIAlertView* success = [[UIAlertView alloc] initWithTitle:@"Success" message:@"Your message has successfully been uploaded and your account has been refunded." delegate:self cancelButtonTitle:@"Maps"
+                                                otherButtonTitles:@"New Spot", nil];
         success.tag=kAlertViewSuccessProblemUpload;
         [success show];
         
     } else {
         NSError* error = [ErrorTransformer apiErrorToNSError:[root objectForKey:@"error"]];
        //CHANGE CODE BACK GAURAV
-        UIAlertView* alerter = [[UIAlertView alloc] initWithTitle:@"Error" message:@"Could not contact server" delegate:self cancelButtonTitle:@"Refund spot" otherButtonTitles:@"New Spot", nil];
-        [alerter show];
-        alerter.tag = kAlertViewSuccessProblemUpload;
-        // [ErrorTransformer errorToAlert:error withDelegate:self];
+        //UIAlertView* alerter = [[UIAlertView alloc] initWithTitle:@"Error" message:@"Could not contact server" delegate:self cancelButtonTitle:@"Refund spot" otherButtonTitles:@"New Spot", nil];
+        //[alerter show];
+        //alerter.tag = kAlertViewSuccessProblemUpload;
+         [ErrorTransformer errorToAlert:error withDelegate:self];
         
         [self.waitingMask removeFromSuperview];
         self.waitingMask = nil;
@@ -332,6 +338,7 @@ fromConnection:(AVCaptureConnection *)connection
     licensePlateProblemInfoView = nil;
     genericProblemView = nil;
     genericProblemTextView = nil;
+    txtLabelTakePic = nil;
     [super viewDidUnload];
 }
 @end

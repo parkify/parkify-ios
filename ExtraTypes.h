@@ -28,6 +28,8 @@ typedef NSString* (^Formatter)(double val);
 #define kAlertViewSuccessProblemUpload 9990
 #define kAlertViewSuccessButOtherProbem 9991
 #define kAlertViewChoicesForProblems 9992
+#define kPhoneNumber @"tel:1-800-luv-park"
+
 //#define TARGET_SERVER_NORMAL @"parkify-rails.herokuapp.com"
 
 //#define TARGET_SERVER TARGET_SERVER_NORMAL //@"192.168.1.132:3000"

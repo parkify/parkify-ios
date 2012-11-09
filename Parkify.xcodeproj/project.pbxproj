@@ -156,6 +156,11 @@
 		F6F1EF6D164A13810003D3CB /* AWSiOSSDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F6F1EF6C164A13810003D3CB /* AWSiOSSDK.framework */; };
 		F6F1EF9A164B445F0003D3CB /* UIDevice+IdentifierAddition.m in Sources */ = {isa = PBXBuildFile; fileRef = F6F1EF99164B445F0003D3CB /* UIDevice+IdentifierAddition.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		F6F1EF9D164B4A320003D3CB /* NSString+MD5Addition.m in Sources */ = {isa = PBXBuildFile; fileRef = F6F1EF9C164B4A320003D3CB /* NSString+MD5Addition.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		F6F1EFAA164C56E90003D3CB /* sad_face.png in Resources */ = {isa = PBXBuildFile; fileRef = F6F1EFA9164C56E90003D3CB /* sad_face.png */; };
+		F6F1EFAC164C5A540003D3CB /* green_button.png in Resources */ = {isa = PBXBuildFile; fileRef = F6F1EFAB164C5A540003D3CB /* green_button.png */; };
+		F6F1EFAE164C5B400003D3CB /* green_button2.png in Resources */ = {isa = PBXBuildFile; fileRef = F6F1EFAD164C5B400003D3CB /* green_button2.png */; };
+		F6F1EFB2164C5BF40003D3CB /* troubleFindingSpotViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = F6F1EFB1164C5BF40003D3CB /* troubleFindingSpotViewController.m */; };
+		F6F1EFB4164CA64D0003D3CB /* red_button.png in Resources */ = {isa = PBXBuildFile; fileRef = F6F1EFB3164CA64D0003D3CB /* red_button.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -464,6 +469,12 @@
 		F6F1EF99164B445F0003D3CB /* UIDevice+IdentifierAddition.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIDevice+IdentifierAddition.m"; sourceTree = "<group>"; };
 		F6F1EF9B164B4A320003D3CB /* NSString+MD5Addition.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSString+MD5Addition.h"; sourceTree = "<group>"; };
 		F6F1EF9C164B4A320003D3CB /* NSString+MD5Addition.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSString+MD5Addition.m"; sourceTree = "<group>"; };
+		F6F1EFA9164C56E90003D3CB /* sad_face.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = sad_face.png; sourceTree = "<group>"; };
+		F6F1EFAB164C5A540003D3CB /* green_button.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = green_button.png; sourceTree = "<group>"; };
+		F6F1EFAD164C5B400003D3CB /* green_button2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = green_button2.png; sourceTree = "<group>"; };
+		F6F1EFB0164C5BF40003D3CB /* troubleFindingSpotViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = troubleFindingSpotViewController.h; sourceTree = "<group>"; };
+		F6F1EFB1164C5BF40003D3CB /* troubleFindingSpotViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = troubleFindingSpotViewController.m; sourceTree = "<group>"; };
+		F6F1EFB3164CA64D0003D3CB /* red_button.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = red_button.png; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -635,6 +646,7 @@
 		8C86260115D1156600F97308 /* Res */ = {
 			isa = PBXGroup;
 			children = (
+				F6F1EFA7164C56E00003D3CB /* images gaurav */,
 				8CE81EFF1624D2C8004260CC /* Design 9 */,
 				8CE703C816054D7C0021DF4A /* Vendor */,
 				8CB12B4715FFAE2100551C0B /* Design 8 */,
@@ -792,8 +804,7 @@
 				8CA7A1F915A3DC980051567D /* Parkify2ViewController.m */,
 				8C79E1C915A8F20D00B49D73 /* ParkifySpotViewController.h */,
 				8C79E1CA15A8F20D00B49D73 /* ParkifySpotViewController.m */,
-				F6DF4EAC164733BE00D9B3B9 /* problemSpotViewController.h */,
-				F6DF4EAD164733BE00D9B3B9 /* problemSpotViewController.m */,
+				F6F1EFAF164C5BD60003D3CB /* troubleWithSpot */,
 				8C78D3A315AABDC000B4D929 /* ParkifyConfirmationViewController.h */,
 				8C78D3A415AABDC000B4D929 /* ParkifyConfirmationViewController.m */,
 				8C78946115AE5F3100576C4D /* Authentication.h */,
@@ -1159,6 +1170,28 @@
 			name = UIDeviceID;
 			sourceTree = "<group>";
 		};
+		F6F1EFA7164C56E00003D3CB /* images gaurav */ = {
+			isa = PBXGroup;
+			children = (
+				F6F1EFAD164C5B400003D3CB /* green_button2.png */,
+				F6F1EFA9164C56E90003D3CB /* sad_face.png */,
+				F6F1EFB3164CA64D0003D3CB /* red_button.png */,
+				F6F1EFAB164C5A540003D3CB /* green_button.png */,
+			);
+			name = "images gaurav";
+			sourceTree = "<group>";
+		};
+		F6F1EFAF164C5BD60003D3CB /* troubleWithSpot */ = {
+			isa = PBXGroup;
+			children = (
+				F6DF4EAC164733BE00D9B3B9 /* problemSpotViewController.h */,
+				F6DF4EAD164733BE00D9B3B9 /* problemSpotViewController.m */,
+				F6F1EFB0164C5BF40003D3CB /* troubleFindingSpotViewController.h */,
+				F6F1EFB1164C5BF40003D3CB /* troubleFindingSpotViewController.m */,
+			);
+			name = troubleWithSpot;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -1260,6 +1293,10 @@
 				8CDD2A361645DDF60000E47C /* Default-568h@2x.png in Resources */,
 				8CDD2A381645DEF50000E47C /* Default.png in Resources */,
 				8CDD2A3A1645E7250000E47C /* app_icon_lowres.png in Resources */,
+				F6F1EFAA164C56E90003D3CB /* sad_face.png in Resources */,
+				F6F1EFAC164C5A540003D3CB /* green_button.png in Resources */,
+				F6F1EFAE164C5B400003D3CB /* green_button2.png in Resources */,
+				F6F1EFB4164CA64D0003D3CB /* red_button.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1352,6 +1389,7 @@
 				F6DF4EAF164733BF00D9B3B9 /* problemSpotViewController.m in Sources */,
 				F6F1EF9A164B445F0003D3CB /* UIDevice+IdentifierAddition.m in Sources */,
 				F6F1EF9D164B4A320003D3CB /* NSString+MD5Addition.m in Sources */,
+				F6F1EFB2164C5BF40003D3CB /* troubleFindingSpotViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
