@@ -16,7 +16,6 @@
 
 @property double currentLat;
 @property double currentLong;
-
 @property (weak, nonatomic) IBOutlet UILabel *titleLable;
 @property double startTime;
 @property double endTime;

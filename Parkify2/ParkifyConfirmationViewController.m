@@ -39,6 +39,7 @@
 
 @property (strong, nonatomic) UIWebView* telText;
 
+@property (nonatomic, strong) UIViewController *detailVC;
 
 
 @end
@@ -69,7 +70,7 @@
 @synthesize telText = _telText;
 
 @synthesize topBarText = _topBarText;
-
+@synthesize detailVC = _detailVC;
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
@@ -78,7 +79,8 @@
     }
     return self;
 }
-
+-(void)viewWillAppear:(BOOL)animated{
+}
 - (void)viewDidLoad
 {
     [super viewDidLoad];
@@ -703,10 +705,11 @@
 -(void)launchProblemSpotVC:(BOOL)isLicensePlateView{
     UIStoryboard *mainStoryboard = [UIStoryboard storyboardWithName:@"MainStoryboard_iPhone"
                                                              bundle: nil];
-    
-    problemSpotViewController* controller = [mainStoryboard instantiateViewControllerWithIdentifier: @"ProblemSpotVC"];
-    controller.isLicensePlateProblem=isLicensePlateView;
-    [self.navigationController pushViewController:controller animated:YES];
+
+    problemSpotViewController *controller = [mainStoryboard instantiateViewControllerWithIdentifier: @"ProblemSpotVC"];
+    self.detailVC=controller;
+    ((problemSpotViewController*)(self.detailVC)).isLicensePlateProblem=isLicensePlateView;
+    [self.navigationController pushViewController:self.detailVC animated:YES];
 //    UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:controller];
 //    controller.navigationController.navigationBar.tintColor = [UIColor blackColor];
  //   UIModalTransitionStyle style = self.modalTransitionStyle;
@@ -719,8 +722,8 @@
     UIStoryboard *mainStoryboard = [UIStoryboard storyboardWithName:@"MainStoryboard_iPhone"
                                                              bundle: nil];
     
-    troubleFindingSpotViewController* controller = [mainStoryboard instantiateViewControllerWithIdentifier: @"troubleFindingVC"];
-    [self.navigationController pushViewController:controller animated:YES];
+    self.detailVC = [mainStoryboard instantiateViewControllerWithIdentifier: @"troubleFindingVC"];
+    [self.navigationController pushViewController:self.detailVC animated:YES];
     
 }
 #pragma mark alert view delegate

@@ -20,6 +20,7 @@
 static void *AVCamFocusModeObserverContext = &AVCamFocusModeObserverContext;
 
 @implementation problemSpotViewController
+@synthesize captureOutput= _captureOutput;
 @synthesize stillImageOutput = _stillImageOutput;
 @synthesize videoPreviewView = _videoPreviewView;
 @synthesize isLicensePlateProblem = _isLicensePlateProblem;
@@ -51,7 +52,9 @@ static void *AVCamFocusModeObserverContext = &AVCamFocusModeObserverContext;
 	return focusString;
 }
 
-
+-(void)viewWillDisappear:(BOOL)animated{
+    [self.captureOutput setSampleBufferDelegate:nil queue:nil];
+}
 - (void)viewDidLoad
 {
     [super viewDidLoad];
@@ -126,14 +129,14 @@ static void *AVCamFocusModeObserverContext = &AVCamFocusModeObserverContext;
     // OUTPUT #2: Video Frames
     /////////////////////////////////////////////////////////////
     // Create Video Frame Outlet that will send each frame to our delegate
-    AVCaptureVideoDataOutput *captureOutput = [[AVCaptureVideoDataOutput alloc] init];
-	captureOutput.alwaysDiscardsLateVideoFrames = YES;
+    self.captureOutput = [[AVCaptureVideoDataOutput alloc] init];
+	self.captureOutput.alwaysDiscardsLateVideoFrames = YES;
 	//captureOutput.minFrameDuration = CMTimeMake(1, 3); // deprecated in IOS5
 	
 	// We need to create a queue to funnel the frames to our delegate
 	dispatch_queue_t queue;
 	queue = dispatch_queue_create("cameraQueue", NULL);
-	[captureOutput setSampleBufferDelegate:self queue:queue];
+	[self.captureOutput setSampleBufferDelegate:self queue:queue];
 	dispatch_release(queue);
 	
 	// Set the video output to store frame in BGRA (It is supposed to be faster)
@@ -142,9 +145,9 @@ static void *AVCamFocusModeObserverContext = &AVCamFocusModeObserverContext;
 	NSNumber* value = [NSNumber numberWithUnsignedInt:kCVPixelFormatType_32BGRA];
 	
 	NSDictionary* videoSettings = [NSDictionary dictionaryWithObject:value forKey:key];
-	[captureOutput setVideoSettings:videoSettings];
+	[self.captureOutput setVideoSettings:videoSettings];
     
-    [session addOutput:captureOutput];
+    [session addOutput:self.captureOutput];
     /////////////////////////////////////////////////////////////
     
     
@@ -339,6 +342,7 @@ fromConnection:(AVCaptureConnection *)connection
     genericProblemView = nil;
     genericProblemTextView = nil;
     txtLabelTakePic = nil;
+
     [super viewDidUnload];
 }
 @end

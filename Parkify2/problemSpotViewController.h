@@ -31,6 +31,7 @@
     __weak IBOutlet UIView *genericProblemView;
     __weak IBOutlet UIView *licensePlateProblemInfoView;
 }
+@property (nonatomic, strong)AVCaptureVideoDataOutput *captureOutput;
 @property (nonatomic, assign) BOOL isLicensePlateProblem;
 @property(nonatomic, retain) UIImage *theProblemImage;
 @property(nonatomic, retain) IBOutlet UIView *          videoPreviewView;

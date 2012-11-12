@@ -723,6 +723,10 @@
                                                         <rect key="frame" x="-4" y="230" width="327" height="14"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                                     </imageView>
+                                                    <imageView userInteractionEnabled="NO" contentMode="scaleToFill" image="spot_view_page_layout_1.png" id="LqS-vN-2Ol">
+                                                        <rect key="frame" x="0.0" y="228" width="327" height="14"/>
+                                                        <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
+                                                    </imageView>
                                                 </subviews>
                                                 <color key="backgroundColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
                                             </view>
@@ -735,11 +739,11 @@
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                     </imageView>
                                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" id="WCm-Fi-UAy">
-                                                        <rect key="frame" x="40" y="17" width="239" height="43"/>
+                                                        <rect key="frame" x="41" y="17" width="239" height="43"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES"/>
                                                         <fontDescription key="fontDescription" type="boldSystem" pointSize="18"/>
                                                         <size key="titleShadowOffset" width="0.0" height="1"/>
-                                                        <state key="normal" title="Send" backgroundImage="blue_button.png">
+                                                        <state key="normal" title="Refund" backgroundImage="blue_button.png">
                                                             <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                             <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                                         </state>
@@ -875,7 +879,7 @@
                                                         </subviews>
                                                     </view>
                                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" id="Mfc-iQ-ppn">
-                                                        <rect key="frame" x="33" y="101" width="239" height="43"/>
+                                                        <rect key="frame" x="33" y="119" width="239" height="43"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                                         <fontDescription key="fontDescription" type="boldSystem" pointSize="18"/>
                                                         <size key="titleShadowOffset" width="0.0" height="1"/>
@@ -2648,7 +2652,6 @@
                 <relationship kind="action" name="refreshTapped:"/>
                 <relationship kind="action" name="searchButtonTapped:"/>
                 <relationship kind="action" name="settingsButtonTapped:" candidateClass="UIButton"/>
-                <relationship kind="action" name="spotMoreInfo:" candidateClass="UIButton"/>
                 <relationship kind="outlet" name="addressBar" candidateClass="UISearchBar"/>
                 <relationship kind="outlet" name="bottomBarButton" candidateClass="UIButton"/>
                 <relationship kind="outlet" name="bottomBarLabel" candidateClass="UILabel"/>
