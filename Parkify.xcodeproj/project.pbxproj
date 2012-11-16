@@ -147,6 +147,10 @@
 		8CE81F051625059A004260CC /* RangeBubble.m in Sources */ = {isa = PBXBuildFile; fileRef = 8CE81F0416250599004260CC /* RangeBubble.m */; };
 		8CF0743F15E6E844002ABE82 /* ParkifyAboutControllerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8CF0743E15E6E844002ABE82 /* ParkifyAboutControllerViewController.m */; };
 		8CF0744215E6EC48002ABE82 /* ParkifySettingsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8CF0744115E6EC48002ABE82 /* ParkifySettingsViewController.m */; };
+		F647131D165203FE004D9289 /* mapDirectionsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = F647131C165203FE004D9289 /* mapDirectionsViewController.m */; };
+		F6471325165422EF004D9289 /* NativeBridge.js in Sources */ = {isa = PBXBuildFile; fileRef = F6471324165422EF004D9289 /* NativeBridge.js */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		F647132816542540004D9289 /* MyWebView.m in Sources */ = {isa = PBXBuildFile; fileRef = F647132716542540004D9289 /* MyWebView.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		F647132A165429CE004D9289 /* googmaps.html in Resources */ = {isa = PBXBuildFile; fileRef = F6471329165429CE004D9289 /* googmaps.html */; };
 		F6B34A5116485FC800AF6633 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F6B34A5016485FC800AF6633 /* AVFoundation.framework */; };
 		F6B34A5316485FCC00AF6633 /* ImageIO.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F6B34A5216485FCC00AF6633 /* ImageIO.framework */; };
 		F6B34A5516485FD500AF6633 /* CoreMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F6B34A5416485FD500AF6633 /* CoreMedia.framework */; };
@@ -457,6 +461,12 @@
 		8CF0743E15E6E844002ABE82 /* ParkifyAboutControllerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ParkifyAboutControllerViewController.m; sourceTree = "<group>"; };
 		8CF0744015E6EC48002ABE82 /* ParkifySettingsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ParkifySettingsViewController.h; sourceTree = "<group>"; };
 		8CF0744115E6EC48002ABE82 /* ParkifySettingsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ParkifySettingsViewController.m; sourceTree = "<group>"; };
+		F647131B165203FE004D9289 /* mapDirectionsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mapDirectionsViewController.h; sourceTree = "<group>"; };
+		F647131C165203FE004D9289 /* mapDirectionsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = mapDirectionsViewController.m; sourceTree = "<group>"; };
+		F6471324165422EF004D9289 /* NativeBridge.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = NativeBridge.js; sourceTree = "<group>"; };
+		F647132616542540004D9289 /* MyWebView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MyWebView.h; sourceTree = "<group>"; };
+		F647132716542540004D9289 /* MyWebView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MyWebView.m; sourceTree = "<group>"; };
+		F6471329165429CE004D9289 /* googmaps.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = googmaps.html; sourceTree = "<group>"; };
 		F6B34A5016485FC800AF6633 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		F6B34A5216485FCC00AF6633 /* ImageIO.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ImageIO.framework; path = System/Library/Frameworks/ImageIO.framework; sourceTree = SDKROOT; };
 		F6B34A5416485FD500AF6633 /* CoreMedia.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMedia.framework; path = System/Library/Frameworks/CoreMedia.framework; sourceTree = SDKROOT; };
@@ -807,6 +817,12 @@
 				F6F1EFAF164C5BD60003D3CB /* troubleWithSpot */,
 				8C78D3A315AABDC000B4D929 /* ParkifyConfirmationViewController.h */,
 				8C78D3A415AABDC000B4D929 /* ParkifyConfirmationViewController.m */,
+				F6471329165429CE004D9289 /* googmaps.html */,
+				F647132616542540004D9289 /* MyWebView.h */,
+				F647132716542540004D9289 /* MyWebView.m */,
+				F647131B165203FE004D9289 /* mapDirectionsViewController.h */,
+				F647131C165203FE004D9289 /* mapDirectionsViewController.m */,
+				F6471324165422EF004D9289 /* NativeBridge.js */,
 				8C78946115AE5F3100576C4D /* Authentication.h */,
 				8C78946215AE5F3100576C4D /* Authentication.m */,
 				8C74008A15AF9D9900007F63 /* Persistance.h */,
@@ -1297,6 +1313,7 @@
 				F6F1EFAC164C5A540003D3CB /* green_button.png in Resources */,
 				F6F1EFAE164C5B400003D3CB /* green_button2.png in Resources */,
 				F6F1EFB4164CA64D0003D3CB /* red_button.png in Resources */,
+				F647132A165429CE004D9289 /* googmaps.html in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1390,6 +1407,9 @@
 				F6F1EF9A164B445F0003D3CB /* UIDevice+IdentifierAddition.m in Sources */,
 				F6F1EF9D164B4A320003D3CB /* NSString+MD5Addition.m in Sources */,
 				F6F1EFB2164C5BF40003D3CB /* troubleFindingSpotViewController.m in Sources */,
+				F647131D165203FE004D9289 /* mapDirectionsViewController.m in Sources */,
+				F6471325165422EF004D9289 /* NativeBridge.js in Sources */,
+				F647132816542540004D9289 /* MyWebView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

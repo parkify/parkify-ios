@@ -1,0 +1,135 @@
+<html>
+<script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false"></script>
+<link rel="stylesheet" href="http://code.jquery.com/mobile/1.2.0/jquery.mobile-1.2.0.min.css" />
+<script src="http://code.jquery.com/jquery-1.8.2.min.js"></script>
+<script src="http://code.jquery.com/mobile/1.2.0/jquery.mobile-1.2.0.min.js"></script>
+<script>
+
+var NativeBridge = {
+callbacksCount : 1,
+		 callbacks : {},
+
+		 // Automatically called by native layer when a result is available
+		 resultForCallback : function resultForCallback(callbackId, resultArray) {
+
+			 try {
+				 var callback = NativeBridge.callbacks[callbackId];
+				 if (!callback) return;
+
+				 callback.apply(null,resultArray);
+			 } catch(e) {alert(e)}
+		 },
+
+		 // Use this in javascript to request native objective-c code
+		 // functionName : string (I think the name is explicit :p)
+		 // args : array of arguments
+		 // callback : function with n-arguments that is going to be called when the native code returned
+call : function call(functionName, args, callback) {
+
+	       var hasCallback = callback && typeof callback == "function";
+	       var callbackId = hasCallback ? NativeBridge.callbacksCount++ : 0;
+
+	       if (hasCallback)
+		       NativeBridge.callbacks[callbackId] = callback;
+
+	       var iframe = document.createElement("IFRAME");
+	       iframe.setAttribute("src", "js-frame:" + functionName + ":" + callbackId+ ":" + encodeURIComponent(JSON.stringify(args)));
+	       document.documentElement.appendChild(iframe);
+	       iframe.parentNode.removeChild(iframe);
+	       iframe = null;
+
+
+       }
+
+};
+var directionsShowing = false;
+var directionsDisplay;
+var directionsService = new google.maps.DirectionsService();
+var map;
+
+function initialize () {
+
+	console = new Object();
+	console.log = function(log) {
+		var iframe = document.createElement("IFRAME");
+		iframe.setAttribute("src", "ios-log:#iOS#" + log);
+		document.documentElement.appendChild(iframe);
+		iframe.parentNode.removeChild(iframe);
+		iframe = null;
+	}
+
+	console.debug = console.log;
+	console.info = console.log;
+	console.warn = console.log;
+	console.error = console.log;
+	console.log("Calling jquery stuff");
+
+
+
+	document.getElementById("headertext").innerHTML = "Initialize called";
+	NativeBridge.call("getCenterCoord", null, function (lat, long, endlat, endlong, textonly) {
+    /*var lat = "37.78";
+    var long = "-122.41";
+    var endlat = "37.87";
+    var endlong = "-122.2568";
+    var textonly="1";
+       */
+                      console.log("Callback");
+			document.getElementById("headertext").innerHTML="The new coords are " + lat + "," + long+ " and spot is " + endlat + ","+endlong;
+
+                document.getElementById("headertext").innerHTML="";
+
+
+			var directionsService = new google.maps.DirectionsService();
+			var directionsDisplay = new google.maps.DirectionsRenderer();
+			var center = new google.maps.LatLng(lat,long);
+			var myOptions = { center : center, mapTypeId : google.maps.MapTypeId.ROADMAP };
+
+            var map = new google.maps.Map(document.getElementById("map_canvas"), myOptions);
+                      if (textonly=="1"){
+                      directionsDisplay.setPanel(document.getElementById("directions-panel"));
+                          $("#map_canvas").remove();
+                      }
+                      else{
+                        directionsDisplay.setMap(map);
+                      }
+// directionsDisplay.setPanel(document.getElementById("directions-panel"));
+var mode = google.maps.DirectionsTravelMode.DRIVING;
+var end = new google.maps.LatLng(endlat, endlong);;
+
+	var request = {
+origin : center,
+	 destination : end,
+	 travelMode : mode
+	};
+
+directionsService.route(request, function(response, status) {
+
+		if(status == google.maps.DirectionsStatus.OK) {
+
+		directionsDisplay.setDirections(response);
+		NativeBridge.call("finishedLoading", null, function () {});
+		}
+		});
+
+    });
+}
+
+</script>
+<div data-role="page" data-theme="b" class="page-map" style="width:100%; height:100%;">
+<head>
+<div id ="headertext"> Hello1 </div>
+</head>
+<body onload="initialize()">
+<div data-role="content" style="width:100%; height:100%; padding-left:0px; padding-right:0px; padding-top:1px">
+
+    <div id="map_canvas" style="width:100% height:100%; min-width:320px; min-height:480px;"></div>
+    <div id="directions-panel" style="padding-left:0px; padding-right:0px; padding-top:0px; padding-bottom:20px"></div>
+</div>
+<div data-role="footer" data-theme="d" data-position="fixed" id="footer">
+<p style="margin:0px; padding:0px">
+
+</p></div>
+</div>
+</body>
+</html>

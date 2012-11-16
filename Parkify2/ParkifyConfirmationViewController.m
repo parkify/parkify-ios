@@ -18,7 +18,8 @@
 #import "DirectionsControl.h"
 #import "problemSpotViewController.h"
 #import "troubleFindingSpotViewController.h"
-
+#import "MyWebView.h"
+#import "mapDirectionsViewController.h"
 //#import "PlacedAgent.h"
 
 #define CALLOUT_CONTENT_OFFSET 20
@@ -622,6 +623,16 @@
 }
 
 - (IBAction)directionsButtonTapped:(UIButton *)sender {
+    mapDirectionsViewController *newMaps = [[mapDirectionsViewController alloc] init];
+    
+    //MyWebView *newMaps = [[MyWebView alloc] initWithFrame:self.view.frame];
+    newMaps.currLat=self.currentLat;
+    newMaps.currLong = self.currentLong;
+    newMaps.spotLat = self.spot.mLat;
+    newMaps.spotLong =self.spot.mLong;
+    [self.navigationController pushViewController:newMaps animated:YES];
+//    [self.view addSubview:newMaps];
+    return;
     
     
     Class itemClass = [MKMapItem class];
@@ -710,12 +721,6 @@
     self.detailVC=controller;
     ((problemSpotViewController*)(self.detailVC)).isLicensePlateProblem=isLicensePlateView;
     [self.navigationController pushViewController:self.detailVC animated:YES];
-//    UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:controller];
-//    controller.navigationController.navigationBar.tintColor = [UIColor blackColor];
- //   UIModalTransitionStyle style = self.modalTransitionStyle;
-  //  [self presentViewController:navController animated:true completion:^{}];
-    
-  //  self.modalTransitionStyle = style;
     
 }
 -(void)launchtroubleFindingVC{
