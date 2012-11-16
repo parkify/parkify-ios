@@ -8,13 +8,13 @@
 
 #import <UIKit/UIKit.h>
 #import "MyWebView.h"
-@interface mapDirectionsViewController : UIViewController <webViewCustomDelegate>
+@interface mapDirectionsViewController : UIViewController <webViewCustomDelegate, UIWebViewDelegate>
 {
     double currLat;
     double currLong;
     double spotLat;
     double spotLong;
-    MyWebView *currWebView;
+    UIWebView *currWebView;
     BOOL textDirs;
 }
 

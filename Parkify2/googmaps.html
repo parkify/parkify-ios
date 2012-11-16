@@ -46,7 +46,15 @@ var directionsShowing = false;
 var directionsDisplay;
 var directionsService = new google.maps.DirectionsService();
 var map;
+    function showMap(){
+        $("#map_canvas").show();
+        $("#directions-panel").hide();
+    }
+    function showText(){
+        $("#map_canvas").hide();
+        $("#directions-panel").show();
 
+    }
 function initialize () {
 
 	console = new Object();
@@ -67,13 +75,13 @@ function initialize () {
 
 
 	document.getElementById("headertext").innerHTML = "Initialize called";
-	NativeBridge.call("getCenterCoord", null, function (lat, long, endlat, endlong, textonly) {
-    /*var lat = "37.78";
+	//NativeBridge.call("getCenterCoord", null, function (lat, long, endlat, endlong, textonly) {
+    var lat = "37.78";
     var long = "-122.41";
     var endlat = "37.87";
     var endlong = "-122.2568";
-    var textonly="1";
-       */
+    var textonly="0";
+      // */
                       console.log("Callback");
 			document.getElementById("headertext").innerHTML="The new coords are " + lat + "," + long+ " and spot is " + endlat + ","+endlong;
 
@@ -88,9 +96,11 @@ function initialize () {
             var map = new google.maps.Map(document.getElementById("map_canvas"), myOptions);
                       if (textonly=="1"){
                       directionsDisplay.setPanel(document.getElementById("directions-panel"));
-                          $("#map_canvas").remove();
+                          $("#map_canvas").hide();
                       }
                       else{
+                      
+                      $("#directions-panel").hide();
                         directionsDisplay.setMap(map);
                       }
 // directionsDisplay.setPanel(document.getElementById("directions-panel"));
@@ -112,7 +122,7 @@ directionsService.route(request, function(response, status) {
 		}
 		});
 
-    });
+   // });
 }
 
 </script>

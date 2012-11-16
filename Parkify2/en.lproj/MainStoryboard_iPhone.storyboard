@@ -619,11 +619,35 @@
                         <outlet property="topViewLabel" destination="Kdz-dR-2Ot" id="4WO-r1-Phy"/>
                         <segue destination="yRH-GF-inc" kind="push" id="EzA-xA-Oo1"/>
                         <segue destination="aq0-Ch-y0L" kind="push" id="AHP-0z-8mg"/>
+                        <segue destination="3Fw-5k-Ail" kind="push" id="NMt-SS-l1u"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Nsy-Fj-e1g" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="-999" y="-63"/>
+        </scene>
+        <!--Map Directions View Controller-->
+        <scene sceneID="fsy-os-KmN">
+            <objects>
+                <viewController storyboardIdentifier="mapDirectionsVC" useStoryboardIdentifierAsRestorationIdentifier="YES" id="3Fw-5k-Ail" customClass="mapDirectionsViewController" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="Df7-mn-MYO">
+                        <rect key="frame" x="0.0" y="64" width="320" height="416"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                        <subviews>
+                            <imageView opaque="NO" userInteractionEnabled="NO" contentMode="scaleToFill" image="bottom_background.png" id="u7x-4o-KUp">
+                                <rect key="frame" x="0.0" y="0.0" width="320" height="416"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                            </imageView>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                    </view>
+                    <navigationItem key="navigationItem" id="v59-id-VTC"/>
+                    <simulatedStatusBarMetrics key="simulatedStatusBarMetrics" statusBarStyle="blackTranslucent"/>
+                    <simulatedNavigationBarMetrics key="simulatedTopBarMetrics" barStyle="blackOpaque" prompted="NO"/>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="jK3-Tg-ZuR" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-410" y="-43"/>
         </scene>
         <!--Problem Spot View Controller - Problem?-->
         <scene sceneID="6Ll-5S-l0W">
@@ -2813,6 +2837,9 @@
         </class>
         <class className="TPKeyboardAvoidingScrollView" superclassName="UIScrollView">
             <source key="sourceIdentifier" type="project" relativePath="./Classes/TPKeyboardAvoidingScrollView.h"/>
+        </class>
+        <class className="mapDirectionsViewController" superclassName="UIViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/mapDirectionsViewController.h"/>
         </class>
         <class className="problemSpotViewController" superclassName="UIViewController">
             <source key="sourceIdentifier" type="project" relativePath="./Classes/problemSpotViewController.h"/>

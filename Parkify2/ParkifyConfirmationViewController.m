@@ -623,7 +623,11 @@
 }
 
 - (IBAction)directionsButtonTapped:(UIButton *)sender {
-    mapDirectionsViewController *newMaps = [[mapDirectionsViewController alloc] init];
+    UIStoryboard *mainStoryboard = [UIStoryboard storyboardWithName:@"MainStoryboard_iPhone"
+                                                             bundle: nil];
+    
+
+    mapDirectionsViewController *newMaps = [mainStoryboard instantiateViewControllerWithIdentifier: @"mapDirectionsVC"];;
     
     //MyWebView *newMaps = [[MyWebView alloc] initWithFrame:self.view.frame];
     newMaps.currLat=self.currentLat;
