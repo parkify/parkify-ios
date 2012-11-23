@@ -7,8 +7,10 @@
 //
 
 #import <UIKit/UIKit.h>
+#import <CoreLocation/CoreLocation.h>
+
 #import "MyWebView.h"
-@interface mapDirectionsViewController : UIViewController <webViewCustomDelegate, UIWebViewDelegate>
+@interface mapDirectionsViewController : UIViewController <webViewCustomDelegate, UIWebViewDelegate,CLLocationManagerDelegate>
 {
     double currLat;
     double currLong;

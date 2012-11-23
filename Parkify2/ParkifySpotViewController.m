@@ -34,19 +34,18 @@
 @synthesize waitingMask = _waitingMask;
 @synthesize pageControl = _pageControl;
 @synthesize pictureScrollView = _pictureScrollView;
-
 @synthesize taxLabel = _taxLabel;
-@synthesize pictureActivityView = _pictureActivityView;
-@synthesize imageView = _imageView;
+//@synthesize pictureActivityView = _pictureActivityView;
+//@synthesize imageView = _imageView;
 @synthesize titleLable = _titleLable;
 
 @synthesize flashingSign = _flashingSign;
 @synthesize spot = _spot;
-@synthesize infoScrollView = _infoScrollView;
+//@synthesize infoScrollView = _infoScrollView;
 @synthesize infoWebView = _infoWebView;
 @synthesize timeDurationLabel = _timeDurationLabel;
-@synthesize infoBox = _infoBox;
-@synthesize timeLabel = _timeLabel;
+//@synthesize infoBox = _infoBox;
+//@synthesize timeLabel = _timeLabel;
 @synthesize priceLabel = _priceLabel;
 @synthesize rangeBarContainer = _rangeBarContainer;
 
@@ -58,7 +57,7 @@
 //@synthesize startTime = _startTime;
 //@synthesize endTime = _endTime;
 
-@synthesize errorLabel = _errorLabel;
+//@synthesize errorLabel = _errorLabel;
 @synthesize timerPolling = _timerPolling;
 @synthesize timerDuration = _timerDuration;
 
@@ -98,7 +97,6 @@
     NSDate* currentDate = [NSDate date];
     
     double currentTime = [currentDate timeIntervalSince1970];
-    
     MultiImageViewer* miViewer = [[MultiImageViewer alloc] initWithFrame:self.multiImageViewFrame.frame withImageIds:self.spot.landscapeInfoImageIDs];
     
     CGRect frame = miViewer.frame;
@@ -129,8 +127,15 @@
     
 
     double maxVal = self.spot.endTime;
-    
-    self.rangeBar = [[RangeBar alloc] initWithFrame:[self.rangeBarContainer bounds] minVal:prevHourMark maxVal:maxVal minRange:30*60 displayedRange:numHours*60*60 selectedMinVal:currentTime selectedMaxVal:currentTime + 1800 withTimeFormatter:timeFormatter withPriceFormatter:^NSString *(double val) {
+  /*  self.rangeBar = [[RangeBar alloc] initWithFrame:[self.rangeBarContainer bounds] minVal:prevHourMark maxVal:maxVal minRange:30*60 displayedRange:numHours*60*60 selectedMinVal:currentTime selectedMaxVal:currentTime + 1800 withTimeFormatter:timeFormatter withPriceFormatter:^NSString *(double val) {
+        if(fmod(val,1.0) >= 0.01) {
+            return [NSString stringWithFormat:@"$%0.2f", val];
+        } else {
+            return [NSString stringWithFormat:@"$%0.0f", val];
+        }
+    } withPriceSource:self.spot];
+*/
+    self.rangeBar = [[RangeBar alloc] initWithFrame:[self.rangeBarContainer bounds] minVal:prevHourMark minimumSelectableValue:prevHourMark maxVal:maxVal minRange:30*60 displayedRange:numHours*60*60 selectedMinVal:currentTime selectedMaxVal:currentTime + 1800 withTimeFormatter:timeFormatter withPriceFormatter:^NSString *(double val) {
         if(fmod(val,1.0) >= 0.01) {
             return [NSString stringWithFormat:@"$%0.2f", val];
         } else {
@@ -168,23 +173,16 @@
 
 - (void)viewDidUnload
 {
-    [self setInfoBox:nil];
-    [self setTimeLabel:nil];
     [self setPriceLabel:nil];
     [self setRangeBarContainer:nil];
-    [self setErrorLabel:nil];
     [self setTitleLable:nil];
     [self setTaxLabel:nil];
     [self setTimeDurationLabel:nil];
     [self setInfoWebView:nil];
-    [self setInfoScrollView:nil];
     [self setFlashingSign:nil];
-    [self setPictureActivityView:nil];
-    [self setImageView:nil];
     [self setStartTimeLabel:nil];
     [self setEndTimeALabel:nil];
     [self setEndTimeLabel:nil];
-    [self setTestBubble:nil];
     [self setPageControl:nil];
     [self setPictureScrollView:nil];
     [self setMultiImageViewFrame:nil];
@@ -302,7 +300,7 @@
     CGSize fittingSize = [self.infoWebView sizeThatFits:CGSizeZero];
     frame.size = fittingSize;
     self.infoWebView.frame = frame;
-    self.infoScrollView.contentSize = frame.size;
+ //   self.infoScrollView.contentSize = frame.size;
         
 }
 
@@ -373,7 +371,7 @@
     //self.taxLabel.transform = squish;
     self.titleLable.text = infoTitle;
     [self setTitle:infoTitle];
-    self.timeLabel.text = timeString;
+   // self.timeLabel.text = timeString;
     //self.timeLabel.transform = squish;
     self.priceLabel.text = priceString;
     //self.priceLabel.transform = squish;
@@ -387,15 +385,33 @@
     frame.origin.x = self.endTimeLabel.frame.origin.x + size.width + 1;
     self.endTimeALabel.frame = frame;
 }
-
 - (IBAction)parkButtonTapped:(UIButton *)sender {
     BOOL notransactiondebug = false;
     if (notransactiondebug) {
-        [self switchToConfirmation];
+        [self switchToConfirmation:@"DYLAN WHAT?"];
         return;
     }
     if ([Persistance retrieveAuthToken] == nil) {
-        [Api authenticateModallyFrom:self withSuccess:^(NSDictionary * result){}];
+        [Api authenticateModallyFrom:self withSuccess:^(NSDictionary * result)
+        {
+            NSString *status = [[result objectForKey:@"exit"] copy];
+            NSLog(@"result status is %@", status);
+            if ( [status isEqualToString:@"logged_in"]){
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    NSLog(@"Logged in");
+                    [self previewTransaction];
+                        });
+
+            }
+            else{
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    NSLog(@"Not Logged in");
+                });
+
+            }
+        }
+        
+         ];
         return;
     } else {
         [self previewTransaction];
@@ -417,7 +433,7 @@
     }
 }
 
-- (void) switchToConfirmation {
+- (void) switchToConfirmation:(NSString*)paymentDetails {
     [self stopPolling];    
     self.navigationController.modalPresentationStyle = UIModalPresentationCurrentContext;
     
@@ -430,16 +446,19 @@
         UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:controller];
         [navController.navigationBar setTintColor:[UIColor blackColor]];
         controller.spot = self.spot;
-        [Persistance saveCurrentSpotId:self.spot.mID];
+        NSMutableDictionary *thetransaction = [Persistance addNewTransaction:self.spot withStartTime:self.rangeBar. selectedMinimumValue andEndTime:self.rangeBar.selectedMaximumValue andLastPaymentDetails:paymentDetails];
+        NSDictionary *tester = [Persistance retrieveTransactions];
+        NSLog(@"Are they stored? \n%@", tester);
+       /* [Persistance saveCurrentSpotId:self.spot.mID];
         controller.startTime = self.rangeBar. selectedMinimumValue;
         [Persistance saveCurrentStartTime:controller.startTime];
         controller.endTime = self.rangeBar.selectedMaximumValue;
         [Persistance saveCurrentEndTime:controller.endTime];
-        
+        */
         controller.currentLat = self.currentLat;
         controller.currentLong = self.currentLong;
-        
-        controller.topBarText = [Persistance retrieveLastPaymentInfoDetails];
+        controller.transactionInfo = thetransaction;
+        controller.topBarText = paymentDetails;
         
         [Persistance saveCurrentSpot:self.spot];
         
@@ -458,8 +477,15 @@
     }
     
     id transactionRequest = [Authentication makeTransactionRequestWithUserToken:[Persistance retrieveAuthToken] withSpotId:self.spot.mID withStartTime:self.rangeBar.selectedMinimumValue withEndTime:self.rangeBar.selectedMaximumValue withOfferIds:offerIds withLicensePlate:[Persistance retrieveLicensePlateNumber]];
+#ifdef DEBUGVER
+    NSString *sslorno = @"http";
     
-    NSString* urlString = [[NSString alloc] initWithFormat:@"https://%@/api/v1/acceptances.json?auth_token=%@", TARGET_SERVER, [Persistance retrieveAuthToken]];
+#else
+    NSString *sslorno = @"https";
+    
+#endif
+
+    NSString* urlString = [[NSString alloc] initWithFormat:@"%@://%@/api/v1/acceptances.json?auth_token=%@",sslorno, TARGET_SERVER, [Persistance retrieveAuthToken]];
     NSURL *url = [NSURL URLWithString:urlString];
     
     
@@ -482,7 +508,7 @@
             NSString* paymentInfoDetails = [[root objectForKey:@"acceptance"] objectForKey:@"details"];
             [Persistance saveLastPaymentInfoDetails:paymentInfoDetails];
             
-            [self switchToConfirmation];
+            [self switchToConfirmation:paymentInfoDetails];
             
             //[self performSegueWithIdentifier:@"ViewConfirmation" sender:self];
             //NSLog(@"TEST");
@@ -540,7 +566,14 @@
     
     id transactionRequest = [Authentication makeTransactionRequestWithUserToken:[Persistance retrieveAuthToken] withSpotId:self.spot.mID withStartTime:self.rangeBar.selectedMinimumValue withEndTime:self.rangeBar.selectedMaximumValue withOfferIds:offerIds withLicensePlate:[Persistance retrieveLicensePlateNumber]];
     
-    NSString* urlString = [[NSString alloc] initWithFormat:@"https://%@/api/v1/acceptances/preview.json?auth_token=%@", TARGET_SERVER, [Persistance retrieveAuthToken]];
+#ifdef DEBUGVER
+    NSString *sslorno = @"http";
+
+#else
+    NSString *sslorno = @"https";
+
+#endif
+    NSString* urlString = [[NSString alloc] initWithFormat:@"%@://%@/api/v1/acceptances/preview.json?auth_token=%@", sslorno, TARGET_SERVER, [Persistance retrieveAuthToken]];
     NSURL *url = [NSURL URLWithString:urlString];
     
     

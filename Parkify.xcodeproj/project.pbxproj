@@ -147,6 +147,7 @@
 		8CE81F051625059A004260CC /* RangeBubble.m in Sources */ = {isa = PBXBuildFile; fileRef = 8CE81F0416250599004260CC /* RangeBubble.m */; };
 		8CF0743F15E6E844002ABE82 /* ParkifyAboutControllerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8CF0743E15E6E844002ABE82 /* ParkifyAboutControllerViewController.m */; };
 		8CF0744215E6EC48002ABE82 /* ParkifySettingsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8CF0744115E6EC48002ABE82 /* ParkifySettingsViewController.m */; };
+		F6303458165AF9930050F555 /* extendReservationViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = F6303457165AF9930050F555 /* extendReservationViewController.m */; };
 		F647131D165203FE004D9289 /* mapDirectionsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = F647131C165203FE004D9289 /* mapDirectionsViewController.m */; };
 		F6471325165422EF004D9289 /* NativeBridge.js in Sources */ = {isa = PBXBuildFile; fileRef = F6471324165422EF004D9289 /* NativeBridge.js */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		F647132816542540004D9289 /* MyWebView.m in Sources */ = {isa = PBXBuildFile; fileRef = F647132716542540004D9289 /* MyWebView.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
@@ -165,6 +166,7 @@
 		F6F1EFAE164C5B400003D3CB /* green_button2.png in Resources */ = {isa = PBXBuildFile; fileRef = F6F1EFAD164C5B400003D3CB /* green_button2.png */; };
 		F6F1EFB2164C5BF40003D3CB /* troubleFindingSpotViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = F6F1EFB1164C5BF40003D3CB /* troubleFindingSpotViewController.m */; };
 		F6F1EFB4164CA64D0003D3CB /* red_button.png in Resources */ = {isa = PBXBuildFile; fileRef = F6F1EFB3164CA64D0003D3CB /* red_button.png */; };
+		F6F9715A16603BCF008788B0 /* selected_bubble_green.png in Resources */ = {isa = PBXBuildFile; fileRef = F6F9715916603BCF008788B0 /* selected_bubble_green.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -461,6 +463,8 @@
 		8CF0743E15E6E844002ABE82 /* ParkifyAboutControllerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ParkifyAboutControllerViewController.m; sourceTree = "<group>"; };
 		8CF0744015E6EC48002ABE82 /* ParkifySettingsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ParkifySettingsViewController.h; sourceTree = "<group>"; };
 		8CF0744115E6EC48002ABE82 /* ParkifySettingsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ParkifySettingsViewController.m; sourceTree = "<group>"; };
+		F6303456165AF9930050F555 /* extendReservationViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = extendReservationViewController.h; sourceTree = "<group>"; };
+		F6303457165AF9930050F555 /* extendReservationViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = extendReservationViewController.m; sourceTree = "<group>"; };
 		F647131B165203FE004D9289 /* mapDirectionsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mapDirectionsViewController.h; sourceTree = "<group>"; };
 		F647131C165203FE004D9289 /* mapDirectionsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = mapDirectionsViewController.m; sourceTree = "<group>"; };
 		F6471324165422EF004D9289 /* NativeBridge.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = NativeBridge.js; sourceTree = "<group>"; };
@@ -485,6 +489,7 @@
 		F6F1EFB0164C5BF40003D3CB /* troubleFindingSpotViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = troubleFindingSpotViewController.h; sourceTree = "<group>"; };
 		F6F1EFB1164C5BF40003D3CB /* troubleFindingSpotViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = troubleFindingSpotViewController.m; sourceTree = "<group>"; };
 		F6F1EFB3164CA64D0003D3CB /* red_button.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = red_button.png; sourceTree = "<group>"; };
+		F6F9715916603BCF008788B0 /* selected_bubble_green.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = selected_bubble_green.png; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -814,6 +819,8 @@
 				8CA7A1F915A3DC980051567D /* Parkify2ViewController.m */,
 				8C79E1C915A8F20D00B49D73 /* ParkifySpotViewController.h */,
 				8C79E1CA15A8F20D00B49D73 /* ParkifySpotViewController.m */,
+				F6303456165AF9930050F555 /* extendReservationViewController.h */,
+				F6303457165AF9930050F555 /* extendReservationViewController.m */,
 				F6F1EFAF164C5BD60003D3CB /* troubleWithSpot */,
 				8C78D3A315AABDC000B4D929 /* ParkifyConfirmationViewController.h */,
 				8C78D3A415AABDC000B4D929 /* ParkifyConfirmationViewController.m */,
@@ -1123,6 +1130,7 @@
 			children = (
 				8C930F1F1638BFF7003C53A9 /* info_page_splash.png */,
 				8C930F1D1638AAAF003C53A9 /* checkmark.png */,
+				F6F9715916603BCF008788B0 /* selected_bubble_green.png */,
 				8C930F0D16378E92003C53A9 /* unselected_bubble.png */,
 				8C930F0916378ADA003C53A9 /* selected_bubble.png */,
 				8CDF6D8F1630407E004B6A37 /* warning.png */,
@@ -1314,6 +1322,7 @@
 				F6F1EFAE164C5B400003D3CB /* green_button2.png in Resources */,
 				F6F1EFB4164CA64D0003D3CB /* red_button.png in Resources */,
 				F647132A165429CE004D9289 /* googmaps.html in Resources */,
+				F6F9715A16603BCF008788B0 /* selected_bubble_green.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1410,6 +1419,7 @@
 				F647131D165203FE004D9289 /* mapDirectionsViewController.m in Sources */,
 				F6471325165422EF004D9289 /* NativeBridge.js in Sources */,
 				F647132816542540004D9289 /* MyWebView.m in Sources */,
+				F6303458165AF9930050F555 /* extendReservationViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

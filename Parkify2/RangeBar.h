@@ -18,10 +18,12 @@
 @property(nonatomic) double displayedRange;
 @property(nonatomic) double selectedMinimumValue;
 @property(nonatomic) double selectedMaximumValue;
+@property(nonatomic) double minimumSelectableValue;
 
 @property (nonatomic, strong) Formatter timeFormatter;
 @property (nonatomic, strong) Formatter priceFormatter;
 
-- (RangeBar*)initWithFrame:(CGRect)frame minVal:(double)minVal maxVal:(double)maxVal minRange:(double)minRange displayedRange:(double)displayedRange selectedMinVal:(double)selectedMinVal selectedMaxVal:(double)selectedMaxVal withTimeFormatter:(Formatter)timeFormatter withPriceFormatter:(Formatter)priceFormatter withPriceSource:(NSObject<PriceStore>*)  priceSource;
+//- (RangeBar*)initWithFrame:(CGRect)frame minVal:(double)minVal maxVal:(double)maxVal minRange:(double)minRange displayedRange:(double)displayedRange selectedMinVal:(double)selectedMinVal selectedMaxVal:(double)selectedMaxVal withTimeFormatter:(Formatter)timeFormatter withPriceFormatter:(Formatter)priceFormatter withPriceSource:(NSObject<PriceStore>*)  priceSource;
+- (RangeBar*)initWithFrame:(CGRect)frame minVal:(double)minVal minimumSelectableValue:(double)minSelectVal maxVal:(double)maxVal minRange:(double)minRange displayedRange:(double)displayedRange selectedMinVal:(double)selectedMinVal selectedMaxVal:(double)selectedMaxVal withTimeFormatter:(Formatter)timeFormatter withPriceFormatter:(Formatter)priceFormatter withPriceSource:(NSObject<PriceStore>*)  priceSource;
 
 @end

@@ -22,12 +22,14 @@
 @property (strong, nonatomic) UIView * bubbleBooked;
 @property (strong, nonatomic) UIImageView * bubbleFree;
 @property (strong, nonatomic) UIImageView * bubbleBackground;
+@property (strong, nonatomic) UIImageView * bubbleNewBackground;
 @property (strong, nonatomic) UIImageView * vertBar;
 @property (strong, nonatomic) UILabel * priceLabel;
 @property (strong, nonatomic) UILabel * timeLabel;
 @property (strong, nonatomic) UILabel * dateLabel;
 @property CGRect mainRect;
 @property (strong, nonatomic) UIColor * selectedColor;
+@property (strong, nonatomic) UIColor * newselectedColor;
 @property (strong, nonatomic) UIColor * unselectedColor;
 
 @property (strong, nonatomic) NSObject<PriceStore>* priceSource;
@@ -42,7 +44,8 @@
 @end
 
 @implementation RangeBubble
-
+@synthesize minimumSelectedValue = _minimumSelectedValue;
+@synthesize bubbleNewBackground = _bubbleNewBackground;
 @synthesize minimumValue = _minimumValue;
 @synthesize maximumValue = _maximumValue;
 @synthesize minimumRange = _minimumRange;
@@ -61,6 +64,7 @@
 @synthesize mainRect = _mainRect;
 @synthesize selectedColor = _selectedColor;
 @synthesize unselectedColor = _unselectedColor;
+@synthesize newselectedColor = _newselectedColor;
 
 -(void) setAlpha:(CGFloat)alpha {
     [super setAlpha:alpha];
@@ -102,7 +106,7 @@
     return _priceFormatter;
 }
 
-- (RangeBubble*)initWithFrame:(CGRect)frame minVal:(double)minVal maxVal:(double)maxVal minRange:(double)minRange selectedMinVal:(double)selectedMinVal selectedMaxVal:(double)selectedMaxVal withPriceFormatter:(Formatter)priceFormatter withTimeFormatter:(Formatter)timeFormatter withPriceSource:(NSObject<PriceStore>*)priceSource {
+- (RangeBubble*)initWithFrame:(CGRect)frame minVal:(double)minVal maxVal:(double)maxVal minRange:(double)minRange selectedMinVal:(double)selectedMinVal selectedMaxVal:(double)selectedMaxVal withPriceFormatter:(Formatter)priceFormatter withTimeFormatter:(Formatter)timeFormatter withPriceSource:(NSObject<PriceStore>*)priceSource withMinimumSelectedValue:(double)minSelVal {
     
     self.priceSource = priceSource;
     
@@ -120,6 +124,7 @@
         self.mainRect = CGRectMake(0,h-h_main,w,h_main);
         
         self.minimumValue = minVal;
+        self.minimumSelectedValue=minSelVal;
         self.maximumValue = maxVal;
         self.minimumRange = minRange;
         self.priceFormatter = priceFormatter;
@@ -131,6 +136,7 @@
         
         self.selectedColor = [UIColor colorWithRed:(97.0/255.0) green:(189.0/255.0) blue:(250.0/255.0) alpha:1];
         self.unselectedColor = [UIColor colorWithRed:(130.0/255.0) green:(130.0/255.0) blue:(130.0/255.0) alpha:1];
+        self.newselectedColor = [UIColor colorWithRed:(0.0/255.0) green:(250.0/255.0) blue:(0.0/255.0) alpha:1];
         
         //track background
         /*
@@ -166,7 +172,7 @@
         [self addSubview:self.bubbleFree];
         
         //track booked
-        UIImage* imgBlue = [UIImage imageNamed:@"selected_bubble.png"];//[UIImage imageWithImage:[UIImage imageNamed:@"selected_bubble.png"] scaledToSize:CGSizeMake(w, h_main)];
+        UIImage* imgBlue =[UIImage imageNamed:@"selected_bubble.png"];//[UIImage imageWithImage:[UIImage imageNamed:@"selected_bubble.png"] scaledToSize:CGSizeMake(w, h_main)];
         UIImageView* bubbleBookedImgView = [[UIImageView alloc] initWithImage:imgBlue];
         
         bubbleBookedImgView.frame = self.mainRect;
@@ -178,6 +184,17 @@
         [self.bubbleBooked setClipsToBounds:true];
         
         [self addSubview:self.bubbleBooked];
+        
+        UIImage* imgGreen =[UIImage imageNamed:@"selected_bubble_green.png"];//[UIImage imageWithImage:[UIImage imageNamed:@"selected_bubble.png"] scaledToSize:CGSizeMake(w, h_main)];
+        
+        self.bubbleNewBackground = [[UIImageView alloc] initWithImage:imgGreen];
+        self.bubbleNewBackground.clipsToBounds = true;
+        self.bubbleNewBackground.frame = self.mainRect;
+        self.bubbleNewBackground.alpha = self.alpha;
+        
+        [self addSubview:self.bubbleNewBackground];
+        
+        
         
         //labels
         float text_height = (h-h_main)/4;
@@ -260,7 +277,7 @@
         return @"DEFAULT";
     } withTimeFormatter:^NSString *(double val) {
         return @"DEFAULT";
-    } withPriceSource:nil];
+    } withPriceSource:nil withMinimumSelectedValue:0];
 }
 
 
@@ -293,19 +310,34 @@
     
     
     double begin = [self xForValue:self.selectedMinimumValue];
+    double blueedn = [self xForValue:self.minimumSelectedValue];
     double end = [self xForValue:self.selectedMaximumValue];
     
 
     
+   /* 
     CALayer* maskLayer = [CALayer layer];
     maskLayer.frame = CGRectMake(begin,0,end-begin ,self.bubbleBooked.frame.size.height);
     CGRect rect = CGRectMake(begin,0,end-begin ,self.bubbleBooked.frame.size.height);
+    maskLayer.contents = (__bridge id)[[UIImage imageNamed:@"maskImage.png"] CGImage];
+
+    */
+    CALayer* maskLayer = [CALayer layer];
+    maskLayer.frame = CGRectMake(begin,0,end-begin ,self.bubbleBooked.frame.size.height);
     maskLayer.contents = (__bridge id)[[UIImage imageNamed:@"maskImage.png"] CGImage];
 
     
     self.bubbleBooked.layer.mask = maskLayer;
     
     [self.bubbleBooked setNeedsDisplay];
+    
+    CALayer* maskLayertwo = [CALayer layer];
+    maskLayertwo.frame = CGRectMake(blueedn,0,end-blueedn ,self.bubbleBooked.frame.size.height);
+    NSLog(@"The frame is %@", NSStringFromCGRect(maskLayertwo.frame));
+    maskLayertwo.contents = (__bridge id)[[UIImage imageNamed:@"maskImage.png"] CGImage];
+
+    [self.bubbleNewBackground.layer setMask:maskLayertwo];
+    [self.bubbleNewBackground setNeedsDisplay];
     
     //NOW labels!
     

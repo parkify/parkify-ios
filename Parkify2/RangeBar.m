@@ -107,6 +107,7 @@
 @implementation RangeBar
 
 @synthesize minimumValue = _minimumValue;
+@synthesize minimumSelectableValue = _minimumSelectableValue;
 @synthesize maximumValue = _maximumValue;
 @synthesize minimumRange = _minimumRange;
 @synthesize displayedRange = _displayedRange;
@@ -138,7 +139,7 @@
 
 @synthesize lastTouchedPoint = _lastTouchedPoint;
 
-- (RangeBar*)initWithFrame:(CGRect)frame minVal:(double)minVal maxVal:(double)maxVal minRange:(double)minRange displayedRange:(double)displayedRange selectedMinVal:(double)selectedMinVal selectedMaxVal:(double)selectedMaxVal withTimeFormatter:(Formatter)timeFormatter withPriceFormatter:(Formatter)priceFormatter withPriceSource:(NSObject<PriceStore>*)  priceSource{
+- (RangeBar*)initWithFrame:(CGRect)frame minVal:(double)minVal minimumSelectableValue:(double)minSelectVal maxVal:(double)maxVal minRange:(double)minRange displayedRange:(double)displayedRange selectedMinVal:(double)selectedMinVal selectedMaxVal:(double)selectedMaxVal withTimeFormatter:(Formatter)timeFormatter withPriceFormatter:(Formatter)priceFormatter withPriceSource:(NSObject<PriceStore>*)  priceSource{
     self = [super initWithFrame:frame];
     if (self) {
         
@@ -146,6 +147,7 @@
         self.priceSource = priceSource;
         
         self.minimumValue = minVal;
+        self.minimumSelectableValue = minSelectVal;
         self.maximumValue = maxVal;
         self.minimumRange = minRange;
         self.displayedRange = displayedRange;
@@ -184,17 +186,16 @@
         CGRect bubbleRect = CGRectMake(0,0,[self bubbleWidth], self.trackRect.size.height);
         
         self.trackBubbles = [[NSMutableArray alloc] init];
-        
-        
         for (int i = 0; i< self.numDisplayedBubbles; i++) {
             double minVal = self.minimumValue + (bubbleRange*i);
             double maxVal = self.minimumValue + (bubbleRange*(i+1));
             double selectedMinVal = MAX(minVal, self.selectedMinimumValue);
             double selectedMaxVal = MIN(maxVal, self.selectedMaximumValue);
             
-            RangeBubble* bubble = [[RangeBubble alloc] initWithFrame:bubbleRect minVal:minVal maxVal:maxVal minRange:self.minimumRange selectedMinVal:selectedMinVal selectedMaxVal:selectedMaxVal withPriceFormatter:self.priceFormatter withTimeFormatter:self.timeFormatter withPriceSource:self.priceSource];
+            RangeBubble* bubble = [[RangeBubble alloc] initWithFrame:bubbleRect minVal:minVal maxVal:maxVal minRange:self.minimumRange selectedMinVal:selectedMinVal selectedMaxVal:selectedMaxVal withPriceFormatter:self.priceFormatter withTimeFormatter:self.timeFormatter withPriceSource:self.priceSource withMinimumSelectedValue:self.minimumSelectableValue+ (30*60)];
             [self addSubview:bubble];
             [self.trackBubbles addObject:bubble];
+            
         }
         [UIView animateWithDuration:1.0
                          animations:^{
@@ -212,7 +213,7 @@
 //I suggest you don't use this one.
 - (id)initWithFrame:(CGRect)frame
 {
-    return [self initWithFrame:frame minVal:0 maxVal:1 minRange:0.01 displayedRange:10 selectedMinVal:0 selectedMaxVal:1 withTimeFormatter:^NSString *(double val) {
+    return [self initWithFrame:frame minVal:0 minimumSelectableValue:0 maxVal:1 minRange:0.01 displayedRange:10 selectedMinVal:0 selectedMaxVal:1 withTimeFormatter:^NSString *(double val) {
         return @"";
     } withPriceFormatter:^NSString *(double val) {
         return @"";
@@ -346,8 +347,9 @@
 
     double newVal = lowVal + delVal;
     newVal = MIN(newVal, self.maximumValue);
-    newVal = MAX(newVal, self.selectedMinimumValue + self.minimumRange);
-
+    //newVal = MAX(newVal, self.selectedMinimumValue + self.minimumRange);
+    newVal = MAX(newVal, self.minimumSelectableValue + self.minimumRange);
+    NSLog(@"Value is %f", newVal);
     if(newVal <= self.maximumValue) {
         self.maxThumb.center = CGPointMake([self xForValue:newVal], self.maxThumb.center.y);
         self.selectedMaximumValue = newVal;
@@ -409,9 +411,8 @@
     double maxVal = lastBubble.maximumValue + bubbleRange;
     double selectedMinVal = self.selectedMinimumValue;
     double selectedMaxVal = self.selectedMaximumValue;
-        
     RangeBubble* bubble = [[RangeBubble alloc] initWithFrame:bubbleRect minVal:minVal maxVal:maxVal minRange:self.      minimumRange selectedMinVal:selectedMinVal selectedMaxVal:selectedMaxVal
-                                          withPriceFormatter:self.priceFormatter withTimeFormatter:self.timeFormatter withPriceSource:self.priceSource];
+                                          withPriceFormatter:self.priceFormatter withTimeFormatter:self.timeFormatter withPriceSource:self.priceSource withMinimumSelectedValue:self.minimumSelectableValue+(30*60)];
     [self addSubview:bubble];
     [self.trackBubbles addObject:bubble];
     

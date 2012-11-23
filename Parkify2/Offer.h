@@ -8,14 +8,14 @@
 
 #import <Foundation/Foundation.h>
 
-@interface PriceInterval : NSObject
+@interface PriceInterval : NSObject <NSCoding>
 @property double startTime;
 @property double endTime;
 @property double pricePerHour;
 - (id) initFromDictionary:(NSDictionary*)dictIn;
 @end
 
-@interface Offer : NSObject
+@interface Offer : NSObject <NSCoding>
 
 
 @property double startTime;

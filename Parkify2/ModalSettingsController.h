@@ -12,7 +12,7 @@
 
 @interface ModalSettingsController : UITabBarController
 
-@property (weak, nonatomic) SuccessBlock successBlock;
+@property (strong, nonatomic) SuccessBlock successBlock;
 
 - (void) exitWithResults:(NSDictionary *)results;
 @end

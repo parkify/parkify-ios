@@ -42,7 +42,7 @@
 @property (strong, nonatomic) NSString *mDesc;
 @property Boolean mFree;
 @property Boolean mRemove;
-@property (strong, nonatomic) NSArray* offers;
+@property (strong, nonatomic) NSMutableArray* offers;
 
 @property (strong, nonatomic) NSString* mSpotLayout;
 @property (strong, nonatomic) NSString* mSpotDifficulty;

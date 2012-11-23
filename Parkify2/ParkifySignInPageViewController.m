@@ -287,7 +287,15 @@
 }
 
 - (IBAction)resetPasswordTapped:(id)sender {
-    NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"https://%@/my/users/password/new", TARGET_SERVER]];
+#ifdef DEBUGVER
+    NSString *sslorno = @"http";
+    
+#else
+    NSString *sslorno = @"https";
+    
+#endif
+
+    NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"%@://%@/my/users/password/new",sslorno, TARGET_SERVER]];
     [[UIApplication sharedApplication] openURL:url];
 }
 

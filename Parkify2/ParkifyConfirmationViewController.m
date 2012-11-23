@@ -20,6 +20,7 @@
 #import "troubleFindingSpotViewController.h"
 #import "MyWebView.h"
 #import "mapDirectionsViewController.h"
+#import "extendReservationViewController.h"
 //#import "PlacedAgent.h"
 
 #define CALLOUT_CONTENT_OFFSET 20
@@ -46,9 +47,9 @@
 @end
 
 @implementation ParkifyConfirmationViewController
-
-@synthesize startTime = _startTime;
-@synthesize endTime = _endTime;
+@synthesize transactionInfo = _transactionInfo;
+//@synthesize startTime = _startTime;
+//@synthesize endTime = _endTime;
 @synthesize mainScrollView = _mainScrollView;
 
 @synthesize titleLable = _titleLable;
@@ -253,7 +254,7 @@
             [dateFormatter setDateFormat:@"h:mm a"];
             return [dateFormatter stringFromDate:time]; };
         
-        NSString* timeString = [NSString stringWithFormat:@"%@ - %@", formatter(self.startTime), formatter(self.endTime)];
+        NSString* timeString = [NSString stringWithFormat:@"%@ - %@", formatter([[self.transactionInfo objectForKey:@"starttime"] doubleValue]), formatter([[self.transactionInfo objectForKey:@"endtime"] doubleValue])];
         
         //Layout text
         NSString* layoutString = ([self.spot.mSpotLayout isEqualToString:@"parallel"]) ? @"YES" : @"NO";
@@ -711,6 +712,16 @@
             [self.topBarView setHidden:true];
         }];
     }];
+}
+
+- (IBAction)extendReservation:(id)sender {
+    UIStoryboard *mainStoryboard = [UIStoryboard storyboardWithName:@"MainStoryboard_iPhone"
+                                                             bundle: nil];
+    
+    extendReservationViewController *controller = [mainStoryboard instantiateViewControllerWithIdentifier: @"extendResVC"];
+    controller.transactioninfo= self.transactionInfo;
+    [self.navigationController pushViewController:controller animated:YES];
+
 }
 
 - (IBAction)topBarButtonTapped:(id)sender {

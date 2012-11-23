@@ -16,7 +16,45 @@
 @synthesize window = _window;
 @synthesize user = _user;
 @synthesize parkingSpots = _parkingSpots;
+@synthesize transactions = _transactions;
 
+-(NSMutableDictionary*)transactions{
+    if(!transactions){
+        NSDictionary *trans = [Persistance retrieveTransactions];
+        transactions= [[NSMutableDictionary alloc] init];
+        NSMutableDictionary *actvies = [[NSMutableDictionary alloc] init];
+        NSMutableDictionary *alltrans = [[NSMutableDictionary alloc] init];
+        [transactions setValue:actvies forKey:@"active"];
+        [transactions setValue:alltrans forKey:@"all"];
+        
+        if(trans){
+            double currentTime = [[NSDate date] timeIntervalSince1970];
+            NSDictionary *aller = [trans objectForKey:@"all"];
+            for (NSString *transactionkey in aller){
+                NSDictionary *transaction = [aller objectForKey:transactionkey];
+                NSMutableDictionary *thistransaction = [NSMutableDictionary dictionaryWithDictionary:transaction];
+                NSLog(@"transaction is %@", transaction);
+                double startTime = [[transaction objectForKey:@"starttime"] doubleValue];
+                double endTime =[[transaction objectForKey:@"endtime"] doubleValue];
+                
+                if ((currentTime >= startTime) && (currentTime <= endTime)){
+                    [thistransaction setValue:@"1" forKey:@"active"];
+                    [actvies setValue:thistransaction forKey:[NSString stringWithFormat:@"%i", [[thistransaction objectForKey:@"spotid"] intValue] ]];
+                }
+                else{
+                    [thistransaction setValue:@"0" forKey:@"active"];
+
+                }
+                [alltrans setValue:thistransaction forKey:[NSString stringWithFormat:@"%i", [[thistransaction objectForKey:@"spotid"] intValue] ]];
+
+
+            }
+        }
+        
+
+    }
+    return transactions;
+}
 -(User*) user {
   if(!_user) {
     _user = [[User alloc] init];
@@ -42,6 +80,13 @@ void uncaughtExceptionHandler(NSException *exception) {
     // Override point for customization after application launch.
     NSSetUncaughtExceptionHandler(&uncaughtExceptionHandler);
     [Persistance updatePersistedDataWithAppVersion];
+        
+        // Register with apple that this app will use push notification
+        
+        [[UIApplication sharedApplication] registerForRemoteNotificationTypes:(UIRemoteNotificationTypeAlert |
+                                                                               
+                                                                               UIRemoteNotificationTypeSound | UIRemoteNotificationTypeBadge)];
+        
     //[Flurry startSession:@"TS2D3KM78SMZ8MJWNYNV"];
     
     //[PlacedAgent initWithAppKey:@"6f15dab4fc2d"];
@@ -51,7 +96,18 @@ void uncaughtExceptionHandler(NSException *exception) {
   
     return YES;
 }
-							
+- (void)application:(UIApplication *)application didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken {
+    
+    // Show the device token obtained from apple to the log
+    
+    NSLog(@"deviceToken: %@", deviceToken);
+    
+}
+- (void)application:(UIApplication*)application didFailToRegisterForRemoteNotificationsWithError:(NSError*)error
+{
+	NSLog(@"Failed to get token, error: %@", error);
+}
+
 - (void)applicationWillResignActive:(UIApplication *)application
 {
     // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.

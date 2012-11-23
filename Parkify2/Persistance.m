@@ -13,6 +13,9 @@
 + (id) retrieveUserRecordwithName:(NSString*)name;
 + (void) saveRecord:(id)record withName:(NSString*)name;
 + (id) retrieveRecordwithName:(NSString*)name;
++ (void) saveUserPlist:(id)record withName:(NSString *)name;
++ (id) retrievePlistWithName:(NSString *)name;
+
 @end
 
 @implementation Persistance
@@ -38,6 +41,27 @@
     return toRtn;
 }
 
++ (void) saveUserPlist:(id)record withName:(NSString *)name{
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *documentsDirectory = [paths objectAtIndex:0];
+    NSString *writableDBPath = [documentsDirectory stringByAppendingPathComponent:name];
+    
+    BOOL saved= [NSKeyedArchiver archiveRootObject:record toFile:writableDBPath];
+    NSLog(@"did save object with name %@, %d", name, saved);
+
+}
++ (id) retrievePlistWithName:(NSString *)name{
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *documentsDirectory = [paths objectAtIndex:0];
+    NSString *writableDBPath = [documentsDirectory stringByAppendingPathComponent:name];
+    
+    
+    NSFileManager *fmang = [NSFileManager defaultManager];
+    if ([fmang isReadableFileAtPath:writableDBPath]){
+        return [NSKeyedUnarchiver unarchiveObjectWithFile:writableDBPath];
+    }
+    return nil;
+}
 
 + (void) saveUserRecord:(id)record withName:(NSString*)name {
     NSUserDefaults* standardUserDefaults = [NSUserDefaults standardUserDefaults];
@@ -56,8 +80,10 @@
     currentUser = (currentUser != nil) ? currentUser : [NSNumber numberWithInt:-1];
     
     id val = nil;
-    if (standardUserDefaults) val = [standardUserDefaults objectForKey:name];
-    if (val) val = [val objectForKey:[NSString stringWithFormat:@"%@", currentUser ]];
+    if (standardUserDefaults)
+        val = [standardUserDefaults objectForKey:name];
+    if (val)
+        val = [val objectForKey:[NSString stringWithFormat:@"%@", currentUser ]];
     return val;
 }
 
@@ -146,7 +172,21 @@
 }
 
 
-
++(NSMutableDictionary*)addNewTransaction:(ParkingSpot*)spot withStartTime:(double)timeIn andEndTime:(double)timeOut andLastPaymentDetails:(NSString*)details{
+    NSMutableDictionary *newTransaction = [NSMutableDictionary dictionaryWithObjects:[NSArray arrayWithObjects:[NSNumber numberWithInt:spot.mID], details, [NSNumber numberWithDouble:timeIn],[NSNumber numberWithDouble:timeOut],@"1",spot.offers, nil] forKeys:[NSArray arrayWithObjects:@"spotid",@"lastpayment", @"starttime",@"endtime",@"active" ,@"offers",nil]];
+    ParkifyAppDelegate *delegate = (ParkifyAppDelegate*)[[UIApplication sharedApplication] delegate];
+    NSLog(@"Saving transaciton %@", newTransaction);
+    [[delegate.transactions objectForKey:@"active"] setValue:newTransaction forKey:[NSString stringWithFormat:@"%i", spot.mID]];
+    [[delegate.transactions objectForKey:@"all"] setValue:newTransaction forKey:[NSString stringWithFormat:@"%i", spot.mID]];
+    
+    [Persistance saveUserPlist:delegate.transactions withName:@"transactionarray"];
+//    [Persistance saveUserRecord:delegate.transactions withName:@"transactionarray"];
+    return newTransaction;
+}
++(NSDictionary*)retrieveTransactions{
+    return [Persistance retrievePlistWithName:@"transactionarray"];
+//    return [Persistance retrieveUserRecordwithName:@"transactionarray"];
+}
 +(void)saveCurrentSpotId:(int)spotId{
     if (spotId == -1) {
         [Persistance saveUserRecord:nil withName:@"CurrentSpotId"];
@@ -154,6 +194,7 @@
         [Persistance saveUserRecord:[NSNumber numberWithInt:spotId] withName:@"CurrentSpotId"];
     }
 }
+
 +(int)retrieveCurrentSpotId {
     return [[Persistance retrieveUserRecordwithName:@"CurrentSpotId"] intValue];
 }
@@ -178,9 +219,9 @@
         [Persistance saveUserRecord:[NSNumber numberWithDouble:timeIn] withName:@"CurrentEndTime"];
     }
 }
-+(double)retrieveCurrentEndTime {
+/*+(double)retrieveCurrentEndTime {
     return [[Persistance retrieveUserRecordwithName:@"CurrentEndTime"] doubleValue];
-}
+}*/
 
 +(void)saveCurrentSpot:(ParkingSpot*)spot {
     if (spot) {

@@ -10,6 +10,9 @@
 #import "ParkingSpot.h"
 
 @interface Persistance : NSObject
+
++(NSMutableDictionary*)addNewTransaction:(ParkingSpot*)spot withStartTime:(double)timeIn andEndTime:(double)timeOut andLastPaymentDetails:(NSString*)details;
++(NSDictionary*)retrieveTransactions;
 +(void)saveUserID:(NSNumber*)user;
 +(NSNumber*)retrieveUserID;
 +(void)saveAuthToken:(NSString*)token;
@@ -34,10 +37,10 @@
 +(ParkingSpot*)retrieveCurrentSpot;
 
 +(void)saveCurrentStartTime:(double)timeIn;
-+(double)retrieveCurrentStartTime;
+//+(double)retrieveCurrentStartTime;
 
 +(void)saveCurrentEndTime:(double)timeIn;
-+(double)retrieveCurrentEndTime;
+//+(double)retrieveCurrentEndTime;
 
 +(void)saveLastPaymentInfoDetails:(NSString*)lpid;
 +(NSString*)retrieveLastPaymentInfoDetails;

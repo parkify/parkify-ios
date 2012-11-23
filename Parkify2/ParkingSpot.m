@@ -91,7 +91,7 @@ standardImageIDs:(NSDictionary*)standardImageIDs
     spotCoverage:(NSString*)spotCoverageIn
      spotSignage:(NSString*)spotSignageIn
             desc:(NSString*)descIn
-          offers:(NSArray*)offersIn
+          offers:(NSMutableArray*)offersIn
          address:(NSString*)addrIn
       directions:(NSString*)dirIn {
 
@@ -232,9 +232,7 @@ standardImageIDs:(NSDictionary*)standardImageIDs
     
     Boolean freeIn = [[spot objectForKey:@"free"] boolValue];
     self.mFree = freeIn;
-    if(!freeIn) {
-        return false;
-    }
+    
     
     //Latitutde and Longitude
     self.mLat = [[[spot objectForKey:@"location"] objectForKey:@"latitude" ] doubleValue];
@@ -300,8 +298,8 @@ standardImageIDs:(NSDictionary*)standardImageIDs
     self.standardImageIDs = [[spot objectForKey:@"standard"] copy];
     
     
-    
-    if ([levelOfDetail isEqualToString:@"all"]) {
+
+    if ([levelOfDetail isEqualToString:@"all"] && freeIn) {
         self.mDesc = [spot objectForKey:@"description"];
         NSMutableArray* offersIn = [[NSMutableArray alloc] init];
         
@@ -313,6 +311,10 @@ standardImageIDs:(NSDictionary*)standardImageIDs
         self.mAddress = [[spot objectForKey:@"location"] objectForKey:@"location_address"];
         self.mDirections = [[spot objectForKey:@"location"] objectForKey:@"directions"];
     }
+    if(!freeIn) {
+        return false;
+    }
+
     return true;
 }
 

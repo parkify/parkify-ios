@@ -15,9 +15,12 @@
 
 
 @interface ParkifyAppDelegate : UIResponder <UIApplicationDelegate>
+{
+    NSMutableDictionary *transactions;
 
+}
 @property (strong, nonatomic) UIWindow *window;
-
+@property (nonatomic, strong) NSMutableDictionary*transactions;
 //TODO: Generalize shared objects as a "AppDataObject" class
 @property (strong, nonatomic) User* user;
 @property (strong, nonatomic) ParkingSpotCollection* parkingSpots;

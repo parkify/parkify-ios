@@ -21,6 +21,7 @@
 #import "ParkingSpotCollection.h"
 #import "ParkifyConfirmationViewController.h"
 #import "Persistance.h"
+#import "ParkifyAppDelegate.h"
 //#import "PlacedAgent.h"
 
 #define ORIG_ANNOTATION_WIDTH 54
@@ -133,17 +134,39 @@ typedef struct STargetLocation {
     [self updateBottomBar];
 }
 
--(BOOL)hasReservation {
+-(int)hasReservation {
+    ParkifyAppDelegate *delegate = (ParkifyAppDelegate*)[[UIApplication sharedApplication] delegate];
+    double currentTime = [[NSDate date] timeIntervalSince1970];
+    int numOfRes=0;
+    NSMutableDictionary *actives = [[delegate.transactions objectForKey:@"active"] copy];
+    for (NSString *transactionkey in actives){
+        NSMutableDictionary *transaction = [actives objectForKey:transactionkey];
+        double startTime = [[transaction objectForKey:@"starttime"] doubleValue];
+        double endTime =[[transaction objectForKey:@"endtime"] doubleValue];
+        
+        if ((currentTime >= startTime) && (currentTime <= endTime)){
+            [transaction setValue:@"1" forKey:@"active"];
+            numOfRes++;
+        }
+        else{
+            [[delegate.transactions objectForKey:@"active"] removeObjectForKey:transactionkey];
+            [transaction setValue:@"0" forKey:@"active"];
+            
+        }
+
+    }
+    return [actives count];
+    /*
     double startTime = [Persistance retrieveCurrentStartTime];
     double endTime = [Persistance retrieveCurrentEndTime];
     
     double currentTime = [[NSDate date] timeIntervalSince1970];
-    return (currentTime >= startTime) && (currentTime <= endTime);
+    return (currentTime >= startTime) && (currentTime <= endTime);*/
 }
 
 -(void)updateBottomBar {
-    
-    if([self hasReservation]) {
+    int numRes = [self hasReservation];
+    if(numRes!=0) {
         Formatter formatter = ^(double val) {
             NSDate* time = [[NSDate alloc] initWithTimeIntervalSince1970:val];
             NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
@@ -158,9 +181,10 @@ typedef struct STargetLocation {
         }];
         
         
-        
-        double endTime = [Persistance retrieveCurrentEndTime];
-        self.bottomBarLabel.text = [NSString stringWithFormat:@"Reservation ends at %@          Details ", formatter(endTime)];
+        NSMutableDictionary *actives =  [[((ParkifyAppDelegate*)[[UIApplication sharedApplication] delegate]) transactions] objectForKey:@"active"];
+        NSDictionary *transact = [actives objectForKey:[[actives allKeys] lastObject]];
+        double endTime = [[transact objectForKey:@"endtime"] doubleValue];
+        self.bottomBarLabel.text = [NSString stringWithFormat:@"   (%i)   Reservation ends at %@        Details ", numRes, formatter(endTime)];
         self.bottomBarLabel.textAlignment = UITextAlignmentRight;
         
         
@@ -520,6 +544,46 @@ typedef struct STargetLocation {
     [self expandAddressBar:false];
     [sender resignFirstResponder];
 }
+#define MINIMUM_ZOOM_ARC 0.014 //approximately 1 miles (1 degree of arc ~= 69 miles)
+#define ANNOTATION_REGION_PAD_FACTOR 1.15
+#define MAX_DEGREES_ARC 360
+
+- (void)zoomMapViewToFitAnnotations:(MKMapView *)mapView animated:(BOOL)animated
+{
+    NSArray *annotations = mapView.annotations;
+    int count = [mapView.annotations count];
+    if ( count == 0) { return; } //bail if no annotations
+    //convert NSArray of id <MKAnnotation> into an MKCoordinateRegion that can be used to set the map size
+    //can't use NSArray with MKMapPoint because MKMapPoint is not an id
+    MKMapPoint points[count]; //C array of MKMapPoint struct
+    for( int i=0; i<count; i++ ) //load points C array by converting coordinates to points
+    {
+        CLLocationCoordinate2D coordinate = [(id <MKAnnotation>)[annotations objectAtIndex:i] coordinate];
+        points[i] = MKMapPointForCoordinate(coordinate);
+    }
+    //create MKMapRect from array of MKMapPoint
+    MKMapRect mapRect = [[MKPolygon polygonWithPoints:points count:count] boundingMapRect];
+    //convert MKCoordinateRegion from MKMapRect
+    MKCoordinateRegion region = MKCoordinateRegionForMapRect(mapRect);
+    //add padding so pins aren't scrunched on the edges
+    region.span.latitudeDelta  *= ANNOTATION_REGION_PAD_FACTOR;
+    region.span.longitudeDelta *= ANNOTATION_REGION_PAD_FACTOR;
+    //but padding can't be bigger than the world
+    if( region.span.latitudeDelta > MAX_DEGREES_ARC ) { region.span.latitudeDelta  = MAX_DEGREES_ARC; }
+    if( region.span.longitudeDelta > MAX_DEGREES_ARC ){ region.span.longitudeDelta = MAX_DEGREES_ARC; }
+    
+    //and don't zoom in stupid-close on small samples
+    if( region.span.latitudeDelta  < MINIMUM_ZOOM_ARC ) { region.span.latitudeDelta  = MINIMUM_ZOOM_ARC; }
+    if( region.span.longitudeDelta < MINIMUM_ZOOM_ARC ) { region.span.longitudeDelta = MINIMUM_ZOOM_ARC; }
+    //and if there is a sample of 1 we want the max zoom-in instead of max zoom-out
+    if( count == 1 )
+    {
+        region.span.latitudeDelta = MINIMUM_ZOOM_ARC;
+        region.span.longitudeDelta = MINIMUM_ZOOM_ARC;
+    }
+    [mapView setRegion:region animated:animated];
+    
+}
 
 - (MKAnnotationView *)mapView:(MKMapView *)mapView viewForAnnotation:(id <MKAnnotation>)annotation {
     
@@ -727,6 +791,9 @@ typedef struct STargetLocation {
     //**  **//
         
     self.targetSpot = [[self getParkingSpots] parkingSpotForID:spotID];
+    self.navigationController.modalPresentationStyle = UIModalPresentationCurrentContext;
+    [self performSegueWithIdentifier:@"ViewSpot" sender:self];
+/*
     self.spotsWereUpdatedCallback = ^(void){
         self.targetSpot = [[self getParkingSpots] parkingSpotForID:spotID];
         if(self.targetSpot) {
@@ -743,6 +810,7 @@ typedef struct STargetLocation {
     };
     
     [self.targetSpot updateAsynchronouslyWithLevelOfDetail:@"all"];
+ */
 }
 
 - (IBAction)spotMoreInfo:(UIButton*)sender {
@@ -854,7 +922,11 @@ typedef struct STargetLocation {
 
 - (void)refreshSpots
 {
-    [[self getParkingSpots] updateWithRequest:[NSDictionary dictionaryWithObject:@"low" forKey:@"level_of_detail"]];
+    //GAURAV removing this low thing so i can use the offers to query of the spot status
+    
+    
+    [[self getParkingSpots] updateWithRequest:[NSDictionary dictionaryWithObject:@"all" forKey:@"level_of_detail"]];
+    //    [[self getParkingSpots] updateWithRequest:[NSDictionary dictionaryWithObject:@"low" forKey:@"level_of_detail"]];
 }
 
 
@@ -912,7 +984,7 @@ typedef struct STargetLocation {
 }
 
 - (IBAction)confirmationButtonTapped:(id)sender {
-    if(![self hasReservation]) {
+    if([self hasReservation]==0) {
         return;
     }
     [self switchToConfirmation];
@@ -1028,9 +1100,13 @@ typedef struct STargetLocation {
     [navController.navigationBar setTintColor:[UIColor blackColor]];
 
     controller.spot = [Persistance retrieveCurrentSpot];
-        
-        controller.startTime = [Persistance retrieveCurrentStartTime];
-        controller.endTime = [Persistance retrieveCurrentEndTime];
+    ParkifyAppDelegate *delegate = (ParkifyAppDelegate*)[[UIApplication sharedApplication] delegate];
+    NSDictionary *actives = [delegate.transactions objectForKey:@"active"];
+    NSDictionary *transact = [actives objectForKey:[[actives allKeys] lastObject]];
+
+    controller.transactionInfo = transact ;
+       // controller.startTime = [Persistance retrieveCurrentStartTime];
+       // controller.endTime = [Persistance retrieveCurrentEndTime];
         
         controller.currentLat = self.currentLat;
         controller.currentLong = self.currentLong;

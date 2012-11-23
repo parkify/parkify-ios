@@ -13,7 +13,24 @@
 @synthesize endTime = _endTime;
 @synthesize pricePerHour = _pricePerHour;
 
+- (void)encodeWithCoder:(NSCoder *)aCoder{
+    [aCoder encodeDouble:self.startTime forKey:@"starttime"];
+    [aCoder encodeDouble:self.endTime forKey:@"endtime"];
+    [aCoder encodeDouble:self.pricePerHour forKey:@"priceperhour"];
+}
 
+-(id) initWithCoder:(NSCoder *)aDecoder{
+    if (self = [super init])
+    {
+        self.startTime = [aDecoder decodeDoubleForKey:@"starttime"];
+        self.endTime = [aDecoder decodeDoubleForKey:@"endtime"];
+        self.pricePerHour = [aDecoder decodeDoubleForKey:@"priceperhour"];
+    
+    }
+    
+    return self;
+
+}
 - (id) initFromDictionary:(NSDictionary*)dictIn
 {
     if (self = [super init])
@@ -36,8 +53,25 @@
 @synthesize mId = _mId;
 @synthesize spotId = _spotId;
 
-
-- initFromDictionary:(NSDictionary*)dictIn;
+-(id)initWithCoder:(NSCoder *)aDecoder{
+    if (self = [super init]){
+        self.startTime = [aDecoder decodeDoubleForKey:@"starttimer"];
+        self.endTime = [aDecoder decodeDoubleForKey:@"endtimer"];
+        self.priceList = [aDecoder decodeObjectForKey:@"pricelist"];
+        self.mId = [aDecoder decodeIntForKey:@"mid"];
+        self.spotId = [aDecoder decodeIntForKey:@"spotid"];
+    }
+    return self;
+}
+-(void) encodeWithCoder:(NSCoder *)aCoder   {
+    [aCoder encodeDouble:self.startTime forKey:@"starttimer"];
+    [aCoder encodeDouble:self.endTime forKey:@"endtimer"];
+    [aCoder encodeObject:self.priceList forKey:@"pricelist"];
+    [aCoder encodeInt:self.mId forKey:@"mid"];
+    [aCoder encodeInt:self.spotId forKey:@"spotid"];
+    
+}
+- (id) initFromDictionary:(NSDictionary*)dictIn;
 {
     if (self = [super init])
     {

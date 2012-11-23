@@ -17,18 +17,19 @@
 @property double currentLat;
 @property double currentLong;
 @property (weak, nonatomic) IBOutlet UILabel *titleLable;
-@property double startTime;
-@property double endTime;
+//@property double startTime;
+//@property double endTime;
 @property (weak, nonatomic) IBOutlet UIScrollView *mainScrollView;
 
 @property (strong, nonatomic) NSString* topBarText;
 @property (weak, nonatomic) IBOutlet UIView *topBarView;
 @property (weak, nonatomic) IBOutlet UILabel *topViewLabel;
-
+@property (nonatomic, weak) NSMutableDictionary *transactionInfo;
 - (IBAction)launchTroubleAlert:(id)sender;
 
 //TODO: REMOVETHIS
 @property (weak, nonatomic) IBOutlet UIButton *topBarTapped;
+- (IBAction)extendReservation:(id)sender;
 
 - (IBAction)topBarButtonTapped:(id)sender;
 @end

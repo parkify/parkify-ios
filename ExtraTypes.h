@@ -18,10 +18,14 @@ typedef NSString* (^Formatter)(double val);
 #define ADMIN_VER false
 #define DEBUGVER
 #ifdef DEBUGVER
-    #define TARGET_SERVER @"parkify-rails.herokuapp.com"
+    #define TARGET_SERVER @"192.168.1.112:3000"
+
 #else
-    #define TARGET_SERVER @"192.168.1.132:3000"
+    #define TARGET_SERVER @"parkify-rails.herokuapp.com"
+
 #endif
+
+
 
 #define kGenericErrorAlertTag 6727
 #define kAlertViewErrorInProblemUpload 9989

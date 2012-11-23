@@ -14,25 +14,33 @@
 #import "iToast.h"
 #import "Persistance.h"
 #import "ParkingSpotCollection.h"
-
+#import "ParkifyAppDelegate.h"
 @interface ParkingSpotCollection()
 
 @end
 
 @implementation ParkingSpotCollection
 
-
+@synthesize allParkingSpots = allParkingSpots;
 @synthesize parkingSpots = _parkingSpots;
 @synthesize observerDelegate = _observerDelegate;
 @synthesize currentSpot = _currentSpot;
 
-- (NSDictionary*)parkingSpots {
-    if(!_parkingSpots) _parkingSpots = [[NSDictionary alloc] init];
+- (NSMutableDictionary*)parkingSpots {
+    if(!_parkingSpots) _parkingSpots = [[NSMutableDictionary alloc] init];
     return _parkingSpots;
 }
-
+-(NSMutableDictionary *)allParkingSpots{
+    if (!allParkingSpots)
+        allParkingSpots = [[NSMutableDictionary alloc] init];
+    return allParkingSpots;		
+}
 - (ParkingSpot*)parkingSpotForID:(int)key {
-    return [self.parkingSpots objectForKey:[[NSNumber alloc] initWithInt:key]];
+    return [self.parkingSpots objectForKey:[NSString stringWithFormat:@"%i", key]];
+}
+- (ParkingSpot*)parkingSpotForIDFromAll:(int)key{
+    return [self.allParkingSpots objectForKey:[NSString stringWithFormat:@"%i", key]];
+
 }
 
 - (id)initFromDictionary:(NSDictionary*)root {
@@ -128,10 +136,10 @@
 
 
 - (void)updatefromDictionary:(NSDictionary*)root {
-    
-    double startTime = [Persistance retrieveCurrentStartTime];
-    double endTime = [Persistance retrieveCurrentEndTime];
-    int currentSpotId = [Persistance retrieveCurrentSpotId];
+    NSDictionary *last = [[[((ParkifyAppDelegate*)[[UIApplication sharedApplication] delegate]) transactions] objectForKey:@"actives" ] lastObject];
+    double startTime = [[last objectForKey:@"starttime"] doubleValue];
+    double endTime = [[last objectForKey:@"endtime"] doubleValue];
+    int currentSpotId = [[last objectForKey:@"spotid"] intValue];
     
     double currentTime = [[NSDate date] timeIntervalSince1970];
     BOOL bInInterval = (currentTime >= startTime) && (currentTime <= endTime);
@@ -142,7 +150,7 @@
     NSString* levelOfDetail = [root objectForKey:@"level_of_detail"];
     
     int idIn = -2;
-    
+    //WHEN IS THIS CALLED??
     if ([count isEqualToString: @"one"]) {
         newParkingSpots = [self.parkingSpots mutableCopy];
         
@@ -174,10 +182,13 @@
             }
         }
     } else {
+        /*
         newParkingSpots = [[NSMutableDictionary alloc] init];
     
     
     //update everything
+       // NSLog(@"result is %@", root);
+
         for (NSDictionary * spot in [root objectForKey:@"spots"]) {
         
             int idIn = [[spot objectForKey:@"id"] intValue];
@@ -187,7 +198,6 @@
             if(bInInterval && (idIn == currentSpotId)) {
                 self.currentSpot = actualSpot;
             }
-        
             BOOL bFree = [actualSpot updateFromDictionary:spot withLevelOfDetail:levelOfDetail];
         
             if(!bFree) {
@@ -196,12 +206,42 @@
         
             [newParkingSpots setObject:actualSpot forKey:[[NSNumber alloc] initWithInt:idIn]];
             actualSpot.parentCollection = self;
+        }*/
+        
+        //Don't create a dict everytime..it's wasteful
+        ParkifyAppDelegate *delegate = (ParkifyAppDelegate*)[[UIApplication sharedApplication] delegate];
+        NSDictionary *actives = [delegate.transactions objectForKey:@"active"];
+        for (NSDictionary * spot in [root objectForKey:@"spots"]) {
+            
+            NSString *idIn =[NSString stringWithFormat:@"%i",[[spot objectForKey:@"id"] intValue]];
+            ParkingSpot *actualSpot = [self.allParkingSpots objectForKey:idIn];
+            BOOL freeIn = [[spot objectForKey:@"free"] boolValue];
+            if(!actualSpot){
+                actualSpot = [[ParkingSpot alloc] init];
+                actualSpot.parentCollection=self;
+                freeIn = [actualSpot updateFromDictionary:spot withLevelOfDetail:levelOfDetail];
+                if ([actives objectForKey:[NSString stringWithFormat:@"%i", actualSpot.mID ]]){
+                    actualSpot.offers =[[actives objectForKey:idIn] objectForKey:@"offers"];
+        
+                    //[[NSMutableArray alloc] init];
+                    //[actualSpot.offers addObject:[[actives objectForKey:idIn] objectForKey:@"offers"]];
+                }
+                [self.allParkingSpots setValue:actualSpot forKey:idIn];
+            }
+            if (freeIn){
+                [self.parkingSpots setValue:actualSpot forKey:idIn];
+            }
+            else {
+                if([self.parkingSpots objectForKey:idIn]){
+                    [self.parkingSpots removeObjectForKey:idIn];
+                }
+            }
         }
+        
     }
 
-    self.parkingSpots = [newParkingSpots copy];
 
-    if(self.observerDelegate)[self.observerDelegate spotsWereUpdatedWithCount:count withLevelOfDetail:levelOfDetail withSpot:(int)idIn];
+    if(self.observerDelegate)[self.observerDelegate spotsWereUpdatedWithCount:[NSString stringWithFormat:@"%i",[self.parkingSpots count]] withLevelOfDetail:levelOfDetail withSpot:(int)idIn];
 }
 
 -(CLLocation*) locFromCoord:(CLLocationCoordinate2D)coord {

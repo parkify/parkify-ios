@@ -10,6 +10,8 @@
 #import "MyWebView.h"
 #import "WaitingMask.h"
 #import "UIDevice+IdentifierAddition.h"
+#import <CoreLocation/CoreLocation.h>
+
 @interface mapDirectionsViewController ()
 {
     
@@ -24,6 +26,7 @@
 @synthesize spotLat;
 @synthesize spotLong;
 @synthesize waitingMask = _waitingMask;
+CLLocationManager *_locationManager;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -69,7 +72,45 @@ NSString* encodeToPercentEscapeString(NSString *string) {
                                                                          
                                                                          kCFStringEncodingUTF8) ;
 }
+-(void)showCloseView{
+    UIAlertView *closeDirections = [[UIAlertView alloc] initWithTitle:@"Nearby" message:@"Insert info here" delegate:self cancelButtonTitle:@"OK" otherButtonTitles: nil];
+    [closeDirections show];
+}
+- (CLRegion*)mapDictionaryToRegion:(NSDictionary*)dictionary {
+    NSString *title = [dictionary valueForKey:@"title"];
+    
+    CLLocationDegrees latitude = [[dictionary valueForKey:@"latitude"] doubleValue];
+    CLLocationDegrees longitude =[[dictionary valueForKey:@"longitude"] doubleValue];
+    CLLocationCoordinate2D centerCoordinate = CLLocationCoordinate2DMake(latitude, longitude);
+    
+    CLLocationDistance regionRadius = [[dictionary valueForKey:@"radius"] doubleValue];
+    
+    return [[CLRegion alloc] initCircularRegionWithCenter:centerCoordinate
+                                                   radius:regionRadius
+                                               identifier:title];
+}
+- (void)locationManager:(CLLocationManager *)manager didEnterRegion:(CLRegion *)region {
+    NSLog(@"Entered Region - %@", region.identifier);
+    [self showCloseView];
+}
 
+- (void)locationManager:(CLLocationManager *)manager didExitRegion:(CLRegion *)region {
+    NSLog(@"Exited Region - %@", region.identifier);
+}
+
+- (void)locationManager:(CLLocationManager *)manager didStartMonitoringForRegion:(CLRegion *)region {
+    NSLog(@"Started monitoring %@ region", region.identifier);
+}
+
+-(void)viewWillDisappear:(BOOL)animated{
+    for (CLRegion *region in [_locationManager.monitoredRegions allObjects])
+    {
+        [_locationManager stopMonitoringForRegion:region];
+    }
+    [_locationManager stopMonitoringSignificantLocationChanges];
+    _locationManager.delegate=nil;
+    
+}
 - (void)viewDidLoad
 {
     [super viewDidLoad];
@@ -77,6 +118,9 @@ NSString* encodeToPercentEscapeString(NSString *string) {
     waitingMaskFrame.origin.x = 0;
     waitingMaskFrame.origin.y = 0;
     
+    _locationManager = [[CLLocationManager alloc] init];
+    _locationManager.delegate = self;
+    [_locationManager startUpdatingLocation];
 
     UILabel *titleView = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, 320, 60)];
     [titleView setFont:[UIFont fontWithName:@"Helvetica Light" size:36.0f]];
@@ -95,6 +139,9 @@ NSString* encodeToPercentEscapeString(NSString *string) {
     UIBarButtonItem *switchToText = [[UIBarButtonItem alloc] initWithTitle:@"Text" style:UIBarButtonItemStyleBordered target:self action:@selector(switchDirs)];
     [self.navigationItem setRightBarButtonItem:switchToText];
     */
+    UIBarButtonItem *closeDirections = [[UIBarButtonItem alloc] initWithTitle:@"Nearby" style:UIBarButtonItemStyleBordered target:self action:@selector(showCloseView)];
+    [self.navigationItem setRightBarButtonItem:closeDirections];
+
     NSString *destination =[NSString stringWithFormat:@"%f, %f", self.spotLat, self.spotLong];//@"950 De Guigne Dr, Sunnyvale, CA 94085@37.386888,-122.004564";
     
     //address without latlon
@@ -126,7 +173,31 @@ NSString* encodeToPercentEscapeString(NSString *string) {
     NSLog(@"The url is %@", endpoint);
     
     [currWebView loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:endpoint]]];
+    if (_locationManager == nil) {
+        NSLog(@"Location Manager Not Initialized");
+    }
+    
+    else if(![CLLocationManager regionMonitoringAvailable]) {
+        NSLog(@"This app requires region monitoring features which are unavailable on this device.");
+        
+    }
+    else{
+    
+        CLLocationDegrees curlatitude =spotLat;
+        CLLocationDegrees curlongitude =spotLong;
+        NSString *title = [NSString stringWithFormat:@"Parkify spot"];
 
+    CLLocationCoordinate2D centerCoordinate = CLLocationCoordinate2DMake(curlatitude, curlongitude);
+    
+    CLLocationDistance regionRadius = 100.0f;
+    
+    CLRegion *geofence= [[CLRegion alloc] initCircularRegionWithCenter:centerCoordinate
+                                                   radius:regionRadius
+                                               identifier:title];
+
+        [_locationManager startMonitoringForRegion:geofence desiredAccuracy:kCLLocationAccuracyHundredMeters];
+        
+    }
 	// Do any additional setup after loading the view.
 }
 - (BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)req navigationType:(UIWebViewNavigationType)navigationType {

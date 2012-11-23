@@ -12,11 +12,13 @@
 
 @interface ParkingSpotCollection : NSObject
 - (ParkingSpot*)parkingSpotForID:(int)key;
+- (ParkingSpot*)parkingSpotForIDFromAll:(int)key;
 - (id)initFromDictionary:(NSDictionary*)root;
 
 - (void)updatefromDictionary:(NSDictionary*)root;
 - (void)updateWithRequest:(NSDictionary*)req;
-@property (nonatomic, strong) NSDictionary* parkingSpots;
+@property (nonatomic, strong) NSMutableDictionary* parkingSpots;
+@property (nonatomic, strong) NSMutableDictionary* allParkingSpots;
 @property (nonatomic, weak) id <ParkingSpotObserver> observerDelegate;
 - (ParkingSpot*)closestAvailableSpotToCoord:(CLLocationCoordinate2D)coord;
 
