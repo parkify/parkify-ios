@@ -191,8 +191,11 @@
             double maxVal = self.minimumValue + (bubbleRange*(i+1));
             double selectedMinVal = MAX(minVal, self.selectedMinimumValue);
             double selectedMaxVal = MIN(maxVal, self.selectedMaximumValue);
-            
-            RangeBubble* bubble = [[RangeBubble alloc] initWithFrame:bubbleRect minVal:minVal maxVal:maxVal minRange:self.minimumRange selectedMinVal:selectedMinVal selectedMaxVal:selectedMaxVal withPriceFormatter:self.priceFormatter withTimeFormatter:self.timeFormatter withPriceSource:self.priceSource withMinimumSelectedValue:self.minimumSelectableValue+ (30*60)];
+            double minselectval = self.minimumSelectableValue + (30*60);
+            if(self.minimumSelectableValue == self.minimumValue)
+                minselectval = minVal;
+
+            RangeBubble* bubble = [[RangeBubble alloc] initWithFrame:bubbleRect minVal:minVal maxVal:maxVal minRange:self.minimumRange selectedMinVal:selectedMinVal selectedMaxVal:selectedMaxVal withPriceFormatter:self.priceFormatter withTimeFormatter:self.timeFormatter withPriceSource:self.priceSource withMinimumSelectedValue:minselectval];
             [self addSubview:bubble];
             [self.trackBubbles addObject:bubble];
             
@@ -411,8 +414,11 @@
     double maxVal = lastBubble.maximumValue + bubbleRange;
     double selectedMinVal = self.selectedMinimumValue;
     double selectedMaxVal = self.selectedMaximumValue;
+    double minselectval = self.minimumSelectableValue + (30*60);
+    if(self.minimumSelectableValue == self.minimumValue)
+        minselectval = minVal;
     RangeBubble* bubble = [[RangeBubble alloc] initWithFrame:bubbleRect minVal:minVal maxVal:maxVal minRange:self.      minimumRange selectedMinVal:selectedMinVal selectedMaxVal:selectedMaxVal
-                                          withPriceFormatter:self.priceFormatter withTimeFormatter:self.timeFormatter withPriceSource:self.priceSource withMinimumSelectedValue:self.minimumSelectableValue+(30*60)];
+                                          withPriceFormatter:self.priceFormatter withTimeFormatter:self.timeFormatter withPriceSource:self.priceSource withMinimumSelectedValue:minselectval];
     [self addSubview:bubble];
     [self.trackBubbles addObject:bubble];
     

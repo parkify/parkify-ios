@@ -184,17 +184,18 @@
         [self.bubbleBooked setClipsToBounds:true];
         
         [self addSubview:self.bubbleBooked];
+        if(self.minimumSelectedValue != self.minimumValue){
+
+            UIImage* imgGreen =[UIImage imageNamed:@"selected_bubble_green.png"];//[UIImage imageWithImage:[UIImage imageNamed:@"selected_bubble.png"] scaledToSize:CGSizeMake(w, h_main)];
         
-        UIImage* imgGreen =[UIImage imageNamed:@"selected_bubble_green.png"];//[UIImage imageWithImage:[UIImage imageNamed:@"selected_bubble.png"] scaledToSize:CGSizeMake(w, h_main)];
+            self.bubbleNewBackground = [[UIImageView alloc] initWithImage:imgGreen];
+            self.bubbleNewBackground.clipsToBounds = true;
+            self.bubbleNewBackground.frame = self.mainRect;
+            self.bubbleNewBackground.alpha = self.alpha;
         
-        self.bubbleNewBackground = [[UIImageView alloc] initWithImage:imgGreen];
-        self.bubbleNewBackground.clipsToBounds = true;
-        self.bubbleNewBackground.frame = self.mainRect;
-        self.bubbleNewBackground.alpha = self.alpha;
+            [self addSubview:self.bubbleNewBackground];
         
-        [self addSubview:self.bubbleNewBackground];
-        
-        
+        }
         
         //labels
         float text_height = (h-h_main)/4;
@@ -307,11 +308,21 @@
 
 - (void)updateTrackHighlight{
     
-    
-    
     double begin = [self xForValue:self.selectedMinimumValue];
-    double blueedn = [self xForValue:self.minimumSelectedValue];
     double end = [self xForValue:self.selectedMaximumValue];
+
+    if(self.minimumSelectedValue == self.minimumValue){
+        CALayer* maskLayer = [CALayer layer];
+        maskLayer.frame = CGRectMake(begin,0,end-begin ,self.bubbleBooked.frame.size.height);
+        maskLayer.contents = (__bridge id)[[UIImage imageNamed:@"maskImage.png"] CGImage];
+        self.bubbleBooked.layer.mask = maskLayer;
+        
+        [self.bubbleBooked setNeedsDisplay];
+        
+
+    }
+    else{
+    double blueedn = [self xForValue:self.minimumSelectedValue];
     
 
     
@@ -338,7 +349,7 @@
 
     [self.bubbleNewBackground.layer setMask:maskLayertwo];
     [self.bubbleNewBackground setNeedsDisplay];
-    
+    }
     //NOW labels!
     
     if(end-begin > 0) {
