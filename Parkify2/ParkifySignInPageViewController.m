@@ -211,7 +211,7 @@
 }
 
 - (IBAction)loginButtonPressed:(UIButton *)sender {
-    
+    [[Mixpanel sharedInstance] track:@"loginpressed"];
     if (![Persistance retrieveAuthToken]) {
       if(self.forgotPasswordButton.selected) {
         [Api resetPasswordWithEmail:self.emailField.text withSuccess:^(NSDictionary * d) {
@@ -300,6 +300,8 @@
 }
 
 - (IBAction)logoutButtonPressed:(UIButton *)sender {
+    [[Mixpanel sharedInstance] track:@"logout"];
+    
     /** TODO: also tell server to logout if can **/
     [Persistance saveAuthToken:nil];
     [Persistance saveUserID:[NSNumber numberWithInt:-1]];

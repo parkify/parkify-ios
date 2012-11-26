@@ -395,7 +395,12 @@ typedef struct STargetLocation {
     [self refreshSpots];
     [self startPolling];
     
-    
+    if ([Persistance retrieveAuthToken]){
+        [[Mixpanel sharedInstance] identify:[NSString stringWithFormat:@"%@_%@", [Persistance retrieveFirstName], [Persistance retrieveLastName]]];
+        [[Mixpanel sharedInstance] registerSuperPropertiesOnce:[NSDictionary dictionaryWithObjects:[NSArray arrayWithObjects:[Persistance retrieveUserID], [Persistance retrieveFirstName],[Persistance retrieveLastName], nil] forKeys:[NSArray arrayWithObjects:@"userid",@"firstname",@"lastname", nil]]];
+        [[Mixpanel sharedInstance] track:@"loggedinafterloaded"];
+
+    }
     
 }
 
@@ -791,6 +796,8 @@ typedef struct STargetLocation {
     //**  **//
         
     self.targetSpot = [[self getParkingSpots] parkingSpotForID:spotID];
+    [[Mixpanel sharedInstance] track:@"SpotDetails" properties:[NSDictionary dictionaryWithObject:[NSNumber numberWithInt:spotID] forKey:@"spotid"]];
+    [Crittercism leaveBreadcrumb:@"spotdetails"];
     self.navigationController.modalPresentationStyle = UIModalPresentationCurrentContext;
     [self performSegueWithIdentifier:@"ViewSpot" sender:self];
 /*

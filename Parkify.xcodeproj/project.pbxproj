@@ -152,6 +152,13 @@
 		F6471325165422EF004D9289 /* NativeBridge.js in Sources */ = {isa = PBXBuildFile; fileRef = F6471324165422EF004D9289 /* NativeBridge.js */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		F647132816542540004D9289 /* MyWebView.m in Sources */ = {isa = PBXBuildFile; fileRef = F647132716542540004D9289 /* MyWebView.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		F647132A165429CE004D9289 /* googmaps.html in Resources */ = {isa = PBXBuildFile; fileRef = F6471329165429CE004D9289 /* googmaps.html */; };
+		F698E59C1663F46700DB753A /* libCrittercism_v3_4_0.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F698E59B1663F46700DB753A /* libCrittercism_v3_4_0.a */; };
+		F698E5AC1663F57200DB753A /* MPCJSONDataSerializer.m in Sources */ = {isa = PBXBuildFile; fileRef = F698E5A21663F57200DB753A /* MPCJSONDataSerializer.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		F698E5AD1663F57200DB753A /* MPCJSONSerializer.m in Sources */ = {isa = PBXBuildFile; fileRef = F698E5A41663F57200DB753A /* MPCJSONSerializer.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		F698E5AE1663F57200DB753A /* MPCSerializedJSONData.m in Sources */ = {isa = PBXBuildFile; fileRef = F698E5A61663F57200DB753A /* MPCSerializedJSONData.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		F698E5AF1663F57200DB753A /* NSData+MPBase64.m in Sources */ = {isa = PBXBuildFile; fileRef = F698E5A91663F57200DB753A /* NSData+MPBase64.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		F698E5B01663F57200DB753A /* Mixpanel.m in Sources */ = {isa = PBXBuildFile; fileRef = F698E5AB1663F57200DB753A /* Mixpanel.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		F698E5B21663FDD200DB753A /* CoreTelephony.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F698E5B11663FDD200DB753A /* CoreTelephony.framework */; };
 		F6B34A5116485FC800AF6633 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F6B34A5016485FC800AF6633 /* AVFoundation.framework */; };
 		F6B34A5316485FCC00AF6633 /* ImageIO.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F6B34A5216485FCC00AF6633 /* ImageIO.framework */; };
 		F6B34A5516485FD500AF6633 /* CoreMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F6B34A5416485FD500AF6633 /* CoreMedia.framework */; };
@@ -471,6 +478,19 @@
 		F647132616542540004D9289 /* MyWebView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MyWebView.h; sourceTree = "<group>"; };
 		F647132716542540004D9289 /* MyWebView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MyWebView.m; sourceTree = "<group>"; };
 		F6471329165429CE004D9289 /* googmaps.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = googmaps.html; sourceTree = "<group>"; };
+		F698E59A1663F46700DB753A /* Crittercism.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Crittercism.h; sourceTree = "<group>"; };
+		F698E59B1663F46700DB753A /* libCrittercism_v3_4_0.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libCrittercism_v3_4_0.a; sourceTree = "<group>"; };
+		F698E5A11663F57200DB753A /* MPCJSONDataSerializer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MPCJSONDataSerializer.h; sourceTree = "<group>"; };
+		F698E5A21663F57200DB753A /* MPCJSONDataSerializer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MPCJSONDataSerializer.m; sourceTree = "<group>"; };
+		F698E5A31663F57200DB753A /* MPCJSONSerializer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MPCJSONSerializer.h; sourceTree = "<group>"; };
+		F698E5A41663F57200DB753A /* MPCJSONSerializer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MPCJSONSerializer.m; sourceTree = "<group>"; };
+		F698E5A51663F57200DB753A /* MPCSerializedJSONData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MPCSerializedJSONData.h; sourceTree = "<group>"; };
+		F698E5A61663F57200DB753A /* MPCSerializedJSONData.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MPCSerializedJSONData.m; sourceTree = "<group>"; };
+		F698E5A81663F57200DB753A /* NSData+MPBase64.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSData+MPBase64.h"; sourceTree = "<group>"; };
+		F698E5A91663F57200DB753A /* NSData+MPBase64.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSData+MPBase64.m"; sourceTree = "<group>"; };
+		F698E5AA1663F57200DB753A /* Mixpanel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Mixpanel.h; sourceTree = "<group>"; };
+		F698E5AB1663F57200DB753A /* Mixpanel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Mixpanel.m; sourceTree = "<group>"; };
+		F698E5B11663FDD200DB753A /* CoreTelephony.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreTelephony.framework; path = System/Library/Frameworks/CoreTelephony.framework; sourceTree = SDKROOT; };
 		F6B34A5016485FC800AF6633 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		F6B34A5216485FCC00AF6633 /* ImageIO.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ImageIO.framework; path = System/Library/Frameworks/ImageIO.framework; sourceTree = SDKROOT; };
 		F6B34A5416485FD500AF6633 /* CoreMedia.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMedia.framework; path = System/Library/Frameworks/CoreMedia.framework; sourceTree = SDKROOT; };
@@ -497,6 +517,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F698E5B21663FDD200DB753A /* CoreTelephony.framework in Frameworks */,
 				F6B34A59164865DD00AF6633 /* AssetsLibrary.framework in Frameworks */,
 				F6B34A5716485FDA00AF6633 /* CoreVideo.framework in Frameworks */,
 				F6B34A5516485FD500AF6633 /* CoreMedia.framework in Frameworks */,
@@ -514,6 +535,7 @@
 				8CA7A1E315A3DC980051567D /* Foundation.framework in Frameworks */,
 				8CA7A1E515A3DC980051567D /* CoreGraphics.framework in Frameworks */,
 				F6F1EF6D164A13810003D3CB /* AWSiOSSDK.framework in Frameworks */,
+				F698E59C1663F46700DB753A /* libCrittercism_v3_4_0.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -757,6 +779,7 @@
 		8CA7A1D115A3DC980051567D = {
 			isa = PBXGroup;
 			children = (
+				F698E5B11663FDD200DB753A /* CoreTelephony.framework */,
 				F6F1EF6C164A13810003D3CB /* AWSiOSSDK.framework */,
 				F6B34A58164865DD00AF6633 /* AssetsLibrary.framework */,
 				8CDD2A391645E7220000E47C /* app_icon_lowres.png */,
@@ -784,6 +807,8 @@
 		8CA7A1DF15A3DC980051567D /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				F698E59E1663F57200DB753A /* Mixpanel */,
+				F698E5991663F46700DB753A /* CrittercismSDK */,
 				F6B34A5616485FDA00AF6633 /* CoreVideo.framework */,
 				F6B34A5416485FD500AF6633 /* CoreMedia.framework */,
 				F6B34A5216485FCC00AF6633 /* ImageIO.framework */,
@@ -1183,6 +1208,56 @@
 			name = "Settings Controllers";
 			sourceTree = "<group>";
 		};
+		F698E5991663F46700DB753A /* CrittercismSDK */ = {
+			isa = PBXGroup;
+			children = (
+				F698E59A1663F46700DB753A /* Crittercism.h */,
+				F698E59B1663F46700DB753A /* libCrittercism_v3_4_0.a */,
+			);
+			path = CrittercismSDK;
+			sourceTree = "<group>";
+		};
+		F698E59E1663F57200DB753A /* Mixpanel */ = {
+			isa = PBXGroup;
+			children = (
+				F698E59F1663F57200DB753A /* Library */,
+				F698E5AA1663F57200DB753A /* Mixpanel.h */,
+				F698E5AB1663F57200DB753A /* Mixpanel.m */,
+			);
+			path = Mixpanel;
+			sourceTree = "<group>";
+		};
+		F698E59F1663F57200DB753A /* Library */ = {
+			isa = PBXGroup;
+			children = (
+				F698E5A01663F57200DB753A /* JSON */,
+				F698E5A71663F57200DB753A /* NSData_Base64 */,
+			);
+			path = Library;
+			sourceTree = "<group>";
+		};
+		F698E5A01663F57200DB753A /* JSON */ = {
+			isa = PBXGroup;
+			children = (
+				F698E5A11663F57200DB753A /* MPCJSONDataSerializer.h */,
+				F698E5A21663F57200DB753A /* MPCJSONDataSerializer.m */,
+				F698E5A31663F57200DB753A /* MPCJSONSerializer.h */,
+				F698E5A41663F57200DB753A /* MPCJSONSerializer.m */,
+				F698E5A51663F57200DB753A /* MPCSerializedJSONData.h */,
+				F698E5A61663F57200DB753A /* MPCSerializedJSONData.m */,
+			);
+			path = JSON;
+			sourceTree = "<group>";
+		};
+		F698E5A71663F57200DB753A /* NSData_Base64 */ = {
+			isa = PBXGroup;
+			children = (
+				F698E5A81663F57200DB753A /* NSData+MPBase64.h */,
+				F698E5A91663F57200DB753A /* NSData+MPBase64.m */,
+			);
+			path = NSData_Base64;
+			sourceTree = "<group>";
+		};
 		F6F1EF97164B444C0003D3CB /* UIDeviceID */ = {
 			isa = PBXGroup;
 			children = (
@@ -1420,6 +1495,11 @@
 				F6471325165422EF004D9289 /* NativeBridge.js in Sources */,
 				F647132816542540004D9289 /* MyWebView.m in Sources */,
 				F6303458165AF9930050F555 /* extendReservationViewController.m in Sources */,
+				F698E5AC1663F57200DB753A /* MPCJSONDataSerializer.m in Sources */,
+				F698E5AD1663F57200DB753A /* MPCJSONSerializer.m in Sources */,
+				F698E5AE1663F57200DB753A /* MPCSerializedJSONData.m in Sources */,
+				F698E5AF1663F57200DB753A /* NSData+MPBase64.m in Sources */,
+				F698E5B01663F57200DB753A /* Mixpanel.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1521,6 +1601,7 @@
 					"$(inherited)",
 					"\"$(SRCROOT)/Flurry\"",
 					"\"$(SRCROOT)/FlurryAds\"",
+					"\"$(SRCROOT)/CrittercismSDK\"",
 				);
 				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_NAME = Parkify;
@@ -1548,6 +1629,7 @@
 					"$(inherited)",
 					"\"$(SRCROOT)/Flurry\"",
 					"\"$(SRCROOT)/FlurryAds\"",
+					"\"$(SRCROOT)/CrittercismSDK\"",
 				);
 				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_NAME = Parkify;

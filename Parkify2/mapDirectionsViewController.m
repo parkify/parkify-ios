@@ -25,6 +25,8 @@
 @synthesize currLong;
 @synthesize spotLat;
 @synthesize spotLong;
+@synthesize spotId=_spotId;
+
 @synthesize waitingMask = _waitingMask;
 CLLocationManager *_locationManager;
 
@@ -91,6 +93,8 @@ NSString* encodeToPercentEscapeString(NSString *string) {
 }
 - (void)locationManager:(CLLocationManager *)manager didEnterRegion:(CLRegion *)region {
     NSLog(@"Entered Region - %@", region.identifier);
+    [[Mixpanel sharedInstance] track:@"GeofencingFiredForRegion" properties:[NSDictionary dictionaryWithObject:[NSNumber numberWithInt:self.spotId] forKey:@"spotid"]];
+
     [self showCloseView];
 }
 
@@ -147,7 +151,7 @@ NSString* encodeToPercentEscapeString(NSString *string) {
     //address without latlon
     
     
-    
+
     NSString *title = @"Telenav HQ";
     
     NSString *token = @"fFWUlXmSdqNcCE2MBsexfEpB3hBl3Tv8n9ZmFpDWev1etAqujpLgIYfyhm5HK_ijJDQ2Qq2Z6F8V50HM_d1axaaMCIw6mm012fhCME9i5S0QJ64t_MF4Vq1itm6vVR7O5cV9FyvahgzF8EZc_2pA8qOGkBuf0K4GKZHQwR8UZm0";
@@ -165,6 +169,8 @@ NSString* encodeToPercentEscapeString(NSString *string) {
     
     
     NSString *endpoint = [NSString stringWithFormat: @"http://apps.scout.me/v1/driveto?dt=%@&title=%@&token=%@&name=Parkify", escapedUrlDestination, escapedUrlTitle, escapedUrlToken];
+    [[Mixpanel sharedInstance] track:@"loadingDirections" properties:[NSDictionary dictionaryWithObjects:[NSArray arrayWithObjects:destination,endpoint,[NSNumber numberWithInt:self.spotId], nil] forKeys:[NSArray arrayWithObjects:@"destination",@"url",@"spotid", nil]]];
+
     currWebView = [[UIWebView alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height-40)];
     currWebView.delegate = self;
     currWebView.scalesPageToFit = YES;
@@ -185,7 +191,7 @@ NSString* encodeToPercentEscapeString(NSString *string) {
     
         CLLocationDegrees curlatitude =spotLat;
         CLLocationDegrees curlongitude =spotLong;
-        NSString *title = [NSString stringWithFormat:@"Parkify spot"];
+        NSString *title = [NSString stringWithFormat:@"Spot %i", self.spotId ];
 
     CLLocationCoordinate2D centerCoordinate = CLLocationCoordinate2DMake(curlatitude, curlongitude);
     

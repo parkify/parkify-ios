@@ -620,6 +620,8 @@
 */
 
 - (IBAction)closeButtonTapped:(id)sender {
+    [[Mixpanel sharedInstance] track:@"dismissConfirmationVC"];
+
     [self dismissViewControllerAnimated:true completion:^{}];
 }
 
@@ -635,6 +637,9 @@
     newMaps.currLong = self.currentLong;
     newMaps.spotLat = self.spot.mLat;
     newMaps.spotLong =self.spot.mLong;
+    newMaps.spotId = self.spot.mID;
+    [[Mixpanel sharedInstance] track:@"directionsButtonTapped"];
+
     [self.navigationController pushViewController:newMaps animated:YES];
 //    [self.view addSubview:newMaps];
     return;
@@ -715,6 +720,7 @@
 }
 
 - (IBAction)extendReservation:(id)sender {
+    [[Mixpanel sharedInstance] track:@"launchExtendReservationVC"];
     UIStoryboard *mainStoryboard = [UIStoryboard storyboardWithName:@"MainStoryboard_iPhone"
                                                              bundle: nil];
     

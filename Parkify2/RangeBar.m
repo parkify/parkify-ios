@@ -351,8 +351,10 @@
     double newVal = lowVal + delVal;
     newVal = MIN(newVal, self.maximumValue);
     //newVal = MAX(newVal, self.selectedMinimumValue + self.minimumRange);
-    newVal = MAX(newVal, self.minimumSelectableValue + self.minimumRange);
-    NSLog(@"Value is %f", newVal);
+    if(self.minimumSelectableValue == self.selectedMinimumValue)
+        newVal = MAX(newVal, self.selectedMinimumValue + self.minimumRange);
+    else
+        newVal = MAX(newVal, self.minimumSelectableValue + self.minimumRange);
     if(newVal <= self.maximumValue) {
         self.maxThumb.center = CGPointMake([self xForValue:newVal], self.maxThumb.center.y);
         self.selectedMaximumValue = newVal;

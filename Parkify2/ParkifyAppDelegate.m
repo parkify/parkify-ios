@@ -80,7 +80,11 @@ void uncaughtExceptionHandler(NSException *exception) {
     // Override point for customization after application launch.
     NSSetUncaughtExceptionHandler(&uncaughtExceptionHandler);
     [Persistance updatePersistedDataWithAppVersion];
-        
+    
+    [Crittercism enableWithAppID:@"50b3bc587e69a33784000002"];
+    [Crittercism leaveBreadcrumb:@"App loaded"];
+    [Mixpanel sharedInstanceWithToken:@"0ef037a021b6fa3b5a72057c403d1fbd"];
+    [[Mixpanel sharedInstance] track:@"App loaded"];
         // Register with apple that this app will use push notification
         
         [[UIApplication sharedApplication] registerForRemoteNotificationTypes:(UIRemoteNotificationTypeAlert |

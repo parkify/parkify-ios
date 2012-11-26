@@ -392,6 +392,7 @@
         return;
     }
     if ([Persistance retrieveAuthToken] == nil) {
+        
         [Api authenticateModallyFrom:self withSuccess:^(NSDictionary * result)
         {
             NSString *status = [[result objectForKey:@"exit"] copy];
@@ -447,9 +448,9 @@
         [navController.navigationBar setTintColor:[UIColor blackColor]];
         controller.spot = self.spot;
         NSMutableDictionary *thetransaction = [Persistance addNewTransaction:self.spot withStartTime:self.rangeBar. selectedMinimumValue andEndTime:self.rangeBar.selectedMaximumValue andLastPaymentDetails:paymentDetails];
-        NSDictionary *tester = [Persistance retrieveTransactions];
-        NSLog(@"Are they stored? \n%@", tester);
-       /* [Persistance saveCurrentSpotId:self.spot.mID];
+        [[Mixpanel sharedInstance] track:@"launchConfirmationVC" properties:thetransaction];
+        
+        /* [Persistance saveCurrentSpotId:self.spot.mID];
         controller.startTime = self.rangeBar. selectedMinimumValue;
         [Persistance saveCurrentStartTime:controller.startTime];
         controller.endTime = self.rangeBar.selectedMaximumValue;
@@ -484,7 +485,7 @@
     NSString *sslorno = @"https";
     
 #endif
-
+    [[Mixpanel sharedInstance] track:@"RealTransaction"];
     NSString* urlString = [[NSString alloc] initWithFormat:@"%@://%@/api/v1/acceptances.json?auth_token=%@",sslorno, TARGET_SERVER, [Persistance retrieveAuthToken]];
     NSURL *url = [NSURL URLWithString:urlString];
     
@@ -504,6 +505,8 @@
         NSString *responseString = [request responseString];
         NSDictionary * root = [responseString JSONValue];
         if([[root objectForKey:@"success"] boolValue]) {
+            [[Mixpanel sharedInstance] track:@"RealTransactionSuccess" properties:root];
+
             //Needs to happen on success
             NSString* paymentInfoDetails = [[root objectForKey:@"acceptance"] objectForKey:@"details"];
             [Persistance saveLastPaymentInfoDetails:paymentInfoDetails];
@@ -513,6 +516,7 @@
             //[self performSegueWithIdentifier:@"ViewConfirmation" sender:self];
             //NSLog(@"TEST");
         } else {
+            [[Mixpanel sharedInstance] track:@"RealTransactionFailure" properties:root];
             NSError* error = [ErrorTransformer apiErrorToNSError:[root objectForKey:@"error"]];
             [ErrorTransformer errorToAlert:error withDelegate:self];
             
@@ -557,7 +561,7 @@
 
 
 - (void) previewTransaction {
-    
+    [[Mixpanel sharedInstance] track:@"transactionpreview"];
     NSMutableArray* offerIds = [[NSMutableArray alloc] init];
     for (Offer* offer in self.spot.offers) {
         if ([offer overlapsWithStartTime:self.rangeBar.selectedMinimumValue endTime:self.rangeBar.selectedMaximumValue])
@@ -596,7 +600,8 @@
             
             [self.waitingMask removeFromSuperview];
             self.waitingMask = nil;
-            
+            [[Mixpanel sharedInstance] track:@"transactionpreviewsuccess" properties:root];
+
             UIAlertView* areYouSure = [[UIAlertView alloc] initWithTitle:@"Are you sure?"
                                                                  message:[[root objectForKey:@"message"] objectForKey:@"price_string"]
                                                                 delegate:self
@@ -607,7 +612,8 @@
             //[self performSegueWithIdentifier:@"ViewConfirmation" sender:self];
             //NSLog(@"TEST");
         } else {
-            
+            [[Mixpanel sharedInstance] track:@"transactionpreviewfailure" properties:root];
+
             NSError* error = [ErrorTransformer apiErrorToNSError:[root objectForKey:@"error"]];
             [ErrorTransformer errorToAlert:error withDelegate:self];
             
@@ -695,6 +701,7 @@
 
 
 - (IBAction)closeButtonTapped:(id)sender {
+    [[Mixpanel sharedInstance] track:@"dismissSpotVC"];
     [self dismissViewControllerAnimated:true completion:^{}];
 }
 

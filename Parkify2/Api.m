@@ -322,8 +322,15 @@ withPasswordConfirmation:(NSString*)passwordConfirmation
             [Persistance saveLastFourDigits:[root objectForKey:@"last_four_digits"]];
             [Persistance saveFirstName:[[root objectForKey:@"user"] objectForKey:@"first_name"]];
             [Persistance saveLastName:[[root objectForKey:@"user"] objectForKey:@"last_name"]];
+            [[Mixpanel sharedInstance] identify:[NSString stringWithFormat:@"%@_%@", [Persistance retrieveFirstName], [Persistance retrieveLastName]]];
+            [[Mixpanel sharedInstance] registerSuperPropertiesOnce:[NSDictionary dictionaryWithObjects:[NSArray arrayWithObjects:[Persistance retrieveUserID], [Persistance retrieveFirstName],[Persistance retrieveLastName], nil] forKeys:[NSArray arrayWithObjects:@"userid",@"firstname",@"lastname", nil]]];
+            [[Mixpanel sharedInstance] track:@"loggedin"];
+            [Crittercism leaveBreadcrumb:@"loggedin"];
             successBlock(root);
         } else {
+            [[Mixpanel sharedInstance] track:@"loginerror" properties:root];
+            [Crittercism leaveBreadcrumb:@"loginerror"];
+
             NSError* error = [ErrorTransformer apiErrorToNSError:[root objectForKey:@"error"]];
             failureBlock(error);
         }
@@ -340,7 +347,8 @@ withPasswordConfirmation:(NSString*)passwordConfirmation
 + (void)authenticateModallyFrom:(UIViewController*)parent withSuccess:(SuccessBlock)successBlock {
     UIStoryboard *mainStoryboard = [UIStoryboard storyboardWithName:@"MainStoryboard_iPhone"
                                                              bundle: nil];
-    
+    [[Mixpanel sharedInstance] track:@"AuthenticateModally"];
+    [Crittercism leaveBreadcrumb:@"AuthenticateModally"];
     ModalSettingsController* controller = [mainStoryboard instantiateViewControllerWithIdentifier: @"AuthenticateVC"];
     controller.successBlock = successBlock;
     UIModalTransitionStyle style = parent.modalTransitionStyle;
