@@ -100,6 +100,13 @@ void uncaughtExceptionHandler(NSException *exception) {
   
     return YES;
 }
+- (BOOL)application:(UIApplication *)application handleOpenURL:(NSURL *)url {
+
+
+    NSString *text = [[url host] stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+    NSLog(@"launching options %@", text);
+    return YES;
+}
 - (void)application:(UIApplication *)application didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken {
     
     // Show the device token obtained from apple to the log

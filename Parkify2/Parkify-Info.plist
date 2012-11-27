@@ -44,6 +44,17 @@
 	<string>1.4</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>com.SwoopMap.Parkify</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>parkify</string>
+			</array>
+		</dict>
+	</array>
 	<key>UIMainStoryboardFile</key>
 	<string>MainStoryboard_iPhone</string>
 	<key>UIMainStoryboardFile~ipad</key>
