@@ -22,6 +22,7 @@
 #import "ParkifyConfirmationViewController.h"
 #import "Persistance.h"
 #import "ParkifyAppDelegate.h"
+#import "extendReservationViewController.h"
 //#import "PlacedAgent.h"
 
 #define ORIG_ANNOTATION_WIDTH 54
@@ -237,7 +238,37 @@ typedef struct STargetLocation {
     [self updateMapView];
 }
 
+-(void)checkURL{
+    ParkifyAppDelegate *delegate = (ParkifyAppDelegate*)[[UIApplication sharedApplication] delegate];
+    if(delegate.openURL){
+        NSString *command = [[delegate.openURL host] stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+        NSString * q = [delegate.openURL query];
+        NSArray * pairs = [q componentsSeparatedByString:@"&"];
+        NSMutableDictionary * kvPairs = [NSMutableDictionary dictionary];
+        for (NSString * pair in pairs) {
+            NSArray * bits = [pair componentsSeparatedByString:@"="];
+            NSString * key = [[bits objectAtIndex:0] stringByReplacingPercentEscapesUsingEncoding:NSASCIIStringEncoding];
+            NSString * value = [[bits objectAtIndex:1] stringByReplacingPercentEscapesUsingEncoding:NSASCIIStringEncoding];
+            [kvPairs setObject:value forKey:key];
+        }
+        
 
+        if ([command isEqualToString:@"extend"]){
+            
+            
+            NSString *key = [kvPairs objectForKey:@"spotid"];
+            if(!key)
+                return;
+            if ( [[delegate.transactions objectForKey:@"active"] objectForKey:key])
+                [self performSelectorOnMainThread:@selector(launchExtendReservation:) withObject:key waitUntilDone:NO];
+            else if(   [[self getParkingSpots] parkingSpotForID:[key intValue]]){
+                [self performSelectorOnMainThread:@selector(openSpotViewControllerWithSpot:) withObject:key waitUntilDone:NO];
+            }
+
+        }
+    }
+
+}
 - (void)viewDidLoad
 {
     [super viewDidLoad];
@@ -288,6 +319,7 @@ typedef struct STargetLocation {
 
 - (void)viewWillAppear:(BOOL)animated {
     [self.navigationController setNavigationBarHidden:NO animated:animated];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(checkURL) name:@"launchURL" object:nil];
     
     [super viewWillAppear:animated];
     if(!self.bAlreadyInit) {
@@ -359,7 +391,6 @@ typedef struct STargetLocation {
         */
         
         [self.mapView setNeedsDisplay];
-        
         //[UIView animateWithDuration:5
           //               animations: ^{[self.mapView setAlpha:1];}
             //             completion: ^(BOOL finished){}];
@@ -783,7 +814,8 @@ typedef struct STargetLocation {
 
 #pragma mark opening spot
 
-- (void)openSpotViewControllerWithSpot:(int)spotID  {
+- (void)openSpotViewControllerWithSpot:(NSString*)spotIDstr  {
+    int spotID = [spotIDstr intValue];
     [self stopPolling];
     
     //** Set up waitingMask **//
@@ -821,7 +853,7 @@ typedef struct STargetLocation {
 }
 
 - (IBAction)spotMoreInfo:(UIButton*)sender {
-    [self openSpotViewControllerWithSpot:sender.tag];
+    [self openSpotViewControllerWithSpot:[NSString stringWithFormat:@"%i", sender.tag]];
 }
 //- calloutAccessoryControlTapped:
 
@@ -891,6 +923,7 @@ typedef struct STargetLocation {
     if(self.waitingMask) {
         [self.waitingMask removeFromSuperview];
         self.waitingMask = nil;
+        [self performSelectorInBackground:@selector(checkURL) withObject:nil];
     }
     
     BOOL bChanged = false;
@@ -1087,13 +1120,43 @@ typedef struct STargetLocation {
     }
     ParkingSpot* parkMeNowSpot = [[self getParkingSpots] closestAvailableSpotToCoord:self.targetLocation.location];
     if(parkMeNowSpot) {
-        [self openSpotViewControllerWithSpot:parkMeNowSpot.mID];
+        [self openSpotViewControllerWithSpot:[NSString stringWithFormat:@"%i", parkMeNowSpot.mID]];
     } else {
         [[[iToast makeText:@"No closest available spot"] setGravity:iToastGravityBottom ] show];
     }
      
 }
+-(void)launchExtendReservation:(NSString *)key{
+    [self stopPolling];
+    self.navigationController.modalPresentationStyle = UIModalPresentationCurrentContext;
+    
+    UIStoryboard *mainStoryboard = [UIStoryboard storyboardWithName:@"MainStoryboard_iPhone"
+                                                             bundle: nil];
+    
+    ParkifyConfirmationViewController* controller = [mainStoryboard instantiateViewControllerWithIdentifier: @"ConfirmationVC"];
+    UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:controller];
+    [navController.navigationBar setTintColor:[UIColor blackColor]];
+    
+    controller.spot = [Persistance retrieveCurrentSpot];
+    ParkifyAppDelegate *delegate = (ParkifyAppDelegate*)[[UIApplication sharedApplication] delegate];
+    NSDictionary *actives = [delegate.transactions objectForKey:@"active"];
+    NSMutableDictionary *transact = [actives objectForKey:key];
+    
+    controller.transactionInfo = transact ;
+    // controller.startTime = [Persistance retrieveCurrentStartTime];
+    // controller.endTime = [Persistance retrieveCurrentEndTime];
+    
+    controller.currentLat = self.currentLat;
+    controller.currentLong = self.currentLong;
+    
+    extendReservationViewController *controllerer = [mainStoryboard instantiateViewControllerWithIdentifier: @"extendResVC"];
+    controllerer.transactioninfo= transact;
+    [controller.navigationController pushViewController:controllerer animated:NO];
 
+    self.modalTransitionStyle = UIModalTransitionStyleCoverVertical;
+    [self presentViewController:navController animated:true completion:^{}];
+
+}
 
 - (void) switchToConfirmation {
     [self stopPolling];

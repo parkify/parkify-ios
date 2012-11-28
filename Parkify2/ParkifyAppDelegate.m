@@ -17,7 +17,7 @@
 @synthesize user = _user;
 @synthesize parkingSpots = _parkingSpots;
 @synthesize transactions = _transactions;
-
+@synthesize openURL= _openURL;
 -(NSMutableDictionary*)transactions{
     if(!transactions){
         NSDictionary *trans = [Persistance retrieveTransactions];
@@ -102,9 +102,12 @@ void uncaughtExceptionHandler(NSException *exception) {
 }
 - (BOOL)application:(UIApplication *)application handleOpenURL:(NSURL *)url {
 
-
+    self.openURL=url;
     NSString *text = [[url host] stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
     NSLog(@"launching options %@", text);
+   // if ([text isEqualToString:@"extend"]){
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"launchURL" object:nil];
+   // }
     return YES;
 }
 - (void)application:(UIApplication *)application didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken {
