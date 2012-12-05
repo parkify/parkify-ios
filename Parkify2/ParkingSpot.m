@@ -275,13 +275,18 @@ standardImageIDs:(NSDictionary*)standardImageIDs
     self.imageIDs = [imageIds copy];
     
     
+    self.landscapeInfoImageIDs = [spot objectForKey:@"land_info"];
+   /* if ([imageIds class] != [NSArray class]){
+        imageIds = 
+    }
     NSMutableArray* landscapeInfoImageIDs = [[NSMutableArray alloc] init];
+    
     for (id imageId in [spot objectForKey:@"land_info"]) {
         [landscapeInfoImageIDs addObject:imageId];
     }
     self.landscapeInfoImageIDs = [landscapeInfoImageIDs copy];
     
-    
+    */
     NSMutableArray* landscapeConfImageIDs = [[NSMutableArray alloc] init];
     for (id imageId in [spot objectForKey:@"land_conf"]) {
         [landscapeConfImageIDs addObject:imageId];
@@ -299,18 +304,20 @@ standardImageIDs:(NSDictionary*)standardImageIDs
     
     
 
-    if ([levelOfDetail isEqualToString:@"all"] && freeIn) {
+   // if ([levelOfDetail isEqualToString:@"all"] && freeIn) {
         self.mDesc = [spot objectForKey:@"description"];
         NSMutableArray* offersIn = [[NSMutableArray alloc] init];
-        
+    if (freeIn){
         for (NSDictionary* offer in [spot objectForKey:@"offers"]) {
             [offersIn addObject:[[Offer alloc] initFromDictionary:offer]];
         }
-        self.offers = offersIn;
-        
-        self.mAddress = [[spot objectForKey:@"location"] objectForKey:@"location_address"];
-        self.mDirections = [[spot objectForKey:@"location"] objectForKey:@"directions"];
     }
+        self.offers = offersIn;
+
+        self.mAddress = [[spot objectForKey:@"location"] objectForKey:@"location_address"];
+
+        self.mDirections = [[spot objectForKey:@"location"] objectForKey:@"directions"];
+    //}
     if(!freeIn) {
         return false;
     }

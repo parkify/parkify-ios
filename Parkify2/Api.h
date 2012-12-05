@@ -128,4 +128,6 @@ withFailure:(FailureBlock)failureBlock;
 + (void)sendProblemSpotWithText:(NSString *)problem
                        andImage:(UIImage*)problemImage
             withASIHTTPDelegate:(id)delegate;
++ (void)logout;
+
 @end

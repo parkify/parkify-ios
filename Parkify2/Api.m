@@ -18,6 +18,7 @@
 #import "ParkifyWebViewWrapperController.h"
 #import "ErrorTransformer.h"
 #import "problemSpotViewController.h"
+#import "ParkifyAppDelegate.h"
 
 #define TESTING_V1 true
 
@@ -1003,7 +1004,16 @@ origPassword:(NSString*)origPassword
     [request startAsynchronous];
 
 }
++ (void)logout{
+    [[Mixpanel sharedInstance] track:@"logout"];
+    
+    [Persistance saveAuthToken:nil];
+    [Persistance saveUserID:[NSNumber numberWithInt:-1]];
+    ParkifyAppDelegate *delegate = [[UIApplication sharedApplication] delegate];
+    delegate.transactions=nil;
+    
 
+}
 @end
 
 

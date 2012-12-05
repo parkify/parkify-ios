@@ -300,11 +300,8 @@
 }
 
 - (IBAction)logoutButtonPressed:(UIButton *)sender {
-    [[Mixpanel sharedInstance] track:@"logout"];
-    
+    [Api logout];
     /** TODO: also tell server to logout if can **/
-    [Persistance saveAuthToken:nil];
-    [Persistance saveUserID:[NSNumber numberWithInt:-1]];
 }
 
 - (IBAction)forgotPasswordButtonTapped:(id)sender {

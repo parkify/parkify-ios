@@ -11,7 +11,7 @@
 #import "MultiImageViewer.h"
 #import "UIViewController+AppData_ParkingSpotCollection.h"
 #import "TextFormatter.h"
-
+#import "Api.h"
 @interface extendReservationViewController ()
 
 @end
@@ -113,8 +113,6 @@
         
         //Info web view text
         infoWebViewString = [NSString stringWithFormat:@"<html>%@<body>"
-                             "<span class=l1>Distance away</span></br>"
-                             "<span class=l2>%@</span></br>"
                              "<span class=l3>%@</span></br>"
                              "<span class=fake-space></br></span>"
                              "<span class=fake-space></br></span>"
@@ -122,7 +120,6 @@
                              "<span class=l4>COVERED: %@</span>"
                              "</body></html>",
                              styleString,
-                             self.distanceString,
                              [TextFormatter formatSecuredAddressString:self.spot.mAddress],
                              layoutString,
                              coverageString,
@@ -158,6 +155,7 @@
     NSString *lastPayment = [Persistance retrieveLastPaymentInfoDetails];
     NSLog(@"Last payment %@", lastPayment);
     double currentTime = [currentDate timeIntervalSince1970];
+
     MultiImageViewer* miViewer = [[MultiImageViewer alloc] initWithFrame:self.multiImageViewFrame.frame withImageIds:self.spot.landscapeInfoImageIDs];
     
     CGRect frame = miViewer.frame;
@@ -183,7 +181,7 @@
         [dateFormatter setDateFormat:@"ha"];
         return [dateFormatter stringFromDate:time]; };
     
-    
+
     self.spot = [[self getParkingSpots] parkingSpotForIDFromAll:[[self.transactioninfo objectForKey:@"spotid"] intValue]];
     //[[self.transactioninfo objectForKey:@"endtime"] doubleValue]
     double maxVal = self.spot.endTime;
@@ -343,6 +341,34 @@
     //[[self getParkingSpots] updateWithRequest:[NSDictionary dictionaryWithObject:@"all" forKey:@"level_of_detail"]];
 }
 
+- (IBAction)parkButtonTapped:(UIButton *)sender {
+    if ([Persistance retrieveAuthToken] == nil) {
+        
+        [Api authenticateModallyFrom:self withSuccess:^(NSDictionary * result)
+         {
+             NSString *status = [[result objectForKey:@"exit"] copy];
+             NSLog(@"result status is %@", status);
+             if ( [status isEqualToString:@"logged_in"]){
+                 dispatch_async(dispatch_get_main_queue(), ^{
+                     NSLog(@"Logged in");
+                     [self previewTransaction];
+                 });
+                 
+             }
+             else{
+                 dispatch_async(dispatch_get_main_queue(), ^{
+                     NSLog(@"Not Logged in");
+                 });
+                 
+             }
+         }
+         
+         ];
+        return;
+    } else {
+        [self previewTransaction];
+    }
+}
 
 
 

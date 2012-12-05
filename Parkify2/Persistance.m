@@ -42,18 +42,22 @@
 }
 
 + (void) saveUserPlist:(id)record withName:(NSString *)name{
+    if ( ![Persistance retrieveUserID])
+        return;
+
     NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
     NSString *documentsDirectory = [paths objectAtIndex:0];
-    NSString *writableDBPath = [documentsDirectory stringByAppendingPathComponent:name];
-    
+    NSString *writableDBPath = [documentsDirectory stringByAppendingPathComponent:[NSString stringWithFormat:@"%@%@", [Persistance retrieveUserID], name]];
     BOOL saved= [NSKeyedArchiver archiveRootObject:record toFile:writableDBPath];
     NSLog(@"did save object with name %@, %d", name, saved);
 
 }
 + (id) retrievePlistWithName:(NSString *)name{
+    if ( ![Persistance retrieveUserID])
+        return nil;
     NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
     NSString *documentsDirectory = [paths objectAtIndex:0];
-    NSString *writableDBPath = [documentsDirectory stringByAppendingPathComponent:name];
+    NSString *writableDBPath = [documentsDirectory stringByAppendingPathComponent:[NSString stringWithFormat:@"%@%@", [Persistance retrieveUserID], name]];
     
     
     NSFileManager *fmang = [NSFileManager defaultManager];

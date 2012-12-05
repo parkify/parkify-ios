@@ -497,7 +497,7 @@
     
     [request addRequestHeader:@"User-Agent" value:@"ASIFormDataRequest"]; 
     [request addRequestHeader:@"Content-Type" value:@"application/json"];
-    [request  setRequestMethod:@"POST"];
+    [request setRequestMethod:@"POST"];
     [request setCompletionBlock:^{
         
         

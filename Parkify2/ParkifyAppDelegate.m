@@ -19,8 +19,11 @@
 @synthesize transactions = _transactions;
 @synthesize openURL= _openURL;
 -(NSMutableDictionary*)transactions{
+    if (![Persistance retrieveUserID])
+        return nil;
     if(!transactions){
         NSDictionary *trans = [Persistance retrieveTransactions];
+
         transactions= [[NSMutableDictionary alloc] init];
         NSMutableDictionary *actvies = [[NSMutableDictionary alloc] init];
         NSMutableDictionary *alltrans = [[NSMutableDictionary alloc] init];

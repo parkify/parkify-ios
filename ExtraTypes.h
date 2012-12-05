@@ -16,9 +16,9 @@ typedef void(^FailureBlock)(NSError*);
 typedef NSString* (^Formatter)(double val);
 
 #define ADMIN_VER false
-//#define DEBUGVER
+#define DEBUGVER
 #ifdef DEBUGVER
-    #define TARGET_SERVER @"192.168.1.112:3000"
+    #define TARGET_SERVER @"192.168.1.234:3000"
 
 #else
     #define TARGET_SERVER @"parkify-rails.herokuapp.com"

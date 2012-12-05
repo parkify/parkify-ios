@@ -726,6 +726,7 @@
     
     extendReservationViewController *controller = [mainStoryboard instantiateViewControllerWithIdentifier: @"extendResVC"];
     controller.transactioninfo= self.transactionInfo;
+    controller.spot = self.spot;
     [self.navigationController pushViewController:controller animated:YES];
 
 }

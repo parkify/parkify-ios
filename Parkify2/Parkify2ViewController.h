@@ -27,8 +27,6 @@
     double _currentLat;
     double _currentLong;
 }
-- (IBAction)launchCameraStuffForG:(id)sender;
-@property (strong, nonatomic) UIViewController * vcToSwitch;
 @property (nonatomic, retain)CLLocationManager *locationManager;
 @property (weak, nonatomic) IBOutlet MKMapView *mapView;
 @property (strong, nonatomic) NSTimer *timerPolling;
@@ -56,7 +54,6 @@
 @property (weak, nonatomic) IBOutlet UIButton *searchButton;
 - (IBAction)searchButtonTapped:(id)sender;
 
-- (IBAction)refreshTapped:(id)sender;
 - (IBAction)settingsButtonTapped:(UIButton *)sender;
 
 - (IBAction)myLocationTapped:(id)sender;
