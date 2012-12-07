@@ -1014,6 +1014,53 @@ origPassword:(NSString*)origPassword
     
 
 }
+
++(void) tryTransacation:(NSObject *)spotinfo withStartTime:(double)minimumValue andEndTime:(double)maximumValue withASIdelegate:(id)asidelegate isPreview:(BOOL)preview withExtraParameter:(NSString*)parameter
+{
+    
+    ParkingSpot *spot = (ParkingSpot*)spotinfo;
+    [[Mixpanel sharedInstance] track:@"transactionpreview"];
+    NSMutableArray* offerIds = [[NSMutableArray alloc] init];
+    for (Offer* offer in spot.offers) {
+
+        if ([offer overlapsWithStartTime:minimumValue endTime:maximumValue])
+            [offerIds addObject:[NSNumber numberWithInt:offer.mId]];
+    }
+    
+    id transactionRequest = [Authentication makeTransactionRequestWithUserToken:[Persistance retrieveAuthToken] withSpotId:spot.mID withStartTime:minimumValue withEndTime:maximumValue withOfferIds:offerIds withLicensePlate:[Persistance retrieveLicensePlateNumber]];
+    
+#ifdef DEBUGVER
+    NSString *sslorno = @"http";
+    
+#else
+    NSString *sslorno = @"https";
+    
+#endif
+    NSString *urlString = @"";
+    if(preview)
+        urlString = [[NSString alloc] initWithFormat:@"%@://%@/api/v1/acceptances/preview.json?auth_token=%@%@", sslorno, TARGET_SERVER, [Persistance retrieveAuthToken], parameter];
+    else
+        urlString = [[NSString alloc] initWithFormat:@"%@://%@/api/v1/acceptances.json?auth_token=%@%@",sslorno, TARGET_SERVER, [Persistance retrieveAuthToken],parameter];
+    NSURL *url = [NSURL URLWithString:urlString];
+    
+    NSLog(@"%@", [transactionRequest JSONRepresentation]);
+    ASIFormDataRequest *request = [ASIFormDataRequest requestWithURL:url];
+    [request addPostValue:[transactionRequest JSONRepresentation] forKey:@"transaction"];
+    
+    [request addRequestHeader:@"User-Agent" value:@"ASIFormDataRequest"];
+    [request addRequestHeader:@"Content-Type" value:@"application/json"];
+    [request  setRequestMethod:@"POST"];
+    [request setDelegate:asidelegate];
+    if(preview)
+        request.tag= kPreviewTransaction;
+    else
+        request.tag=kAttempTransaction;
+    
+    [request startAsynchronous];
+    
+}
+
+
 @end
 
 

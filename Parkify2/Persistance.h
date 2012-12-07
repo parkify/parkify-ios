@@ -11,7 +11,7 @@
 
 @interface Persistance : NSObject
 
-+(NSMutableDictionary*)addNewTransaction:(ParkingSpot*)spot withStartTime:(double)timeIn andEndTime:(double)timeOut andLastPaymentDetails:(NSString*)details;
++(NSMutableDictionary*)addNewTransaction:(ParkingSpot*)spot withStartTime:(double)timeIn andEndTime:(double)timeOut andLastPaymentDetails:(NSString*)details withTransactionID:(NSString*)acceptanceid;
 +(NSDictionary*)retrieveTransactions;
 +(void)saveUserID:(NSNumber*)user;
 +(NSNumber*)retrieveUserID;

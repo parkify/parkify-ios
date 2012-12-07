@@ -12,11 +12,18 @@
 #import "UIViewController+AppData_ParkingSpotCollection.h"
 #import "TextFormatter.h"
 #import "Api.h"
+#import "SBJson.h"
+#import "WaitingMask.h"
+#import "ErrorTransformer.h"
+#import "ParkifyConfirmationViewController.h"
 @interface extendReservationViewController ()
+@property (strong, nonatomic) WaitingMask* waitingMask;
 
 @end
 
 @implementation extendReservationViewController
+@synthesize waitingMask = _waitingMask;
+
 @synthesize transactioninfo= _transactioninfo;
 @synthesize taxLabel = _taxLabel;
 //@synthesize pictureActivityView = _pictureActivityView;
@@ -146,6 +153,12 @@
     }
     return self;
 }
+- (void)timeIntervalChanged{
+    [UIView animateWithDuration:0.8 animations:^{
+        self.flashingSign.alpha = 0;
+    }];
+    [self updateInfo];
+}
 
 - (void)viewDidLoad
 {
@@ -186,7 +199,7 @@
     //[[self.transactioninfo objectForKey:@"endtime"] doubleValue]
     double maxVal = self.spot.endTime;
    // maxVal = [[self.transactioninfo objectForKey:@"endtime"] doubleValue];
-    self.rangeBar = [[RangeBar alloc] initWithFrame:[self.rangeBarContainer bounds] minVal:prevHourMark minimumSelectableValue:[[self.transactioninfo objectForKey:@"endtime"] doubleValue]-(30*60) maxVal:maxVal minRange:30*60 displayedRange:numHours*60*60 selectedMinVal:currentTime selectedMaxVal:[[self.transactioninfo objectForKey:@"endtime"] doubleValue] withTimeFormatter:timeFormatter withPriceFormatter:^NSString *(double val) {
+    self.rangeBar = [[RangeBar alloc] initWithFrame:[self.rangeBarContainer bounds] minVal:prevHourMark minimumSelectableValue:[[self.transactioninfo objectForKey:@"endtime"] doubleValue] maxVal:maxVal minRange:30*60 displayedRange:numHours*60*60 selectedMinVal:[[self.transactioninfo objectForKey:@"starttime"] doubleValue] selectedMaxVal:[[self.transactioninfo objectForKey:@"endtime"] doubleValue]+30*60 withTimeFormatter:timeFormatter withPriceFormatter:^NSString *(double val) {
         if(fmod(val,1.0) >= 0.01) {
             return [NSString stringWithFormat:@"$%0.2f", val];
         } else {
@@ -199,7 +212,7 @@
     
     
     
-  //  [self.rangeBar addTarget:self action:@selector(timeIntervalChanged) forControlEvents:UIControlEventValueChanged];
+    [self.rangeBar addTarget:self action:@selector(timeIntervalChanged) forControlEvents:UIControlEventValueChanged];
     [self.rangeBarContainer addSubview:self.rangeBar];
     [self.view bringSubviewToFront:self.rangeBarContainer];
     [self updateInfo];
@@ -258,7 +271,7 @@
         endTimeA = formatterA(self.rangeBar.selectedMaximumValue);
         
         //Price text
-        double durationInSeconds = (self.rangeBar.selectedMaximumValue - self.rangeBar.selectedMinimumValue);
+        double durationInSeconds = (self.rangeBar.selectedMaximumValue - self.rangeBar.minimumSelectableValue);
         ParkingSpot* spot = self.spot;
         double totalPrice = [spot priceFromNowForDurationInSeconds:durationInSeconds];
         
@@ -340,7 +353,82 @@
     [self.spot updateAsynchronouslyWithLevelOfDetail:@"all"];
     //[[self getParkingSpots] updateWithRequest:[NSDictionary dictionaryWithObject:@"all" forKey:@"level_of_detail"]];
 }
+- (void) switchToConfirmation:(NSDictionary*)paymentDetails {
+    [self stopPolling];
+    self.navigationController.modalPresentationStyle = UIModalPresentationCurrentContext;
+    
+    UIViewController* parent = [self presentingViewController];
+    [self dismissViewControllerAnimated:true completion:^{
+        UIStoryboard *mainStoryboard = [UIStoryboard storyboardWithName:@"MainStoryboard_iPhone"
+                                                                 bundle: nil];
+        
+        ParkifyConfirmationViewController* controller = [mainStoryboard instantiateViewControllerWithIdentifier: @"ConfirmationVC"];
+        UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:controller];
+        [navController.navigationBar setTintColor:[UIColor blackColor]];
+        controller.spot = self.spot;
+        NSMutableDictionary *thetransaction = [Persistance addNewTransaction:self.spot withStartTime:self.rangeBar. selectedMinimumValue andEndTime:self.rangeBar.selectedMaximumValue andLastPaymentDetails:[paymentDetails objectForKey:@"details"] withTransactionID:[paymentDetails objectForKey:@"id"]];
+        [[Mixpanel sharedInstance] track:@"launchConfirmationVC" properties:thetransaction];
+        
+        
+        controller.currentLat = self.currentLat;
+        controller.currentLong = self.currentLong;
+        controller.transactionInfo = thetransaction;
+        controller.topBarText = [paymentDetails objectForKey:@"details"];
+        
+        [Persistance saveCurrentSpot:self.spot];
+        
+        parent.modalTransitionStyle = UIModalTransitionStyleCoverVertical;
+        [parent presentViewController:navController animated:true completion:^{}];
+    }
+     ];
+}
+- (void) attemptMakeTransaction {
+    [[Mixpanel sharedInstance] track:@"extendtransactionattempt"];
+    
+    CGRect waitingMaskFrame = self.view.frame;
+    waitingMaskFrame.origin.x = 0;
+    waitingMaskFrame.origin.y = 0;
+    
+    self.waitingMask = [[WaitingMask alloc] initWithFrame:waitingMaskFrame];
+    [self.view addSubview:self.waitingMask];
+    
+    [Api tryTransacation:self.spot withStartTime:self.rangeBar.minimumSelectableValue andEndTime:self.rangeBar.selectedMaximumValue withASIdelegate:self isPreview:FALSE withExtraParameter:[NSString stringWithFormat:@"&extend=true&acceptanceid=%@", [self.transactioninfo objectForKey:@"acceptanceid"]]];
+    
+    return;
+    
+}
 
+- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
+{
+    NSString *title = [alertView buttonTitleAtIndex:buttonIndex];
+    
+    if([title isEqualToString:@"Cancel"])
+    {
+        //NSLog(@"Button 1 was selected.");
+    }
+    else if([title isEqualToString:@"Yes"])
+    {
+        //NSLog(@"Button 2 was selected.");
+        [self attemptMakeTransaction];
+    }
+}
+
+-(void) previewTransaction{
+    [[Mixpanel sharedInstance] track:@"extendtransactionpreview"];
+    
+    CGRect waitingMaskFrame = self.view.frame;
+    waitingMaskFrame.origin.x = 0;
+    waitingMaskFrame.origin.y = 0;
+    
+    self.waitingMask = [[WaitingMask alloc] initWithFrame:waitingMaskFrame];
+    [self.view addSubview:self.waitingMask];
+    
+    [Api tryTransacation:self.spot withStartTime:self.rangeBar.minimumSelectableValue andEndTime:self.rangeBar.selectedMaximumValue withASIdelegate:self isPreview:TRUE withExtraParameter:[NSString stringWithFormat:@"&extend=true&acceptanceid=%@", [self.transactioninfo objectForKey:@"acceptanceid"]]];
+    
+    return;
+    
+
+}
 - (IBAction)parkButtonTapped:(UIButton *)sender {
     if ([Persistance retrieveAuthToken] == nil) {
         
@@ -370,6 +458,96 @@
     }
 }
 
+#pragma  mark ASIHttp delegate
+
+-(void)requestFailed:(ASIHTTPRequest *)request{
+    if ( request.tag == kPreviewTransaction || request.tag == kAttempTransaction){
+        
+        
+        [self.waitingMask removeFromSuperview];
+        self.waitingMask = nil;
+        //[UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+        NSError *error = [request error];
+        NSLog(@"Error: %@ Status code: %i Status Message: %@", error.localizedDescription, request.responseStatusCode, request.responseStatusMessage);
+        if(request.responseStatusCode == 401) {
+            [Api authenticateModallyFrom:self withSuccess:^(NSDictionary * result){}];
+        }
+        else {
+            UIAlertView* error = [[UIAlertView alloc] initWithTitle:@"Error" message:@"Could not contact server" delegate:self cancelButtonTitle:@"Ok"
+                                                  otherButtonTitles: nil];
+            [error show];
+            //self.errorLabel.text = @"Could not contact server";
+            //self.errorLabel.hidden = false;
+        }
+        
+        
+        
+        
+    }
+}
+-(void) requestFinished:(ASIHTTPRequest *)request{
+    if ( request.tag == kPreviewTransaction){
+        //[UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+        NSString *responseString = [request responseString];
+        NSDictionary * root = [responseString JSONValue];
+        if([root objectForKey:@"success"]) {
+            //Needs to happen on success
+            
+            [self.waitingMask removeFromSuperview];
+            self.waitingMask = nil;
+            [[Mixpanel sharedInstance] track:@"transactionpreviewsuccess" properties:root];
+            
+            UIAlertView* areYouSure = [[UIAlertView alloc] initWithTitle:@"Are you sure?"
+                                                                 message:[[root objectForKey:@"message"] objectForKey:@"price_string"]
+                                                                delegate:self
+                                                       cancelButtonTitle:@"Cancel"
+                                                       otherButtonTitles:@"Yes", nil];
+            [areYouSure show];
+            
+            //[self performSegueWithIdentifier:@"ViewConfirmation" sender:self];
+            //NSLog(@"TEST");
+        } else {
+            [[Mixpanel sharedInstance] track:@"transactionpreviewfailure" properties:root];
+            
+            NSError* error = [ErrorTransformer apiErrorToNSError:[root objectForKey:@"error"]];
+            [ErrorTransformer errorToAlert:error withDelegate:self];
+            
+            //self.errorLabel.text = [root objectForKey:@"error"];
+            //self.errorLabel.hidden = false;
+            [self.waitingMask removeFromSuperview];
+            self.waitingMask = nil;
+        }
+        
+        NSLog(@"Response: %@", responseString);
+    }
+    else if(request.tag == kAttempTransaction){
+        //[UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+        NSString *responseString = [request responseString];
+        NSDictionary * root = [responseString JSONValue];
+        if([[root objectForKey:@"success"] boolValue]) {
+            [[Mixpanel sharedInstance] track:@"RealTransactionSuccess" properties:root];
+            
+            //Needs to happen on success
+            NSString* paymentInfoDetails = [[root objectForKey:@"acceptance"] objectForKey:@"details"];
+            [Persistance saveLastPaymentInfoDetails:paymentInfoDetails];
+            
+            [self switchToConfirmation:[root objectForKey:@"acceptance"]];
+            
+            //[self performSegueWithIdentifier:@"ViewConfirmation" sender:self];
+            //NSLog(@"TEST");
+        } else {
+            [[Mixpanel sharedInstance] track:@"RealTransactionFailure" properties:root];
+            NSError* error = [ErrorTransformer apiErrorToNSError:[root objectForKey:@"error"]];
+            [ErrorTransformer errorToAlert:error withDelegate:self];
+            
+            [self.waitingMask removeFromSuperview];
+            self.waitingMask = nil;
+        }
+        
+        NSLog(@"Response: %@", responseString);
+        
+    }
+}
 
 
 @end

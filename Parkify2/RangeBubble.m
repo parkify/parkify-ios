@@ -140,14 +140,14 @@
         
         //track background
         /*
-        UIImage* imgNone = [UIImage imageWithImage:[UIImage imageNamed:@"slider_dark_background.png"] scaledToSize:CGSizeMake(w, h_main)];
-        self.bubbleBackground = [[UIImageView alloc] initWithImage:imgNone];
-        self.bubbleBackground.contentMode = UIViewContentModeLeft;
-        
-        self.bubbleBackground.frame = self.mainRect;
-        
-        
-        self.bubbleBackground.alpha = self.alpha;
+         UIImage* imgNone = [UIImage imageWithImage:[UIImage imageNamed:@"slider_dark_background.png"] scaledToSize:CGSizeMake(w, h_main)];
+         self.bubbleBackground = [[UIImageView alloc] initWithImage:imgNone];
+         self.bubbleBackground.contentMode = UIViewContentModeLeft;
+         
+         self.bubbleBackground.frame = self.mainRect;
+         
+         
+         self.bubbleBackground.alpha = self.alpha;
          */
         
         
@@ -159,7 +159,7 @@
         self.vertBar.frame = CGRectMake(0,0,1,h-(3*h_main/4));
         
         self.vertBar.alpha = self.alpha;
-
+        
         [self addSubview:self.vertBar];
         
         //track free
@@ -185,16 +185,16 @@
         
         [self addSubview:self.bubbleBooked];
         if(self.minimumSelectedValue != self.minimumValue){
-
+            
             UIImage* imgGreen =[UIImage imageNamed:@"selected_bubble_green.png"];//[UIImage imageWithImage:[UIImage imageNamed:@"selected_bubble.png"] scaledToSize:CGSizeMake(w, h_main)];
-        
+            
             self.bubbleNewBackground = [[UIImageView alloc] initWithImage:imgGreen];
             self.bubbleNewBackground.clipsToBounds = true;
             self.bubbleNewBackground.frame = self.mainRect;
             self.bubbleNewBackground.alpha = self.alpha;
-        
+            
             [self addSubview:self.bubbleNewBackground];
-        
+            
         }
         
         //labels
@@ -217,12 +217,12 @@
             [dateFormatter setDateFormat:@"ha"];
             
             //if([[dateFormatter stringFromDate:time] isEqualToString:@"12AM"]) {
-                [dateFormatter setDateFormat:@"EEEE"];
-                NSString* a = [dateFormatter stringFromDate:time];
-                return a;
+            [dateFormatter setDateFormat:@"EEEE"];
+            NSString* a = [dateFormatter stringFromDate:time];
+            return a;
             //} else {
-             //   return @"";
-           // }
+            //   return @"";
+            // }
             
         };
         
@@ -295,7 +295,7 @@
 }
 
 //for now, don't worry about multiple touches.
-- (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {    
+- (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
 }
 
 
@@ -310,45 +310,45 @@
     
     double begin = [self xForValue:self.selectedMinimumValue];
     double end = [self xForValue:self.selectedMaximumValue];
-
+    
     if(self.minimumSelectedValue == self.minimumValue){
         CALayer* maskLayer = [CALayer layer];
-        maskLayer.frame = CGRectMake(begin,0,end-begin ,self.bubbleBooked.frame.size.height);
+        maskLayer.frame = CGRectMake(begin,0,end -begin ,self.bubbleBooked.frame.size.height);
         maskLayer.contents = (__bridge id)[[UIImage imageNamed:@"maskImage.png"] CGImage];
         self.bubbleBooked.layer.mask = maskLayer;
         
         [self.bubbleBooked setNeedsDisplay];
         
-
+        
     }
     else{
-    double blueedn = [self xForValue:self.minimumSelectedValue];
-    
-
-    
-   /* 
-    CALayer* maskLayer = [CALayer layer];
-    maskLayer.frame = CGRectMake(begin,0,end-begin ,self.bubbleBooked.frame.size.height);
-    CGRect rect = CGRectMake(begin,0,end-begin ,self.bubbleBooked.frame.size.height);
-    maskLayer.contents = (__bridge id)[[UIImage imageNamed:@"maskImage.png"] CGImage];
-
-    */
-    CALayer* maskLayer = [CALayer layer];
-    maskLayer.frame = CGRectMake(begin,0,end-begin ,self.bubbleBooked.frame.size.height);
-    maskLayer.contents = (__bridge id)[[UIImage imageNamed:@"maskImage.png"] CGImage];
-
-    
-    self.bubbleBooked.layer.mask = maskLayer;
-    
-    [self.bubbleBooked setNeedsDisplay];
-    
-    CALayer* maskLayertwo = [CALayer layer];
-    maskLayertwo.frame = CGRectMake(blueedn,0,end-blueedn ,self.bubbleBooked.frame.size.height);
-    NSLog(@"The frame is %@", NSStringFromCGRect(maskLayertwo.frame));
-    maskLayertwo.contents = (__bridge id)[[UIImage imageNamed:@"maskImage.png"] CGImage];
-
-    [self.bubbleNewBackground.layer setMask:maskLayertwo];
-    [self.bubbleNewBackground setNeedsDisplay];
+        double blueedn = [self xForValue:self.minimumSelectedValue];
+        
+        
+        
+        /*
+         CALayer* maskLayer = [CALayer layer];
+         maskLayer.frame = CGRectMake(begin,0,end-begin ,self.bubbleBooked.frame.size.height);
+         CGRect rect = CGRectMake(begin,0,end-begin ,self.bubbleBooked.frame.size.height);
+         maskLayer.contents = (__bridge id)[[UIImage imageNamed:@"maskImage.png"] CGImage];
+         
+         */
+        CALayer* maskLayer = [CALayer layer];
+        maskLayer.frame = CGRectMake(begin,0,end-begin ,self.bubbleBooked.frame.size.height);
+        maskLayer.contents = (__bridge id)[[UIImage imageNamed:@"maskImage.png"] CGImage];
+        
+        
+        self.bubbleBooked.layer.mask = maskLayer;
+        
+        [self.bubbleBooked setNeedsDisplay];
+        
+        CALayer* maskLayertwo = [CALayer layer];
+        maskLayertwo.frame = CGRectMake(blueedn,0,end-blueedn ,self.bubbleBooked.frame.size.height);
+        NSLog(@"The frame is %@", NSStringFromCGRect(maskLayertwo.frame));
+        maskLayertwo.contents = (__bridge id)[[UIImage imageNamed:@"maskImage.png"] CGImage];
+        
+        [self.bubbleNewBackground.layer setMask:maskLayertwo];
+        [self.bubbleNewBackground setNeedsDisplay];
     }
     //NOW labels!
     
@@ -365,16 +365,16 @@
     }
     
     
-   
+    
     
     /*[self.bubbleBooked setContentMode:UIViewContentModeRight];
-    self.bubbleBooked.bounds = CGRectMake(begin,
-                                          0,
-                                          end-begin,
-                                          self.bubbleBooked.bounds.size.height);
+     self.bubbleBooked.bounds = CGRectMake(begin,
+     0,
+     end-begin,
+     self.bubbleBooked.bounds.size.height);
      */
     //self.bubbleBooked.center = CGPointMake((begin+end)/2.0, self.bubbleBooked.center.y);
-
+    
 }
 
 -(NSString*) description {

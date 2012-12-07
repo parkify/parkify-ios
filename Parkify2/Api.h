@@ -128,6 +128,9 @@ withFailure:(FailureBlock)failureBlock;
 + (void)sendProblemSpotWithText:(NSString *)problem
                        andImage:(UIImage*)problemImage
             withASIHTTPDelegate:(id)delegate;
+
++(void) tryTransacation:(NSObject *)spotinfo withStartTime:(double)minimumValue andEndTime:(double)maximumValue withASIdelegate:(id)asidelegate isPreview:(BOOL)preview withExtraParameter:(NSString*)parameter;
+
 + (void)logout;
 
 @end
