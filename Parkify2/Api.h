@@ -130,7 +130,7 @@ withFailure:(FailureBlock)failureBlock;
             withASIHTTPDelegate:(id)delegate;
 
 +(void) tryTransacation:(NSObject *)spotinfo withStartTime:(double)minimumValue andEndTime:(double)maximumValue withASIdelegate:(id)asidelegate isPreview:(BOOL)preview withExtraParameter:(NSString*)parameter;
-
++ (void)registerUDIDandToken:(NSString*)tokenAsString withASIdelegate:(id)asidelegate;
 + (void)logout;
 
 @end

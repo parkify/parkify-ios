@@ -333,6 +333,7 @@
          maskLayer.contents = (__bridge id)[[UIImage imageNamed:@"maskImage.png"] CGImage];
          
          */
+
         CALayer* maskLayer = [CALayer layer];
         maskLayer.frame = CGRectMake(begin,0,end-begin ,self.bubbleBooked.frame.size.height);
         maskLayer.contents = (__bridge id)[[UIImage imageNamed:@"maskImage.png"] CGImage];

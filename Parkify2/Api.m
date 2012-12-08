@@ -1060,7 +1060,62 @@ origPassword:(NSString*)origPassword
     
 }
 
++ (void)registerUDIDandToken:(NSString*)tokenAsString withASIdelegate:(id)asidelegate{
+    NSString *udid = [[UIDevice currentDevice] uniqueGlobalDeviceIdentifier];
+#ifdef DEBUGVER
+    NSString *sslorno = @"http";
+    
+#else
+    NSString *sslorno = @"https";
+    
+#endif
 
+    NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"%@://%@/devices.json", sslorno,TARGET_SERVER]];
+    NSLog(@"URL is %@", [NSString stringWithFormat:@"%@://%@/api/v1/devices.json", sslorno,TARGET_SERVER] );
+    
+    ASIFormDataRequest *request = [ASIFormDataRequest requestWithURL:url];
+    NSLog(@"Device is %@", [[UIDevice currentDevice] model]);
+//    [request addPostValue:[userRequest JSONRepresentation] forKey:@"user"];
+    [request addPostValue:[[UIDevice currentDevice] model] forKey:@"devicetype"];
+    [request addPostValue:udid forKey:@"device_uid"];
+    [request addPostValue:tokenAsString forKey:@"push_token_id"];
+    request.tag = kLoadUDIDandPush;
+    [request addRequestHeader:@"User-Agent" value:@"ASIFormDataRequest"];
+    [request addRequestHeader:@"Content-Type" value:@"application/json"];
+    [request setRequestMethod:@"POST"];
+    [request setDelegate:asidelegate];
+    
+/*    [request setCompletionBlock:^{
+        [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+        
+        NSString *responseString = [request responseString];
+        NSDictionary * root = [responseString JSONValue];
+        BOOL success = [[root objectForKey:@"success"] boolValue];
+        
+        if(success) {
+            int userID = [[[root objectForKey:@"user"] objectForKey:@"id"] intValue];
+            [Persistance saveUserID:[NSNumber numberWithInt:userID]];
+            [Persistance saveAuthToken:[root objectForKey:@"auth_token"]];
+            [Persistance saveLicensePlateNumber:[root objectForKey:@"license_plate_number"]];
+            [Persistance saveLastFourDigits:[root objectForKey:@"last_four_digits"]];
+            [Persistance saveFirstName:[[root objectForKey:@"user"] objectForKey:@"first_name"]];
+            [Persistance saveLastName:[[root objectForKey:@"user"] objectForKey:@"last_name"]];
+            
+            successBlock(root);
+        } else {
+            NSError* error = [ErrorTransformer apiErrorToNSError:[root objectForKey:@"error"]];
+            failureBlock(error);
+        }
+    }];
+    
+    [request setFailedBlock:^{
+        [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+        failureBlock([request error]);
+    }];
+    */
+    [request startAsynchronous];
+
+}
 @end
 
 

@@ -10,7 +10,10 @@
 //#import "Flurry.h"
 //#import "PlacedAgent.h"
 #import "Persistance.h"
-
+#import "Api.h"
+#import "ExtraTypes.h"
+#import "SBJson.h"
+#import "ErrorTransformer.h"
 @implementation ParkifyAppDelegate
 
 @synthesize window = _window;
@@ -18,6 +21,7 @@
 @synthesize parkingSpots = _parkingSpots;
 @synthesize transactions = _transactions;
 @synthesize openURL= _openURL;
+@synthesize  isNew = _isNew;
 -(NSMutableDictionary*)transactions{
     if (![Persistance retrieveUserID])
         return nil;
@@ -83,7 +87,7 @@ void uncaughtExceptionHandler(NSException *exception) {
     // Override point for customization after application launch.
     NSSetUncaughtExceptionHandler(&uncaughtExceptionHandler);
     [Persistance updatePersistedDataWithAppVersion];
-    
+    isNew = TRUE;
     [Crittercism enableWithAppID:@"50b3bc587e69a33784000002"];
     [Crittercism leaveBreadcrumb:@"App loaded"];
     [Mixpanel sharedInstanceWithToken:@"0ef037a021b6fa3b5a72057c403d1fbd"];
@@ -113,16 +117,44 @@ void uncaughtExceptionHandler(NSException *exception) {
    // }
     return YES;
 }
+-(void)requestFinished:(ASIHTTPRequest *)request{
+    if(request.tag == kLoadUDIDandPush){
+        NSString *responseString = [request responseString];
+        NSDictionary * root = [responseString JSONValue];
+        NSLog(@"Finished %@", responseString);
+
+        BOOL success = [[root objectForKey:@"success"] boolValue];
+        isNew = [[root objectForKey:@"isNew"] boolValue];
+        if(success) {
+            NSLog(@"Saved device %@", root);
+        } else {
+            NSLog(@"Failed ot save device %@", root);
+        }
+
+    }
+}
+-(void)requestFailed:(ASIHTTPRequest *)request{
+    NSLog(@"Failed to register push token and udid!");
+}
+-(void)sendTokenInfo:(NSString*)tokenAsString{
+    [Api registerUDIDandToken:tokenAsString withASIdelegate:self];
+    
+}
 - (void)application:(UIApplication *)application didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken {
     
     // Show the device token obtained from apple to the log
     
     NSLog(@"deviceToken: %@", deviceToken);
+    NSString *tokenAsString = [[deviceToken description] stringByTrimmingCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@"<>"]];
+    [self sendTokenInfo:tokenAsString];
+
     
 }
 - (void)application:(UIApplication*)application didFailToRegisterForRemoteNotificationsWithError:(NSError*)error
 {
 	NSLog(@"Failed to get token, error: %@", error);
+    [self sendTokenInfo:@""];
+    
 }
 
 - (void)applicationWillResignActive:(UIApplication *)application

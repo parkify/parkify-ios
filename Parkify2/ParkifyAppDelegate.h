@@ -10,16 +10,18 @@
 #import <UIKit/UIKit.h>
 #import "User.h"
 #import "ParkingSpotCollection.h"
-
+#import "ASIHTTPRequest.h"
 #define APP_VERSION @"v1.3"
 
 
-@interface ParkifyAppDelegate : UIResponder <UIApplicationDelegate>
+@interface ParkifyAppDelegate : UIResponder <UIApplicationDelegate, ASIHTTPRequestDelegate>
 {
     NSMutableDictionary *transactions;
     NSURL *openURL;
+    BOOL isNew;
 
 }
+@property (nonatomic, assign) BOOL isNew;
 @property (nonatomic, strong) NSURL *openURL;
 @property (strong, nonatomic) UIWindow *window;
 @property (nonatomic, strong) NSMutableDictionary *transactions;
