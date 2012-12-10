@@ -167,7 +167,7 @@ withPasswordConfirmation:(NSString*)passwordConfirmation
                 [Persistance saveLastFourDigits:[root objectForKey:@"last_four_digits"]];
                 [Persistance saveFirstName:[[root objectForKey:@"user"] objectForKey:@"first_name"]];
                 [Persistance saveLastName:[[root objectForKey:@"user"] objectForKey:@"last_name"]];
-                
+                [Api registerUserWithCurrentDevice];
                 successBlock(root);
             } else {
                 NSError* error = [ErrorTransformer apiErrorToNSError:[root objectForKey:@"error"]];
@@ -956,6 +956,8 @@ origPassword:(NSString*)origPassword
             else
             {
                 NSLog(@"Image successfully uploaded");
+                NSLog(@"putobject respones %@", putObjectResponse.request.JSONRepresentation);
+                
 //                [self showAlertMessage:@"The image was successfully uploaded." withTitle:@"Upload Completed"];
             }
             
@@ -966,7 +968,12 @@ origPassword:(NSString*)origPassword
 #pragma mark methods dealing with problem spots
 + (void)sendProblemSpotWithText:(NSString *)problem
                        andImage:(UIImage*)problemImage
-            withASIHTTPDelegate:(id)delegate;
+                  andResourceID:(int)spotid
+                        withLat:(double)latitude
+                        andLong:(double)longitude
+               withAcceptanceID:(int)acceptid
+                    shouldCancel:(BOOL)shouldCancel
+            withASIHTTPDelegate:(id)delegate
 {
 #ifdef DEBUGVER
     NSString *sslorno = @"http";
@@ -976,26 +983,37 @@ origPassword:(NSString*)origPassword
     
 #endif
 
-    NSString* urlString = [[NSString alloc] initWithFormat:@"%@://%@/api/v1/problem_spot.json?auth_token=%@",sslorno, TARGET_SERVER, [Persistance retrieveAuthToken]];
+    NSString* urlString = [[NSString alloc] initWithFormat:@"%@://%@/api/v1/complaints.json?auth_token=%@",sslorno, TARGET_SERVER, [Persistance retrieveAuthToken]];
     NSURL *url = [NSURL URLWithString:urlString];
     NSString *filename = [[UIDevice currentDevice] uniqueGlobalDeviceIdentifier];
     if ( [Persistance retrieveAuthToken]){
         filename= [filename stringByAppendingFormat:@"_%@_%@", [Persistance retrieveFirstName],[Persistance retrieveLastName]];
     }
+       
     
     NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
     [dateFormatter setDateFormat:@"dd.MM.yyyy_HH:mm:ss"];
+    NSString *imageurl = @"";
     
+    
+    if(problemImage){
     filename = [filename stringByAppendingFormat:@"_%@.png",[dateFormatter stringFromDate:[NSDate date]]];
    [Api processGrandCentralDispatchUpload:[NSData dataWithData:UIImagePNGRepresentation(problemImage)] withImageName:filename];
     NSLog(@"Logging new problem with text: %@", problem);
-    NSString *imageurl = [NSString stringWithFormat:@"https://s3.amazonaws.com/%@/%@",PICTURE_BUCKET, filename];
+    imageurl = [NSString stringWithFormat:@"https://s3.amazonaws.com/%@/%@",PICTURE_BUCKET, filename];
     NSLog(@"The url is %@", imageurl);
+    }
+    
+    NSDictionary *complaints = [NSDictionary dictionaryWithObjects:[NSArray arrayWithObjects:[NSNumber numberWithInt:spotid-90000], problem, imageurl, [NSNumber numberWithDouble:latitude], [NSNumber numberWithDouble:longitude], nil] forKeys:[NSArray arrayWithObjects:@"resource_offer_id",@"descriptions", @"imageurl", @"latitude",@"longitude", nil]];
+
+    ParkifyAppDelegate *appdelegate = (ParkifyAppDelegate*)[[UIApplication sharedApplication] delegate];
+    [[appdelegate.transactions objectForKey:@"active"] removeObjectForKey:[NSString stringWithFormat:@"%i", spotid]];
+    
     ASIFormDataRequest *request = [ASIFormDataRequest requestWithURL:url];
 
-    [request addPostValue:problem forKey:@"problemText"];
-    [request addPostValue:imageurl forKey:@"problemImageURL"];
-    
+    [request addPostValue:[complaints JSONRepresentation] forKey:@"complaint"];
+    [request addPostValue:[NSNumber numberWithInt:acceptid] forKey:@"acceptanceid"];
+    [request addPostValue:[NSString stringWithFormat:@"%@", shouldCancel ? @"1" : @"0"] forKey:@"shouldCancel"];
     [request addRequestHeader:@"User-Agent" value:@"ASIFormDataRequest"];
     [request addRequestHeader:@"Content-Type" value:@"application/json"];
     [request setRequestMethod:@"POST"];
@@ -1069,9 +1087,14 @@ origPassword:(NSString*)origPassword
     NSString *sslorno = @"https";
     
 #endif
+    NSString *urlstring = [NSString stringWithFormat:@"%@://%@/api/v1/devices.json", sslorno,TARGET_SERVER];
+    if ([Persistance retrieveAuthToken] != nil) {
+        urlstring = [urlstring stringByAppendingFormat:@"?auth_token=%@", [Persistance retrieveAuthToken]];
+        
+    }
 
-    NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"%@://%@/devices.json", sslorno,TARGET_SERVER]];
-    NSLog(@"URL is %@", [NSString stringWithFormat:@"%@://%@/api/v1/devices.json", sslorno,TARGET_SERVER] );
+    NSURL *url = [NSURL URLWithString:urlstring];
+    NSLog(@"URL is %@",urlstring );
     
     ASIFormDataRequest *request = [ASIFormDataRequest requestWithURL:url];
     NSLog(@"Device is %@", [[UIDevice currentDevice] model]);
@@ -1084,6 +1107,8 @@ origPassword:(NSString*)origPassword
     [request addRequestHeader:@"Content-Type" value:@"application/json"];
     [request setRequestMethod:@"POST"];
     [request setDelegate:asidelegate];
+    [request startAsynchronous];
+    
     
 /*    [request setCompletionBlock:^{
         [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
@@ -1113,6 +1138,57 @@ origPassword:(NSString*)origPassword
         failureBlock([request error]);
     }];
     */
+
+}
++(void)registerUserWithCurrentDevice{
+    NSString *udid = [[UIDevice currentDevice] uniqueGlobalDeviceIdentifier];
+#ifdef DEBUGVER
+    NSString *sslorno = @"http";
+    
+#else
+    NSString *sslorno = @"https";
+    
+#endif
+    NSString *urlstring = [NSString stringWithFormat:@"%@://%@/api/v1/device_users.json", sslorno,TARGET_SERVER];
+    if ([Persistance retrieveAuthToken] != nil) {
+        urlstring = [urlstring stringByAppendingFormat:@"?auth_token=%@", [Persistance retrieveAuthToken]];
+        
+    }
+    else{
+        NSLog(@"Attempting to register without logging in!");
+        return;
+    }
+    
+    NSURL *url = [NSURL URLWithString:urlstring];
+    NSLog(@"URL is %@",urlstring );
+    
+    ASIFormDataRequest *request = [ASIFormDataRequest requestWithURL:url];
+    NSLog(@"Device is %@", [[UIDevice currentDevice] model]);
+    //    [request addPostValue:[userRequest JSONRepresentation] forKey:@"user"];
+    [request addPostValue:[[UIDevice currentDevice] model] forKey:@"devicetype"];
+    [request addPostValue:udid forKey:@"device_uid"];
+    request.tag = kLoadUDIDandPush;
+    [request addRequestHeader:@"User-Agent" value:@"ASIFormDataRequest"];
+    [request addRequestHeader:@"Content-Type" value:@"application/json"];
+    [request setRequestMethod:@"POST"];
+    [request setCompletionBlock:^{
+        [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+        
+        NSString *responseString = [request responseString];
+        NSDictionary * root = [responseString JSONValue];
+        BOOL success = [[root objectForKey:@"success"] boolValue];
+        
+        if(success) {
+            NSLog(@"Successfully created device user record %@", responseString);
+        
+        } else {
+            NSError* error = [ErrorTransformer apiErrorToNSError:[root objectForKey:@"error"]];
+        }
+    }];
+    
+    [request setFailedBlock:^{
+    }];
+
     [request startAsynchronous];
 
 }

@@ -24,15 +24,11 @@
 @interface Parkify2ViewController : UIViewController <MKMapViewDelegate, CLLocationManagerDelegate,ParkingSpotObserver, UISearchBarDelegate, BSForwardGeocoderDelegate, UIAlertViewDelegate >
 {
     CLLocationManager *_locationManager;
-    double _currentLat;
-    double _currentLong;
 }
 @property (nonatomic, retain)CLLocationManager *locationManager;
 @property (weak, nonatomic) IBOutlet MKMapView *mapView;
 @property (strong, nonatomic) NSTimer *timerPolling;
 @property float timerDuration;
-@property double currentLat;
-@property double currentLong;
 @property (weak, nonatomic) IBOutlet UISearchBar *addressBar;
 @property (weak, nonatomic) IBOutlet UIButton *myLocationButton;
 @property CLLocationCoordinate2D lastSearchedLocation;

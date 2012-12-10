@@ -19,6 +19,7 @@
 #import "ASIFormDataRequest.h"
 #import "ASIHTTPRequestDelegate.h"
 #import <QuartzCore/QuartzCore.h>
+#import "ParkingSpot.h"
 @interface problemSpotViewController : UIViewController<AVCaptureVideoDataOutputSampleBufferDelegate, UIAlertViewDelegate, ASIHTTPRequestDelegate>
 {
     
@@ -31,6 +32,8 @@
     __weak IBOutlet UIView *genericProblemView;
     __weak IBOutlet UIView *licensePlateProblemInfoView;
 }
+@property (nonatomic, strong)NSMutableDictionary *transactionInfo;
+@property(nonatomic, strong)ParkingSpot *theSpot;
 @property (nonatomic, strong)AVCaptureVideoDataOutput *captureOutput;
 @property (nonatomic, assign) BOOL isLicensePlateProblem;
 @property(nonatomic, retain) UIImage *theProblemImage;

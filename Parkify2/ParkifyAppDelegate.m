@@ -22,6 +22,8 @@
 @synthesize transactions = _transactions;
 @synthesize openURL= _openURL;
 @synthesize  isNew = _isNew;
+@synthesize currentLat = _currentLat;
+@synthesize currentLong = _currentLong;
 -(NSMutableDictionary*)transactions{
     if (![Persistance retrieveUserID])
         return nil;

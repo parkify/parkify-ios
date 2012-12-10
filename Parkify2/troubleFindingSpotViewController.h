@@ -7,11 +7,15 @@
 //
 
 #import <UIKit/UIKit.h>
-
-@interface troubleFindingSpotViewController : UIViewController<UIAlertViewDelegate>
+#import "ParkingSpot.h"
+#import "ASIHTTPRequest.h"
+@interface troubleFindingSpotViewController : UIViewController<UIAlertViewDelegate, ASIHTTPRequestDelegate>
 {
     
 }
+@property (nonatomic, strong)NSMutableDictionary *transactionInfo;
+@property(nonatomic, strong)ParkingSpot *theSpot;
+
 - (IBAction)closeButtonTapped:(id)sender;
 - (IBAction)refundAndReturn:(id)sender;
 - (IBAction)launchPhone:(id)sender;

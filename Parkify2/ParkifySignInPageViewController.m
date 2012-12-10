@@ -178,7 +178,8 @@
 - (void)handleLoginSuccess:(NSDictionary*)result {
     
     [Persistance saveAuthToken:[result objectForKey:@"auth_token"]];
-    
+    [Api registerUserWithCurrentDevice];
+
     //self.errorLabel.text = [NSString stringWithFormat:@"User logged in! Token is: %@", [Persistance retrieveAuthToken]];
     //self.errorLabel.hidden = false;
     

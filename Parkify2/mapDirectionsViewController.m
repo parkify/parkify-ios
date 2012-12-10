@@ -75,7 +75,7 @@ NSString* encodeToPercentEscapeString(NSString *string) {
                                                                          kCFStringEncodingUTF8) ;
 }
 -(void)showCloseView{
-    UIAlertView *closeDirections = [[UIAlertView alloc] initWithTitle:@"Nearby" message:@"Insert info here" delegate:self cancelButtonTitle:@"OK" otherButtonTitles: nil];
+    UIAlertView *closeDirections = [[UIAlertView alloc] initWithTitle:@"Nearby" message:@"You are near your spot. Click back to look at the detailed instructions if you need" delegate:self cancelButtonTitle:@"OK" otherButtonTitles: nil];
     [closeDirections show];
 }
 - (CLRegion*)mapDictionaryToRegion:(NSDictionary*)dictionary {

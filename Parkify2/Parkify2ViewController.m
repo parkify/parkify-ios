@@ -76,8 +76,6 @@ typedef struct STargetLocation {
 @synthesize timerPolling = _timerPolling;
 @synthesize timerDuration = _timerDuration;
 @synthesize locationManager = _locationManager;
-@synthesize currentLat = _currentLat;
-@synthesize currentLong = _currentLong;
 @synthesize addressBar = _addressBar;
 @synthesize myLocationButton = _myLocationButton;
 @synthesize targetSpot = _targetSpot;
@@ -329,9 +327,10 @@ typedef struct STargetLocation {
         self.waitingMask = [[WaitingMask alloc] initWithFrame:waitingMaskFrame];
         [self.view addSubview:self.waitingMask];
         //**  **//
+        ParkifyAppDelegate *delegate = (ParkifyAppDelegate*)[[UIApplication sharedApplication] delegate];
         
-        self.currentLat = 37.872679;
-        self.currentLong = -122.266797;
+        delegate.currentLat = 37.872679;
+        delegate.currentLong = -122.266797;
         
         self.locationManager = [[CLLocationManager alloc] init];
         self.locationManager.delegate = self;
@@ -343,21 +342,22 @@ typedef struct STargetLocation {
         
         
         initTarget.type = TARGET_NONE;
-        
+
         if(self.locationManager.location != nil) {
-            self.currentLat = self.locationManager.location.coordinate.latitude;
-            self.currentLong = self.locationManager.location.coordinate.longitude;
+
+            delegate.currentLat = self.locationManager.location.coordinate.latitude;
+            delegate.currentLong = self.locationManager.location.coordinate.longitude;
             initTarget.type = TARGET_CURRENT_LOCATION;
         }
         
         CLLocationCoordinate2D initCoord;
-        initCoord.latitude = self.currentLat;
-        initCoord.longitude = self.currentLong;
+        initCoord.latitude = delegate.currentLat;
+        initCoord.longitude = delegate.currentLong;
         
         self.targetLocationAnnotation = [[LocationAnnotation alloc] init];
         self.targetLocationAnnotation.coordinate = initCoord;
         
-        initTarget.location = CLLocationCoordinate2DMake(self.currentLat, self.currentLong);
+        initTarget.location = CLLocationCoordinate2DMake(delegate.currentLat, delegate.currentLong);
         self.targetLocation = initTarget;
         /*
         self.targetType = TARGET_SEARCHED_LOCATION;
@@ -434,8 +434,10 @@ typedef struct STargetLocation {
            fromLocation:(CLLocation *)oldLocation {
     
     //self.myLocationButton.enabled = true;
-    self.currentLat = newLocation.coordinate.latitude;
-    self.currentLong = newLocation.coordinate.longitude;
+    ParkifyAppDelegate *delegate = (ParkifyAppDelegate*)[[UIApplication sharedApplication] delegate];
+
+    delegate.currentLat = newLocation.coordinate.latitude;
+    delegate.currentLong = newLocation.coordinate.longitude;
     
     if (self.targetLocation.type == TARGET_CURRENT_LOCATION) {
         STargetLocation target;
@@ -510,8 +512,10 @@ typedef struct STargetLocation {
     //[self showTargetPin:false];
     
     CLLocationCoordinate2D myLocation;
-    myLocation.latitude = self.currentLat;
-    myLocation.longitude = self.currentLong;
+    ParkifyAppDelegate *delegate = (ParkifyAppDelegate*)[[UIApplication sharedApplication] delegate];
+
+    myLocation.latitude = delegate.currentLat;
+    myLocation.longitude = delegate.currentLong;
     
     STargetLocation target;
     target.type = TARGET_CURRENT_LOCATION;
@@ -724,8 +728,10 @@ typedef struct STargetLocation {
         //newController.parkingSpots = self.parkingSpots;
         //self.parkingSpots.observerDelegate = newController;
         newController.spot = self.targetSpot;
-        newController.currentLat = self.currentLat;
-        newController.currentLong = self.currentLong;
+        ParkifyAppDelegate *delegate = (ParkifyAppDelegate*)[[UIApplication sharedApplication] delegate];
+
+        newController.currentLat = delegate.currentLat;
+        newController.currentLong = delegate.currentLong;
         newController.distanceString = [TextFormatter formatDistanceClose:distanceToSpot];
         
         [newController.spot updateAsynchronouslyWithLevelOfDetail:@"all"];
@@ -1074,9 +1080,9 @@ typedef struct STargetLocation {
     controller.transactionInfo = transact ;
     // controller.startTime = [Persistance retrieveCurrentStartTime];
     // controller.endTime = [Persistance retrieveCurrentEndTime];
-    
-    controller.currentLat = self.currentLat;
-    controller.currentLong = self.currentLong;
+
+    controller.currentLat = delegate.currentLat;
+    controller.currentLong = delegate.currentLong;
     
     extendReservationViewController *controllerer = [mainStoryboard instantiateViewControllerWithIdentifier: @"extendResVC"];
     controllerer.transactioninfo= transact;
@@ -1107,8 +1113,8 @@ typedef struct STargetLocation {
        // controller.startTime = [Persistance retrieveCurrentStartTime];
        // controller.endTime = [Persistance retrieveCurrentEndTime];
         
-        controller.currentLat = self.currentLat;
-        controller.currentLong = self.currentLong;
+        controller.currentLat = delegate.currentLat;
+        controller.currentLong = delegate.currentLong;
         
         self.modalTransitionStyle = UIModalTransitionStyleCoverVertical;
         [self presentViewController:navController animated:true completion:^{}];

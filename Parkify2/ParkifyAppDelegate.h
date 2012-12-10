@@ -21,6 +21,8 @@
     BOOL isNew;
 
 }
+@property double currentLat;
+@property double currentLong;
 @property (nonatomic, assign) BOOL isNew;
 @property (nonatomic, strong) NSURL *openURL;
 @property (strong, nonatomic) UIWindow *window;
