@@ -36,6 +36,9 @@ typedef NSString* (^Formatter)(double val);
 #define kAttempTransaction 9987
 #define kPhoneNumber @"tel:1-800-luv-park"
 #define kLoadUDIDandPush 9986
+#define kStripeToken @"pk_XeTF5KrqXMeSyyqApBF4q9qDzniMn"
+//#define kStripeTest @"pk_GP95lUPyExWOy8e81qL5vIbwMH7G8"
+
 //#define TARGET_SERVER_NORMAL @"parkify-rails.herokuapp.com"
 
 //#define TARGET_SERVER TARGET_SERVER_NORMAL //@"192.168.1.132:3000"

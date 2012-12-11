@@ -19,6 +19,7 @@
 #import "ErrorTransformer.h"
 #import "problemSpotViewController.h"
 #import "ParkifyAppDelegate.h"
+#import "ExtraTypes.h"
 
 #define TESTING_V1 true
 
@@ -202,7 +203,7 @@ withPasswordConfirmation:(NSString*)passwordConfirmation
     card.addressZip = zipCode;
     
     [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
-    StripeConnection* stripeConnection = [StripeConnection connectionWithPublishableKey:@"pk_XeTF5KrqXMeSyyqApBF4q9qDzniMn"];
+    StripeConnection* stripeConnection = [StripeConnection connectionWithPublishableKey:kStripeToken];
     
     [stripeConnection performRequestWithCard:card
                                      success:^(StripeResponse *response)
@@ -241,7 +242,7 @@ withPasswordConfirmation:(NSString*)passwordConfirmation
     
 #endif
 
-    NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"%@//%@/api/v1/account/add_card.json?&auth_token=%@", sslorno, TARGET_SERVER, authToken]];
+    NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"%@://%@/api/v1/account/add_card.json?&auth_token=%@", sslorno, TARGET_SERVER, authToken]];
     
     
     ASIFormDataRequest *request = [ASIFormDataRequest requestWithURL:url];
