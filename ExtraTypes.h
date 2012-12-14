@@ -17,8 +17,10 @@ typedef NSString* (^Formatter)(double val);
 
 #define ADMIN_VER false
 #define DEBUGVER
+#define APIVER @"v2"
 #ifdef DEBUGVER
-    #define TARGET_SERVER @"192.168.1.117:3000"
+//#define TARGET_SERVER @"192.168.1.117:3000"
+    #define TARGET_SERVER @"parkify-rails-staging.herokuapp.com"
 
 #else
     #define TARGET_SERVER @"parkify-rails.herokuapp.com"

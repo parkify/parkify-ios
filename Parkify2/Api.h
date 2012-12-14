@@ -141,5 +141,5 @@ withFailure:(FailureBlock)failureBlock;
 +(void)registerUserWithCurrentDevice;
 
 +(void)getListOfCurrentAcceptances:(id)asidelegate;
-
++(NSString *)apirootstring;
 @end

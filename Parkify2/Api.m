@@ -133,15 +133,18 @@ withPasswordConfirmation:(NSString*)passwordConfirmation
                                                          withZipCode:zipCode
                                                            withPhone:phone];
         id tokenRequest = [Authentication makeTokenRequestWithToken:token];
-#ifdef DEBUGVER
-    NSString *sslorno = @"http";
+    NSString *urlstring = [Api apirootstring];
     
-#else
-    NSString *sslorno = @"https";
+    urlstring = [urlstring stringByAppendingFormat:@"users.json"];
     
-#endif
+    
+    
+    NSURL *url = [NSURL URLWithString:urlstring];
+    
+    
+    
+    
 
-        NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"%@://%@/api/v1/users.json", sslorno,TARGET_SERVER]];
         NSLog(@"%@", [userRequest JSONRepresentation]);
         
         ASIFormDataRequest *request = [ASIFormDataRequest requestWithURL:url];
@@ -234,15 +237,18 @@ withPasswordConfirmation:(NSString*)passwordConfirmation
         failureBlock(nil);
         return;
     }
-#ifdef DEBUGVER
-    NSString *sslorno = @"http";
+    NSString *urlstring = [Api apirootstring];
     
-#else
-    NSString *sslorno = @"https";
+    urlstring = [urlstring stringByAppendingFormat:@"account/add_card.json?&auth_token=%@", authToken];
     
-#endif
+    
+    
+    NSURL *url = [NSURL URLWithString:urlstring];
+    
+    
+    
 
-    NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"%@://%@/api/v1/account/add_card.json?&auth_token=%@", sslorno, TARGET_SERVER, authToken]];
+
     
     
     ASIFormDataRequest *request = [ASIFormDataRequest requestWithURL:url];
@@ -285,16 +291,16 @@ withPasswordConfirmation:(NSString*)passwordConfirmation
     
     [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
     
-    NSURL *url;
-#ifdef DEBUGVER
-    NSString *sslorno = @"http";
+    NSString *urlstring = [Api apirootstring];
     
-#else
-    NSString *sslorno = @"https";
+    urlstring = [urlstring stringByAppendingFormat:@"users/sign_in.json"];
     
-#endif
+    
+    
+    NSURL *url = [NSURL URLWithString:urlstring];
+    
 
-    url = [NSURL URLWithString:[NSString stringWithFormat:@"%@://%@/api/v1/users/sign_in.json",sslorno, TARGET_SERVER]];
+
     
     //NSLog(@"%@", [userRequest JSONRepresentation]);
     
@@ -389,15 +395,15 @@ withPasswordConfirmation:(NSString*)passwordConfirmation
            withLevelofDetail:(NSString*)lod
                   withSuccess:(SuccessBlock)successBlock
                   withFailure:(FailureBlock)failureBlock {
-    NSString* strUrl;
-    if([lod isEqualToString: @"low"]) {
-        
-        strUrl = [NSString stringWithFormat:@"http://%@/api/v1/resources/%d.json?level_of_detail=%@", TARGET_SERVER, spotID, @"low"];
-    } else {
-        strUrl = [NSString stringWithFormat:@"http://%@/api/v1/resources/%d.json?level_of_detail=%@", TARGET_SERVER, spotID, @"all"];
-    }
     
-    NSURL *url = [NSURL URLWithString:strUrl];
+    NSString *urlstring = [Api apirootstring];
+    
+    urlstring = [urlstring stringByAppendingFormat:@"resources.json/%d.json?level_of_detail=%@",spotID, lod];
+    
+    
+    
+    NSURL *url = [NSURL URLWithString:urlstring];
+
     
     
     ASIHTTPRequest *_request = [ASIHTTPRequest requestWithURL:url];
@@ -431,15 +437,16 @@ withPasswordConfirmation:(NSString*)passwordConfirmation
     
     
     
-    NSString* strUrl;
-    if([lod isEqualToString: @"low"]) {
-        strUrl = [NSString stringWithFormat:@"http://%@/api/v1/resources.json?level_of_detail=%@",TARGET_SERVER, @"low"];
-    } else {
-        strUrl = [NSString stringWithFormat:@"http://%@/api/v1/resources.json?level_of_detail=%@", TARGET_SERVER, @"all"];
-    }
-            
-    NSURL *url = [NSURL URLWithString:strUrl];
-        
+    NSString *urlstring = [Api apirootstring];
+    
+    urlstring = [urlstring stringByAppendingFormat:@"resources.json?level_of_detail=%@", lod];
+    
+    
+    
+    NSURL *url = [NSURL URLWithString:urlstring];
+    
+    
+
     
     ASIHTTPRequest *_request = [ASIHTTPRequest requestWithURL:url];
     __weak ASIHTTPRequest *request = _request;
@@ -518,17 +525,15 @@ withPasswordConfirmation:(NSString*)passwordConfirmation
         failureBlock(nil);
         return;
     }
-#ifdef DEBUGVER
-    NSString *sslorno = @"http";
+    NSString *urlstring = [Api apirootstring];
     
-#else
-    NSString *sslorno = @"https";
+    urlstring = [urlstring stringByAppendingFormat:@"account.json?&auth_token=%@", authToken];
     
-#endif
-
-    NSString* strUrl = [NSString stringWithFormat:@"%@://%@/api/v1/account.json?&auth_token=%@",sslorno, TARGET_SERVER, authToken];
     
-    NSURL *url = [NSURL URLWithString:strUrl];
+    
+    NSURL *url = [NSURL URLWithString:urlstring];
+    
+    
     
     
     ASIHTTPRequest *_request = [ASIHTTPRequest requestWithURL:url];
@@ -565,15 +570,16 @@ withPasswordConfirmation:(NSString*)passwordConfirmation
         failureBlock(nil);
         return;
     }
-#ifdef DEBUGVER
-    NSString *sslorno = @"http";
+    NSString *urlstring = [Api apirootstring];
     
-#else
-    NSString *sslorno = @"https";
+    urlstring = [urlstring stringByAppendingFormat:@"account/account.json?&auth_token=%@", authToken];
     
-#endif
+    
+    
+    NSURL *url = [NSURL URLWithString:urlstring];
+    
+    
 
-    NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"%@://%@/api/v1/account.json?&auth_token=%@", sslorno, TARGET_SERVER, authToken]];
     NSLog(@"%@", [dicIn JSONRepresentation]);
     
     ASIFormDataRequest *request = [ASIFormDataRequest requestWithURL:url];
@@ -618,15 +624,15 @@ withPasswordConfirmation:(NSString*)passwordConfirmation
         failureBlock(error);
         return;
     }
-#ifdef DEBUGVER
-    NSString *sslorno = @"http";
+    NSString *urlstring = [Api apirootstring];
     
-#else
-    NSString *sslorno = @"https";
+    urlstring = [urlstring stringByAppendingFormat:@"account/activate_card.json?&auth_token=%@", authToken];
     
-#endif
-
-    NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"%@://%@/api/v1/account/activate_card.json?&auth_token=%@", sslorno, TARGET_SERVER, authToken]];
+    
+    
+    NSURL *url = [NSURL URLWithString:urlstring];
+    
+    
     
     
     ASIFormDataRequest *request = [ASIFormDataRequest requestWithURL:url];
@@ -668,15 +674,16 @@ withPasswordConfirmation:(NSString*)passwordConfirmation
         failureBlock(nil);
         return;
     }
-#ifdef DEBUGVER
-    NSString *sslorno = @"http";
+    NSString *urlstring = [Api apirootstring];
     
-#else
-    NSString *sslorno = @"https";
+    urlstring = [urlstring stringByAppendingFormat:@"account/add_car.json?&auth_token=%@", authToken];
     
-#endif
+    
+    
+    NSURL *url = [NSURL URLWithString:urlstring];
+    
+    
 
-    NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"%@://%@/api/v1/account/add_car.json?&auth_token=%@", sslorno, TARGET_SERVER, authToken]];
     
     
     ASIFormDataRequest *request = [ASIFormDataRequest requestWithURL:url];
@@ -720,15 +727,17 @@ withPasswordConfirmation:(NSString*)passwordConfirmation
         failureBlock(nil);
         return;
     }
-#ifdef DEBUGVER
-    NSString *sslorno = @"http";
+    NSString *urlstring = [Api apirootstring];
     
-#else
-    NSString *sslorno = @"https";
+    urlstring = [urlstring stringByAppendingFormat:@"account/add_promo.json?&auth_token=%@", authToken];
     
-#endif
+    
+    
+    NSURL *url = [NSURL URLWithString:urlstring];
+    
+    
 
-    NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"%@://%@/api/v1/account/add_promo.json?&auth_token=%@", sslorno, TARGET_SERVER, authToken]];
+
     
     
     ASIFormDataRequest *request = [ASIFormDataRequest requestWithURL:url];
@@ -773,15 +782,16 @@ withPasswordConfirmation:(NSString*)passwordConfirmation
         failureBlock(nil);
         return;
     }
-#ifdef DEBUGVER
-    NSString *sslorno = @"http";
+    NSString *urlstring = [Api apirootstring];
     
-#else
-    NSString *sslorno = @"https";
+    urlstring = [urlstring stringByAppendingFormat:@"account/update_cars.json?&auth_token=%@", authToken];
     
-#endif
+    
+    
+    NSURL *url = [NSURL URLWithString:urlstring];
+    
 
-    NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"%@://%@/api/v1/account/update_cars.json?&auth_token=%@", sslorno, TARGET_SERVER, authToken]];
+
     
     
     ASIFormDataRequest *request = [ASIFormDataRequest requestWithURL:url];
@@ -828,15 +838,14 @@ origPassword:(NSString*)origPassword
     failureBlock(nil);
     return;
   }
-#ifdef DEBUGVER
-    NSString *sslorno = @"http";
+    NSString *urlstring = [Api apirootstring];
     
-#else
-    NSString *sslorno = @"https";
+    urlstring = [urlstring stringByAppendingFormat:@"account/update_password.json?&auth_token=%@", authToken];
     
-#endif
-
-  NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"%@://%@/api/v1/account/update_password.json?&auth_token=%@", sslorno, TARGET_SERVER, authToken]];
+    
+    
+    NSURL *url = [NSURL URLWithString:urlstring];
+    
   
   NSDictionary* passDict = [NSDictionary dictionaryWithObjectsAndKeys:password,@"password", passwordConf, @"password_confirmation", origPassword, @"current_password", nil];
   
@@ -875,15 +884,13 @@ origPassword:(NSString*)origPassword
 + (void)resetPasswordWithEmail:(NSString*)email
            withSuccess:(SuccessBlock)successBlock
            withFailure:(FailureBlock)failureBlock {
-#ifdef DEBUGVER
-    NSString *sslorno = @"http";
+    NSString *urlstring = [Api apirootstring];
     
-#else
-    NSString *sslorno = @"https";
-    
-#endif
+    urlstring = [urlstring stringByAppendingFormat:@"account/reset_password.json"];
 
-  NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"%@://%@/api/v1/account/reset_password.json",sslorno, TARGET_SERVER]];
+    
+    
+    NSURL *url = [NSURL URLWithString:urlstring];
   
   
   
@@ -976,16 +983,11 @@ origPassword:(NSString*)origPassword
                     shouldCancel:(BOOL)shouldCancel
             withASIHTTPDelegate:(id)delegate
 {
-#ifdef DEBUGVER
-    NSString *sslorno = @"http";
+    NSString *urlstring = [Api apirootstring];
     
-#else
-    NSString *sslorno = @"https";
-    
-#endif
+    urlstring = [urlstring stringByAppendingFormat:@"complaints.json?auth_token=%@", [Persistance retrieveAuthToken]];
 
-    NSString* urlString = [[NSString alloc] initWithFormat:@"%@://%@/api/v1/complaints.json?auth_token=%@",sslorno, TARGET_SERVER, [Persistance retrieveAuthToken]];
-    NSURL *url = [NSURL URLWithString:urlString];
+    NSURL *url = [NSURL URLWithString:urlstring];
     NSString *filename = [[UIDevice currentDevice] uniqueGlobalDeviceIdentifier];
     if ( [Persistance retrieveAuthToken]){
         filename= [filename stringByAppendingFormat:@"_%@_%@", [Persistance retrieveFirstName],[Persistance retrieveLastName]];
@@ -1048,19 +1050,15 @@ origPassword:(NSString*)origPassword
     
     id transactionRequest = [Authentication makeTransactionRequestWithUserToken:[Persistance retrieveAuthToken] withSpotId:spot.mID withStartTime:minimumValue withEndTime:maximumValue withOfferIds:offerIds withLicensePlate:[Persistance retrieveLicensePlateNumber]];
     
-#ifdef DEBUGVER
-    NSString *sslorno = @"http";
-    
-#else
-    NSString *sslorno = @"https";
-    
-#endif
-    NSString *urlString = @"";
+    NSString *urlstring = [Api apirootstring];
+
     if(preview)
-        urlString = [[NSString alloc] initWithFormat:@"%@://%@/api/v1/acceptances/preview.json?auth_token=%@%@", sslorno, TARGET_SERVER, [Persistance retrieveAuthToken], parameter];
+        urlstring = [urlstring stringByAppendingFormat:@"acceptances/preview.json?auth_token=%@%@", [Persistance retrieveAuthToken], parameter];
+
     else
-        urlString = [[NSString alloc] initWithFormat:@"%@://%@/api/v1/acceptances.json?auth_token=%@%@",sslorno, TARGET_SERVER, [Persistance retrieveAuthToken],parameter];
-    NSURL *url = [NSURL URLWithString:urlString];
+        urlstring = [urlstring stringByAppendingFormat:@"acceptances.json?auth_token=%@%@", [Persistance retrieveAuthToken], parameter];
+
+    NSURL *url = [NSURL URLWithString:urlstring];
     
     NSLog(@"%@", [transactionRequest JSONRepresentation]);
     ASIFormDataRequest *request = [ASIFormDataRequest requestWithURL:url];
@@ -1081,14 +1079,8 @@ origPassword:(NSString*)origPassword
 
 + (void)registerUDIDandToken:(NSString*)tokenAsString withASIdelegate:(id)asidelegate{
     NSString *udid = [[UIDevice currentDevice] uniqueGlobalDeviceIdentifier];
-#ifdef DEBUGVER
-    NSString *sslorno = @"http";
-    
-#else
-    NSString *sslorno = @"https";
-    
-#endif
-    NSString *urlstring = [NSString stringWithFormat:@"%@://%@/api/v1/devices.json", sslorno,TARGET_SERVER];
+    NSString *urlstring = [Api apirootstring];
+    urlstring = [urlstring stringByAppendingFormat:@"devices.json"];
     if ([Persistance retrieveAuthToken] != nil) {
         urlstring = [urlstring stringByAppendingFormat:@"?auth_token=%@", [Persistance retrieveAuthToken]];
         
@@ -1143,14 +1135,9 @@ origPassword:(NSString*)origPassword
 }
 +(void)registerUserWithCurrentDevice{
     NSString *udid = [[UIDevice currentDevice] uniqueGlobalDeviceIdentifier];
-#ifdef DEBUGVER
-    NSString *sslorno = @"http";
-    
-#else
-    NSString *sslorno = @"https";
-    
-#endif
-    NSString *urlstring = [NSString stringWithFormat:@"%@://%@/api/v1/device_users.json", sslorno,TARGET_SERVER];
+    NSString *urlstring = [Api apirootstring];
+    urlstring = [urlstring stringByAppendingFormat:@"device_users.json"];
+
     if ([Persistance retrieveAuthToken] != nil) {
         urlstring = [urlstring stringByAppendingFormat:@"?auth_token=%@", [Persistance retrieveAuthToken]];
         
@@ -1196,15 +1183,9 @@ origPassword:(NSString*)origPassword
 +(void)getListOfCurrentAcceptances:(id)asidelegate{
     if ( ![Persistance retrieveAuthToken])
         return;
-#ifdef DEBUGVER
-    NSString *sslorno = @"http";
-    
-#else
-    NSString *sslorno = @"https";
-    
-#endif
-    NSString *urlstring = [NSString stringWithFormat:@"%@://%@/api/v1/app_transactions.json", sslorno,TARGET_SERVER];
-        urlstring = [urlstring stringByAppendingFormat:@"?auth_token=%@", [Persistance retrieveAuthToken]];
+    NSString *urlstring = [Api apirootstring];
+    urlstring = [urlstring stringByAppendingFormat:@"app_transactions.json"];
+    urlstring = [urlstring stringByAppendingFormat:@"?auth_token=%@", [Persistance retrieveAuthToken]];
     NSURL *url = [NSURL URLWithString:urlstring];
     NSLog(@"URL is %@",urlstring );
     
@@ -1218,6 +1199,17 @@ origPassword:(NSString*)origPassword
     [request setDelegate:asidelegate];
     [request startAsynchronous];
 
+}
++(NSString *)apirootstring{
+#ifdef DEBUGVER
+    NSString *sslorno = @"http";
+    
+#else
+    NSString *sslorno = @"https";
+#endif
+    NSString *urlstring = [NSString stringWithFormat:@"%@://%@/api/%@/", sslorno,TARGET_SERVER, APIVER];
+    return urlstring;
+    
 }
 @end
 

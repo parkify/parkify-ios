@@ -144,6 +144,7 @@ void uncaughtExceptionHandler(NSException *exception) {
             NSArray *acceptances = [responseString JSONValue];
             NSDictionary *alltransactionsonphone = [self.transactions objectForKey:@"all"];
             NSDictionary *actives = [self.transactions objectForKey:@"active"];
+            NSLog(@"There are %i active reservations", [acceptances count]);
             for (NSDictionary *acceptance in acceptances){
             NSLog(@"Active %@", acceptance);
                 if ([alltransactionsonphone objectForKey:[NSString stringWithFormat:@"%i", 90000 + [[acceptance objectForKey:@"resource_offer_id"] intValue] ]]){
