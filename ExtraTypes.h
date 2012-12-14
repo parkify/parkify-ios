@@ -16,7 +16,7 @@ typedef void(^FailureBlock)(NSError*);
 typedef NSString* (^Formatter)(double val);
 
 #define ADMIN_VER false
-#define DEBUGVER
+//#define DEBUGVER
 #define APIVER @"v2"
 #ifdef DEBUGVER
 //#define TARGET_SERVER @"192.168.1.117:3000"

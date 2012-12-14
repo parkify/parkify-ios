@@ -1614,8 +1614,8 @@
 		8CA7A1FF15A3DC980051567D /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_IDENTITY = "iPhone Distribution";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
+				CODE_SIGN_IDENTITY = "iPhone Distribution: Dylan Jackson";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: Dylan Jackson";
 				CURRENT_PROJECT_VERSION = 1.0.2;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1633,8 +1633,8 @@
 				);
 				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_NAME = Parkify;
-				PROVISIONING_PROFILE = "";
-				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
+				PROVISIONING_PROFILE = "D9C2F81A-2602-4195-AD00-11A07093C066";
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "D9C2F81A-2602-4195-AD00-11A07093C066";
 				SDKROOT = iphoneos;
 				WRAPPER_EXTENSION = app;
 			};
