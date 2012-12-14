@@ -23,7 +23,7 @@ typedef NSString* (^Formatter)(double val);
     #define TARGET_SERVER @"parkify-rails-staging.herokuapp.com"
 
 #else
-    #define TARGET_SERVER @"parkify-rails.herokuapp.com"
+    #define TARGET_SERVER @"parkify-rails-staging.herokuapp.com"
 
 #endif
 
