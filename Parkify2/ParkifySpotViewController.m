@@ -135,7 +135,8 @@
         }
     } withPriceSource:self.spot];
 */
-    self.rangeBar = [[RangeBar alloc] initWithFrame:[self.rangeBarContainer bounds] minVal:prevHourMark minimumSelectableValue:prevHourMark maxVal:maxVal minRange:30*60 displayedRange:numHours*60*60 selectedMinVal:currentTime selectedMaxVal:currentTime + 1800 withTimeFormatter:timeFormatter withPriceFormatter:^NSString *(double val) {
+    NSLog(@"minVal is %f and selectedMinVal is %f", prevHourMark, currentTime);
+    self.rangeBar = [[RangeBar alloc] initWithFrame:[self.rangeBarContainer bounds] minVal:prevHourMark minimumSelectableValue:prevHourMark maxVal:maxVal minRange:30*60 displayedRange:numHours*60*60 selectedMinVal:currentTime-(30*60) selectedMaxVal:currentTime withTimeFormatter:timeFormatter withPriceFormatter:^NSString *(double val) {
         if(fmod(val,1.0) >= 0.01) {
             return [NSString stringWithFormat:@"$%0.2f", val];
         } else {
@@ -415,6 +416,8 @@
          ];
         return;
     } else {
+        
+        //[Api previewTransaction:self.spot withStartTime:self.rangeBar.selectedMinimumValue andEndTime:self.rangeBar.selectedMaximumValue withASIdelegate:self];
         [self previewTransaction];
     }
 }
@@ -434,7 +437,7 @@
     }
 }
 
-- (void) switchToConfirmation:(NSString*)paymentDetails {
+- (void) switchToConfirmation:(NSDictionary*)paymentDetails {
     [self stopPolling];    
     self.navigationController.modalPresentationStyle = UIModalPresentationCurrentContext;
     
@@ -447,19 +450,14 @@
         UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:controller];
         [navController.navigationBar setTintColor:[UIColor blackColor]];
         controller.spot = self.spot;
-        NSMutableDictionary *thetransaction = [Persistance addNewTransaction:self.spot withStartTime:self.rangeBar. selectedMinimumValue andEndTime:self.rangeBar.selectedMaximumValue andLastPaymentDetails:paymentDetails];
+        NSMutableDictionary *thetransaction = [Persistance addNewTransaction:self.spot withStartTime:self.rangeBar. selectedMinimumValue andEndTime:self.rangeBar.selectedMaximumValue andLastPaymentDetails:[paymentDetails objectForKey:@"details"] withTransactionID:[paymentDetails objectForKey:@"id"]];
         [[Mixpanel sharedInstance] track:@"launchConfirmationVC" properties:thetransaction];
         
-        /* [Persistance saveCurrentSpotId:self.spot.mID];
-        controller.startTime = self.rangeBar. selectedMinimumValue;
-        [Persistance saveCurrentStartTime:controller.startTime];
-        controller.endTime = self.rangeBar.selectedMaximumValue;
-        [Persistance saveCurrentEndTime:controller.endTime];
-        */
+     
         controller.currentLat = self.currentLat;
         controller.currentLong = self.currentLong;
         controller.transactionInfo = thetransaction;
-        controller.topBarText = paymentDetails;
+        controller.topBarText = [paymentDetails objectForKey:@"details"];
         
         [Persistance saveCurrentSpot:self.spot];
         
@@ -470,82 +468,7 @@
 }
 
 - (void) attemptMakeTransaction {
-    
-    NSMutableArray* offerIds = [[NSMutableArray alloc] init];
-    for (Offer* offer in self.spot.offers) {
-        if ([offer overlapsWithStartTime:self.rangeBar.selectedMinimumValue endTime:self.rangeBar.selectedMaximumValue])
-        [offerIds addObject:[NSNumber numberWithInt:offer.mId]];
-    }
-    
-    id transactionRequest = [Authentication makeTransactionRequestWithUserToken:[Persistance retrieveAuthToken] withSpotId:self.spot.mID withStartTime:self.rangeBar.selectedMinimumValue withEndTime:self.rangeBar.selectedMaximumValue withOfferIds:offerIds withLicensePlate:[Persistance retrieveLicensePlateNumber]];
-#ifdef DEBUGVER
-    NSString *sslorno = @"http";
-    
-#else
-    NSString *sslorno = @"https";
-    
-#endif
-    [[Mixpanel sharedInstance] track:@"RealTransaction"];
-    NSString* urlString = [[NSString alloc] initWithFormat:@"%@://%@/api/v1/acceptances.json?auth_token=%@",sslorno, TARGET_SERVER, [Persistance retrieveAuthToken]];
-    NSURL *url = [NSURL URLWithString:urlString];
-    
-    
-    
-    NSLog(@"%@", [transactionRequest JSONRepresentation]);
-    ASIFormDataRequest *request = [ASIFormDataRequest requestWithURL:url];
-    [request addPostValue:[transactionRequest JSONRepresentation] forKey:@"transaction"];
-    
-    [request addRequestHeader:@"User-Agent" value:@"ASIFormDataRequest"]; 
-    [request addRequestHeader:@"Content-Type" value:@"application/json"];
-    [request  setRequestMethod:@"POST"];
-    [request setCompletionBlock:^{
-        
-        
-        //[UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
-        NSString *responseString = [request responseString];
-        NSDictionary * root = [responseString JSONValue];
-        if([[root objectForKey:@"success"] boolValue]) {
-            [[Mixpanel sharedInstance] track:@"RealTransactionSuccess" properties:root];
-
-            //Needs to happen on success
-            NSString* paymentInfoDetails = [[root objectForKey:@"acceptance"] objectForKey:@"details"];
-            [Persistance saveLastPaymentInfoDetails:paymentInfoDetails];
-            
-            [self switchToConfirmation:paymentInfoDetails];
-            
-            //[self performSegueWithIdentifier:@"ViewConfirmation" sender:self];
-            //NSLog(@"TEST");
-        } else {
-            [[Mixpanel sharedInstance] track:@"RealTransactionFailure" properties:root];
-            NSError* error = [ErrorTransformer apiErrorToNSError:[root objectForKey:@"error"]];
-            [ErrorTransformer errorToAlert:error withDelegate:self];
-            
-            [self.waitingMask removeFromSuperview];
-            self.waitingMask = nil;
-        }
-        
-        NSLog(@"Response: %@", responseString);
-         
-        
-    }];
-    [request setFailedBlock:^{
-        [self.waitingMask removeFromSuperview];
-        self.waitingMask = nil;
-        //[UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
-        NSError *error = [request error];
-        NSLog(@"Error: %@", error.localizedDescription);
-        if(request.responseStatusCode == 401) {
-            [Api authenticateModallyFrom:self withSuccess:^(NSDictionary * result){}];
-        }
-        else {
-            UIAlertView* error = [[UIAlertView alloc] initWithTitle:@"Error" message:@"Could not contact server" delegate:self cancelButtonTitle:@"Ok"
-                                                  otherButtonTitles: nil];
-            [error show];
-            //self.errorLabel.text = @"Could not contact server";
-            //self.errorLabel.hidden = false;
-        }
-        
-    }];
+    [[Mixpanel sharedInstance] track:@"transactionattempt"];
     
     CGRect waitingMaskFrame = self.view.frame;
     waitingMaskFrame.origin.x = 0;
@@ -554,7 +477,9 @@
     self.waitingMask = [[WaitingMask alloc] initWithFrame:waitingMaskFrame];
     [self.view addSubview:self.waitingMask];
     
-    [request startAsynchronous];
+    [Api tryTransacation:self.spot withStartTime:self.rangeBar.selectedMinimumValue andEndTime:self.rangeBar.selectedMaximumValue withASIdelegate:self isPreview:FALSE withExtraParameter:@""];
+    
+    return;
 
 }
 
@@ -562,89 +487,6 @@
 
 - (void) previewTransaction {
     [[Mixpanel sharedInstance] track:@"transactionpreview"];
-    NSMutableArray* offerIds = [[NSMutableArray alloc] init];
-    for (Offer* offer in self.spot.offers) {
-        if ([offer overlapsWithStartTime:self.rangeBar.selectedMinimumValue endTime:self.rangeBar.selectedMaximumValue])
-            [offerIds addObject:[NSNumber numberWithInt:offer.mId]];
-    }
-    
-    id transactionRequest = [Authentication makeTransactionRequestWithUserToken:[Persistance retrieveAuthToken] withSpotId:self.spot.mID withStartTime:self.rangeBar.selectedMinimumValue withEndTime:self.rangeBar.selectedMaximumValue withOfferIds:offerIds withLicensePlate:[Persistance retrieveLicensePlateNumber]];
-    
-#ifdef DEBUGVER
-    NSString *sslorno = @"http";
-
-#else
-    NSString *sslorno = @"https";
-
-#endif
-    NSString* urlString = [[NSString alloc] initWithFormat:@"%@://%@/api/v1/acceptances/preview.json?auth_token=%@", sslorno, TARGET_SERVER, [Persistance retrieveAuthToken]];
-    NSURL *url = [NSURL URLWithString:urlString];
-    
-    
-    
-    NSLog(@"%@", [transactionRequest JSONRepresentation]);
-    ASIFormDataRequest *request = [ASIFormDataRequest requestWithURL:url];
-    [request addPostValue:[transactionRequest JSONRepresentation] forKey:@"transaction"];
-    
-    [request addRequestHeader:@"User-Agent" value:@"ASIFormDataRequest"];
-    [request addRequestHeader:@"Content-Type" value:@"application/json"];
-    [request  setRequestMethod:@"POST"];
-    [request setCompletionBlock:^{
-        
-        
-        //[UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
-        NSString *responseString = [request responseString];
-        NSDictionary * root = [responseString JSONValue];
-        if([root objectForKey:@"success"]) {
-            //Needs to happen on success
-            
-            [self.waitingMask removeFromSuperview];
-            self.waitingMask = nil;
-            [[Mixpanel sharedInstance] track:@"transactionpreviewsuccess" properties:root];
-
-            UIAlertView* areYouSure = [[UIAlertView alloc] initWithTitle:@"Are you sure?"
-                                                                 message:[[root objectForKey:@"message"] objectForKey:@"price_string"]
-                                                                delegate:self
-                                                       cancelButtonTitle:@"Cancel"
-                                                       otherButtonTitles:@"Yes", nil];
-            [areYouSure show];
-            
-            //[self performSegueWithIdentifier:@"ViewConfirmation" sender:self];
-            //NSLog(@"TEST");
-        } else {
-            [[Mixpanel sharedInstance] track:@"transactionpreviewfailure" properties:root];
-
-            NSError* error = [ErrorTransformer apiErrorToNSError:[root objectForKey:@"error"]];
-            [ErrorTransformer errorToAlert:error withDelegate:self];
-            
-            //self.errorLabel.text = [root objectForKey:@"error"];
-            //self.errorLabel.hidden = false;
-            [self.waitingMask removeFromSuperview];
-            self.waitingMask = nil;
-        }
-        
-        NSLog(@"Response: %@", responseString);
-        
-        
-    }];
-    [request setFailedBlock:^{
-        [self.waitingMask removeFromSuperview];
-        self.waitingMask = nil;
-        //[UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
-        NSError *error = [request error];
-        NSLog(@"Error: %@", error.localizedDescription);
-        if(request.responseStatusCode == 401) {
-            [Api authenticateModallyFrom:self withSuccess:^(NSDictionary * result){}];
-        }
-        else {
-            UIAlertView* error = [[UIAlertView alloc] initWithTitle:@"Error" message:@"Could not contact server" delegate:self cancelButtonTitle:@"Ok"
-                                                  otherButtonTitles: nil];
-            [error show];
-            //self.errorLabel.text = @"Could not contact server";
-            //self.errorLabel.hidden = false;
-        }
-        
-    }];
     
     CGRect waitingMaskFrame = self.view.frame;
     waitingMaskFrame.origin.x = 0;
@@ -652,9 +494,11 @@
     
     self.waitingMask = [[WaitingMask alloc] initWithFrame:waitingMaskFrame];
     [self.view addSubview:self.waitingMask];
-    
-    [request startAsynchronous];
-    
+
+    [Api tryTransacation:self.spot withStartTime:self.rangeBar.selectedMinimumValue andEndTime:self.rangeBar.selectedMaximumValue withASIdelegate:self isPreview:TRUE withExtraParameter:@""];
+
+    return;
+   
 }
 
 
@@ -706,6 +550,94 @@
 }
 
 
+#pragma  mark ASIHttp delegate
 
+-(void)requestFailed:(ASIHTTPRequest *)request{
+    if ( request.tag == kPreviewTransaction || request.tag == kAttempTransaction){
+            
+        
+        [self.waitingMask removeFromSuperview];
+        self.waitingMask = nil;
+        //[UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+        NSError *error = [request error];
+        NSLog(@"Error: %@ Status code: %i Status Message: %@", error.localizedDescription, request.responseStatusCode, request.responseStatusMessage);
+        if(request.responseStatusCode == 401) {
+            [Api authenticateModallyFrom:self withSuccess:^(NSDictionary * result){}];
+        }
+        else {
+            UIAlertView* error = [[UIAlertView alloc] initWithTitle:@"Error" message:@"Could not contact server" delegate:self cancelButtonTitle:@"Ok"
+                                                  otherButtonTitles: nil];
+            [error show];
+            //self.errorLabel.text = @"Could not contact server";
+            //self.errorLabel.hidden = false;
+        }
 
+            
+            
+            
+    }
+}
+-(void) requestFinished:(ASIHTTPRequest *)request{
+    if ( request.tag == kPreviewTransaction){
+        //[UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+        NSString *responseString = [request responseString];
+        NSDictionary * root = [responseString JSONValue];
+        if([root objectForKey:@"success"]) {
+            //Needs to happen on success
+            
+            [self.waitingMask removeFromSuperview];
+            self.waitingMask = nil;
+            [[Mixpanel sharedInstance] track:@"transactionpreviewsuccess" properties:root];
+            
+            UIAlertView* areYouSure = [[UIAlertView alloc] initWithTitle:@"Are you sure?"
+                                                                 message:[[root objectForKey:@"message"] objectForKey:@"price_string"]
+                                                                delegate:self
+                                                       cancelButtonTitle:@"Cancel"
+                                                       otherButtonTitles:@"Yes", nil];
+            [areYouSure show];
+            
+            //[self performSegueWithIdentifier:@"ViewConfirmation" sender:self];
+            //NSLog(@"TEST");
+        } else {
+            [[Mixpanel sharedInstance] track:@"transactionpreviewfailure" properties:root];
+            
+            NSError* error = [ErrorTransformer apiErrorToNSError:[root objectForKey:@"error"]];
+            [ErrorTransformer errorToAlert:error withDelegate:self];
+            
+            //self.errorLabel.text = [root objectForKey:@"error"];
+            //self.errorLabel.hidden = false;
+            [self.waitingMask removeFromSuperview];
+            self.waitingMask = nil;
+        }
+        
+        NSLog(@"Response: %@", responseString);
+    }
+    else if(request.tag == kAttempTransaction){
+        //[UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+        NSString *responseString = [request responseString];
+        NSDictionary * root = [responseString JSONValue];
+        if([[root objectForKey:@"success"] boolValue]) {
+            [[Mixpanel sharedInstance] track:@"RealTransactionSuccess" properties:root];
+            
+            //Needs to happen on success
+            NSString* paymentInfoDetails = [[root objectForKey:@"acceptance"] objectForKey:@"details"];
+            [Persistance saveLastPaymentInfoDetails:paymentInfoDetails];
+            
+            [self switchToConfirmation:[root objectForKey:@"acceptance"]];
+            
+            //[self performSegueWithIdentifier:@"ViewConfirmation" sender:self];
+            //NSLog(@"TEST");
+        } else {
+            [[Mixpanel sharedInstance] track:@"RealTransactionFailure" properties:root];
+            NSError* error = [ErrorTransformer apiErrorToNSError:[root objectForKey:@"error"]];
+            [ErrorTransformer errorToAlert:error withDelegate:self];
+            
+            [self.waitingMask removeFromSuperview];
+            self.waitingMask = nil;
+        }
+        
+        NSLog(@"Response: %@", responseString);
+
+    }
+}
 @end

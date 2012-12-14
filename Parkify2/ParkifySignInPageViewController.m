@@ -178,7 +178,8 @@
 - (void)handleLoginSuccess:(NSDictionary*)result {
     
     [Persistance saveAuthToken:[result objectForKey:@"auth_token"]];
-    
+    [Api registerUserWithCurrentDevice];
+
     //self.errorLabel.text = [NSString stringWithFormat:@"User logged in! Token is: %@", [Persistance retrieveAuthToken]];
     //self.errorLabel.hidden = false;
     
@@ -300,11 +301,8 @@
 }
 
 - (IBAction)logoutButtonPressed:(UIButton *)sender {
-    [[Mixpanel sharedInstance] track:@"logout"];
-    
+    [Api logout];
     /** TODO: also tell server to logout if can **/
-    [Persistance saveAuthToken:nil];
-    [Persistance saveUserID:[NSNumber numberWithInt:-1]];
 }
 
 - (IBAction)forgotPasswordButtonTapped:(id)sender {

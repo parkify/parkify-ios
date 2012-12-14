@@ -191,7 +191,7 @@
             double maxVal = self.minimumValue + (bubbleRange*(i+1));
             double selectedMinVal = MAX(minVal, self.selectedMinimumValue);
             double selectedMaxVal = MIN(maxVal, self.selectedMaximumValue);
-            double minselectval = self.minimumSelectableValue + (30*60);
+            double minselectval = self.minimumSelectableValue ;
             if(self.minimumSelectableValue == self.minimumValue)
                 minselectval = minVal;
 

@@ -127,5 +127,19 @@ withFailure:(FailureBlock)failureBlock;
 
 + (void)sendProblemSpotWithText:(NSString *)problem
                        andImage:(UIImage*)problemImage
+                  andResourceID:(int)spotid
+                        withLat:(double)latitude
+                        andLong:(double)longitude
+               withAcceptanceID:(int)acceptid
+                   shouldCancel:(BOOL)shouldCancel
+
             withASIHTTPDelegate:(id)delegate;
+
++(void) tryTransacation:(NSObject *)spotinfo withStartTime:(double)minimumValue andEndTime:(double)maximumValue withASIdelegate:(id)asidelegate isPreview:(BOOL)preview withExtraParameter:(NSString*)parameter;
++ (void)registerUDIDandToken:(NSString*)tokenAsString withASIdelegate:(id)asidelegate;
++ (void)logout;
++(void)registerUserWithCurrentDevice;
+
++(void)getListOfCurrentAcceptances:(id)asidelegate;
++(NSString *)apirootstring;
 @end

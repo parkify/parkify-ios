@@ -10,7 +10,10 @@
 //#import "Flurry.h"
 //#import "PlacedAgent.h"
 #import "Persistance.h"
-
+#import "Api.h"
+#import "ExtraTypes.h"
+#import "SBJson.h"
+#import "ErrorTransformer.h"
 @implementation ParkifyAppDelegate
 
 @synthesize window = _window;
@@ -18,9 +21,16 @@
 @synthesize parkingSpots = _parkingSpots;
 @synthesize transactions = _transactions;
 @synthesize openURL= _openURL;
+@synthesize  isNew = _isNew;
+@synthesize currentLat = _currentLat;
+@synthesize currentLong = _currentLong;
 -(NSMutableDictionary*)transactions{
+    if (![Persistance retrieveUserID])
+        return nil;
     if(!transactions){
+        [Api getListOfCurrentAcceptances:self];
         NSDictionary *trans = [Persistance retrieveTransactions];
+
         transactions= [[NSMutableDictionary alloc] init];
         NSMutableDictionary *actvies = [[NSMutableDictionary alloc] init];
         NSMutableDictionary *alltrans = [[NSMutableDictionary alloc] init];
@@ -28,23 +38,23 @@
         [transactions setValue:alltrans forKey:@"all"];
         
         if(trans){
-            double currentTime = [[NSDate date] timeIntervalSince1970];
+           // double currentTime = [[NSDate date] timeIntervalSince1970];
             NSDictionary *aller = [trans objectForKey:@"all"];
             for (NSString *transactionkey in aller){
                 NSDictionary *transaction = [aller objectForKey:transactionkey];
                 NSMutableDictionary *thistransaction = [NSMutableDictionary dictionaryWithDictionary:transaction];
                 NSLog(@"transaction is %@", transaction);
-                double startTime = [[transaction objectForKey:@"starttime"] doubleValue];
-                double endTime =[[transaction objectForKey:@"endtime"] doubleValue];
-                
-                if ((currentTime >= startTime) && (currentTime <= endTime)){
-                    [thistransaction setValue:@"1" forKey:@"active"];
-                    [actvies setValue:thistransaction forKey:[NSString stringWithFormat:@"%i", [[thistransaction objectForKey:@"spotid"] intValue] ]];
-                }
-                else{
-                    [thistransaction setValue:@"0" forKey:@"active"];
+            //    double startTime = [[transaction objectForKey:@"starttime"] doubleValue];
+             //   double endTime =[[transaction objectForKey:@"endtime"] doubleValue];
+             //
+                //if ((currentTime >= startTime) && (currentTime <= endTime)){
+                  //  [thistransaction setValue:@"1" forKey:@"active"];
+                //    [actvies setValue:thistransaction forKey:[NSString stringWithFormat:@"%i", [[thistransaction objectForKey:@"spotid"] intValue] ]];
+               // }
+               // else{
+                 //   [thistransaction setValue:@"0" forKey:@"active"];
 
-                }
+//                }
                 [alltrans setValue:thistransaction forKey:[NSString stringWithFormat:@"%i", [[thistransaction objectForKey:@"spotid"] intValue] ]];
 
 
@@ -80,7 +90,7 @@ void uncaughtExceptionHandler(NSException *exception) {
     // Override point for customization after application launch.
     NSSetUncaughtExceptionHandler(&uncaughtExceptionHandler);
     [Persistance updatePersistedDataWithAppVersion];
-    
+    isNew = TRUE;
     [Crittercism enableWithAppID:@"50b3bc587e69a33784000002"];
     [Crittercism leaveBreadcrumb:@"App loaded"];
     [Mixpanel sharedInstanceWithToken:@"0ef037a021b6fa3b5a72057c403d1fbd"];
@@ -110,16 +120,74 @@ void uncaughtExceptionHandler(NSException *exception) {
    // }
     return YES;
 }
+-(void)requestFinished:(ASIHTTPRequest *)request{
+    NSString *responseString = [request responseString];
+
+    if(request.tag == kLoadUDIDandPush){
+        NSDictionary * root = [responseString JSONValue];
+        NSLog(@"Finished %@", responseString);
+
+        BOOL success = [[root objectForKey:@"success"] boolValue];
+        isNew = [[root objectForKey:@"isNew"] boolValue];
+        if(success) {
+            NSLog(@"Saved device %@", root);
+        } else {
+            NSLog(@"Failed ot save device %@", root);
+        }
+
+    }
+    
+    else if(request.tag == kGetAcceptances){
+        if (responseString){
+        
+            
+            NSArray *acceptances = [responseString JSONValue];
+            NSDictionary *alltransactionsonphone = [self.transactions objectForKey:@"all"];
+            NSDictionary *actives = [self.transactions objectForKey:@"active"];
+            NSLog(@"There are %i active reservations", [acceptances count]);
+            for (NSDictionary *acceptance in acceptances){
+            NSLog(@"Active %@", acceptance);
+                if ([alltransactionsonphone objectForKey:[NSString stringWithFormat:@"%i", 90000 + [[acceptance objectForKey:@"resource_offer_id"] intValue] ]]){
+                    [actives setValue:[alltransactionsonphone objectForKey:[NSString stringWithFormat:@"%i", 90000 + [[acceptance objectForKey:@"resource_offer_id"] intValue] ]] forKey:[NSString stringWithFormat:@"%i", 90000 + [[acceptance objectForKey:@"resource_offer_id"] intValue] ]];
+                    
+                }
+                else{
+ 
+                    ParkingSpot *thisSpot = [self.parkingSpots parkingSpotForID:90000 + [[acceptance objectForKey:@"resource_offer_id"] intValue] ];
+                    
+                    NSMutableDictionary *thetransaction = [Persistance addNewTransaction: thisSpot withStartTime:[[acceptance objectForKey:@"start_time"] doubleValue] andEndTime:[[acceptance objectForKey:@"end_time"] doubleValue] andLastPaymentDetails:[acceptance objectForKey:@"details"] withTransactionID:[acceptance objectForKey:@"id"]];
+                    NSLog(@"Transaction not in records, added in %@", thetransaction);
+                    //[Persistance addNewTransaction:self.spot withStartTime:self.rangeBar. selectedMinimumValue andEndTime:self.rangeBar.selectedMaximumValue andLastPaymentDetails:[paymentDetails objectForKey:@"details"] withTransactionID:[paymentDetails objectForKey:@"id"]];
+
+                }
+       
+            }
+        }
+
+    }
+}
+-(void)requestFailed:(ASIHTTPRequest *)request{
+    NSLog(@"Failed to register push token and udid!");
+}
+-(void)sendTokenInfo:(NSString*)tokenAsString{
+    [Api registerUDIDandToken:tokenAsString withASIdelegate:self];
+    
+}
 - (void)application:(UIApplication *)application didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken {
     
     // Show the device token obtained from apple to the log
     
     NSLog(@"deviceToken: %@", deviceToken);
+    NSString *tokenAsString = [[deviceToken description] stringByTrimmingCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@"<>"]];
+    [self sendTokenInfo:tokenAsString];
+
     
 }
 - (void)application:(UIApplication*)application didFailToRegisterForRemoteNotificationsWithError:(NSError*)error
 {
 	NSLog(@"Failed to get token, error: %@", error);
+    [self sendTokenInfo:@""];
+    
 }
 
 - (void)applicationWillResignActive:(UIApplication *)application

@@ -67,7 +67,6 @@ typedef struct STargetLocation {
 @property (weak, nonatomic) IBOutlet UIView *bottomBarView;
 @property (weak, nonatomic) IBOutlet UILabel *bottomBarLabel;
 
-@property (strong, nonatomic) CompletionBlock spotsWereUpdatedCallback;
 
 @end
 
@@ -77,14 +76,11 @@ typedef struct STargetLocation {
 @synthesize timerPolling = _timerPolling;
 @synthesize timerDuration = _timerDuration;
 @synthesize locationManager = _locationManager;
-@synthesize currentLat = _currentLat;
-@synthesize currentLong = _currentLong;
 @synthesize addressBar = _addressBar;
 @synthesize myLocationButton = _myLocationButton;
 @synthesize targetSpot = _targetSpot;
 @synthesize lastSearchedLocation = _lastSearchedLocation;
 @synthesize targetType = _targetType;
-@synthesize vcToSwitch = _vcToSwitch;
 @synthesize bAlreadyInit = _bAlreadyInit;
 
 @synthesize annotations = _annotations;
@@ -105,7 +101,6 @@ typedef struct STargetLocation {
 @synthesize bottomBarView = _bottomBarView;
 @synthesize bottomBarLabel = _bottomBarLabel;
 
-@synthesize spotsWereUpdatedCallback = _spotsWereUpdatedCallback;
 
 /*
 - (ParkingSpotCollection*)parkingSpots {
@@ -332,9 +327,10 @@ typedef struct STargetLocation {
         self.waitingMask = [[WaitingMask alloc] initWithFrame:waitingMaskFrame];
         [self.view addSubview:self.waitingMask];
         //**  **//
+        ParkifyAppDelegate *delegate = (ParkifyAppDelegate*)[[UIApplication sharedApplication] delegate];
         
-        self.currentLat = 37.872679;
-        self.currentLong = -122.266797;
+        delegate.currentLat = 37.872679;
+        delegate.currentLong = -122.266797;
         
         self.locationManager = [[CLLocationManager alloc] init];
         self.locationManager.delegate = self;
@@ -346,21 +342,22 @@ typedef struct STargetLocation {
         
         
         initTarget.type = TARGET_NONE;
-        
+
         if(self.locationManager.location != nil) {
-            self.currentLat = self.locationManager.location.coordinate.latitude;
-            self.currentLong = self.locationManager.location.coordinate.longitude;
+
+            delegate.currentLat = self.locationManager.location.coordinate.latitude;
+            delegate.currentLong = self.locationManager.location.coordinate.longitude;
             initTarget.type = TARGET_CURRENT_LOCATION;
         }
         
         CLLocationCoordinate2D initCoord;
-        initCoord.latitude = self.currentLat;
-        initCoord.longitude = self.currentLong;
+        initCoord.latitude = delegate.currentLat;
+        initCoord.longitude = delegate.currentLong;
         
         self.targetLocationAnnotation = [[LocationAnnotation alloc] init];
         self.targetLocationAnnotation.coordinate = initCoord;
         
-        initTarget.location = CLLocationCoordinate2DMake(self.currentLat, self.currentLong);
+        initTarget.location = CLLocationCoordinate2DMake(delegate.currentLat, delegate.currentLong);
         self.targetLocation = initTarget;
         /*
         self.targetType = TARGET_SEARCHED_LOCATION;
@@ -402,24 +399,6 @@ typedef struct STargetLocation {
    
     
     
-    //[[UISearchBar appearance]setSearchFieldBackgroundImage:[UIImage imageNamed:@"crosshair.png"] forState:UIControlStateNormal];
-    
-    /*
-    for (UIView *subview in self.addressBar.subviews) {
-        NSLog(@"%@", subview.class);
-        if ([subview isKindOfClass:NSClassFromString(@"UISearchBarBackground")]) {
-            [subview removeFromSuperview];
-            //break;
-        }
-    } */
-    /*
-    for (UIView *subview in self.addressBar.subviews) {
-        NSLog(@"%@", subview.class);
-        if (![subview isKindOfClass:NSClassFromString(@"UISearchBarTextField")]) {
-            [subview removeFromSuperview];
-            //break;
-        }
-    } */
     
     [self updateBottomBar];
     self.timerDuration = 10;
@@ -455,8 +434,10 @@ typedef struct STargetLocation {
            fromLocation:(CLLocation *)oldLocation {
     
     //self.myLocationButton.enabled = true;
-    self.currentLat = newLocation.coordinate.latitude;
-    self.currentLong = newLocation.coordinate.longitude;
+    ParkifyAppDelegate *delegate = (ParkifyAppDelegate*)[[UIApplication sharedApplication] delegate];
+
+    delegate.currentLat = newLocation.coordinate.latitude;
+    delegate.currentLong = newLocation.coordinate.longitude;
     
     if (self.targetLocation.type == TARGET_CURRENT_LOCATION) {
         STargetLocation target;
@@ -517,12 +498,6 @@ typedef struct STargetLocation {
     [Api settingsModallyFrom:self withSuccess:^(NSDictionary * results) {
         NSLog(@"%@", results);
     }];
-    /*
-    
-    [Api authenticateModallyFrom:self withSuccess:^(NSDictionary * results) {
-        NSLog(@"%@", results);
-    }];
-     */
 }
 
 - (IBAction)myLocationTapped:(id)sender {
@@ -537,8 +512,10 @@ typedef struct STargetLocation {
     //[self showTargetPin:false];
     
     CLLocationCoordinate2D myLocation;
-    myLocation.latitude = self.currentLat;
-    myLocation.longitude = self.currentLong;
+    ParkifyAppDelegate *delegate = (ParkifyAppDelegate*)[[UIApplication sharedApplication] delegate];
+
+    myLocation.latitude = delegate.currentLat;
+    myLocation.longitude = delegate.currentLong;
     
     STargetLocation target;
     target.type = TARGET_CURRENT_LOCATION;
@@ -751,8 +728,10 @@ typedef struct STargetLocation {
         //newController.parkingSpots = self.parkingSpots;
         //self.parkingSpots.observerDelegate = newController;
         newController.spot = self.targetSpot;
-        newController.currentLat = self.currentLat;
-        newController.currentLong = self.currentLong;
+        ParkifyAppDelegate *delegate = (ParkifyAppDelegate*)[[UIApplication sharedApplication] delegate];
+
+        newController.currentLat = delegate.currentLat;
+        newController.currentLong = delegate.currentLong;
         newController.distanceString = [TextFormatter formatDistanceClose:distanceToSpot];
         
         [newController.spot updateAsynchronouslyWithLevelOfDetail:@"all"];
@@ -765,50 +744,6 @@ typedef struct STargetLocation {
 }
 
 
-- (void)openSpotConirmationViewWithSpot:(int)spotID {
-    [self stopPolling];
-    //** Set up waitingMask **//
-    
-    
-    
-    CGRect waitingMaskFrame = self.view.frame;
-    waitingMaskFrame.origin.x = 0;
-    waitingMaskFrame.origin.y = 0;
-    
-    self.waitingMask = [[WaitingMask alloc] initWithFrame:waitingMaskFrame];
-    [self.view addSubview:self.waitingMask];
-    //**  **//
-    
-    
-    self.targetSpot = [[self getParkingSpots] parkingSpotForID:spotID];
-    if(!self.targetSpot) {
-        self.targetSpot = [[ParkingSpot alloc]init];
-        self.targetSpot.mID = spotID;
-    }
-    [self getParkingSpots].observerDelegate = nil;
-    // self.targetSpot.parentCollection = self.parkingSpots;
-     
-    self.spotsWereUpdatedCallback = ^(void){
-        /*
-        self.targetSpot = [self.parkingSpots parkingSpotForID:spotID];
-        if(self.targetSpot) {
-            self.navigationController.modalPresentationStyle = UIModalPresentationCurrentContext;
-            [self performSegueWithIdentifier:@"ViewSpot" sender:self];
-        } else {
-            [self startPolling];
-            if(self.waitingMask) {
-                [self.waitingMask removeFromSuperview];
-                self.waitingMask = nil;
-            }
-        }
-         */
-        
-        [self switchToConfirmation];
-        self.spotsWereUpdatedCallback = nil;
-    };
-    
-    [self.targetSpot updateAsynchronouslyWithLevelOfDetail:@"all"];
-}
 
 
 
@@ -832,24 +767,6 @@ typedef struct STargetLocation {
     [Crittercism leaveBreadcrumb:@"spotdetails"];
     self.navigationController.modalPresentationStyle = UIModalPresentationCurrentContext;
     [self performSegueWithIdentifier:@"ViewSpot" sender:self];
-/*
-    self.spotsWereUpdatedCallback = ^(void){
-        self.targetSpot = [[self getParkingSpots] parkingSpotForID:spotID];
-        if(self.targetSpot) {
-            self.navigationController.modalPresentationStyle = UIModalPresentationCurrentContext;
-            [self performSegueWithIdentifier:@"ViewSpot" sender:self];
-        } else {
-            [self startPolling];
-            if(self.waitingMask) {
-                [self.waitingMask removeFromSuperview];
-                self.waitingMask = nil;
-            }
-        }
-        self.spotsWereUpdatedCallback = nil;
-    };
-    
-    [self.targetSpot updateAsynchronouslyWithLevelOfDetail:@"all"];
- */
 }
 
 - (IBAction)spotMoreInfo:(UIButton*)sender {
@@ -884,25 +801,46 @@ typedef struct STargetLocation {
 -(void)spotsWereUpdatedWithCount:(NSString *)count withLevelOfDetail:(NSString*)lod withSpot:(int)spotID
 {
     [self updateBottomBar];
+    if(self.waitingMask) {
+        [self.waitingMask removeFromSuperview];
+        self.waitingMask = nil;
+        [self performSelectorInBackground:@selector(checkURL) withObject:nil];
+    }
+
+    NSDictionary *parkingspots = [[self getParkingSpots] parkingSpots];
+    NSMutableArray *usedkeys = [[NSMutableArray alloc] init];
+    for(ParkingSpotAnnotation* map_annotation in [self.mapView.annotations copy]) {
+        if ([map_annotation class] != [ParkingSpotAnnotation class])
+            continue;
+        NSString *key = [NSString stringWithFormat:@"%i", map_annotation.spot.mID];
+        if (![parkingspots objectForKey:key]){
+            [self.mapView removeAnnotation:map_annotation    ];
+            
+        }
+        else{
+            [usedkeys addObject:key];
+        }
+        
+    }
+    for (NSString *key in [parkingspots allKeys]){
+        if (![usedkeys containsObject:key]){
+            [self.mapView addAnnotation:[ParkingSpotAnnotation annotationForSpot:[parkingspots objectForKey:key]]];
+        }
+    }
+    /*
     NSMutableArray* annotations = [[NSMutableArray alloc] init ];
+    
     for (ParkingSpot* spot in [[self getParkingSpots].parkingSpots allValues]) {
         [annotations addObject:[ParkingSpotAnnotation annotationForSpot:spot]];
     }
     self.annotations = annotations;
-    
-    if([lod isEqualToString:@"all"]) {
-        if([count isEqualToString:@"all"] || ([count isEqualToString:@"one"] && spotID == self.targetSpot.mID)) {
-            if(self.spotsWereUpdatedCallback) self.spotsWereUpdatedCallback();
-        }
-    }
-    
-    if(ADMIN_VER) {
-    NSMutableArray* ids = [[NSMutableArray alloc] init ];
-    for (ParkingSpot* spot in [[self getParkingSpots].parkingSpots allValues]) {
+    */
+#if ADMIN_VER
+        NSMutableArray* ids = [[NSMutableArray alloc] init ];
+        for (ParkingSpot* spot in [[self getParkingSpots].parkingSpots allValues]) {
         
         [ids addObject:[NSNumber numberWithInt:(spot.mID - 90000)]];
-    }
-    
+        }
     
     NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"intValue" ascending:TRUE];
     [ids sortUsingDescriptors:[NSArray arrayWithObject:sortDescriptor]];
@@ -913,7 +851,9 @@ typedef struct STargetLocation {
         }
     
         [[[iToast makeText:toToast] setGravity:iToastGravityBottom ] show];
-    }
+
+#endif
+
     
 }
 
@@ -927,7 +867,7 @@ typedef struct STargetLocation {
     }
     
     BOOL bChanged = false;
-    NSMutableArray* annotationsToRemove = [[NSMutableArray alloc] init];
+ /*   NSMutableArray* annotationsToRemove = [[NSMutableArray alloc] init];
     NSMutableArray* annotationsAdded = [[NSMutableArray alloc] init];
     
     //NSLog(@"Before_m=%d, Before_map=%d\t", [self.annotations count],[self.mapView.annotations count] );
@@ -954,7 +894,7 @@ typedef struct STargetLocation {
     }
     
     [self.mapView removeAnnotations:annotationsToRemove];
-    
+    */
     //NSLog(@"After_m=%d, After_map=%d\n", [self.annotations count],[self.mapView.annotations count] );
     //if(self.mapView.annotations) [self.mapView removeAnnotations:self.mapView.annotations];
     //[self.mapView addAnnotations:self.annotations];
@@ -1000,11 +940,6 @@ typedef struct STargetLocation {
     
     [self refreshSpots];
     
-    
-    for(NSObject<MKAnnotation>* pin in self.mapView.annotations)
-    {
-        NSLog(@"IMG FOR %@ is %@", pin, [self.mapView viewForAnnotation:pin].image);
-    }
     
     
     self.timerPolling = [NSTimer scheduledTimerWithTimeInterval: self.timerDuration
@@ -1145,9 +1080,9 @@ typedef struct STargetLocation {
     controller.transactionInfo = transact ;
     // controller.startTime = [Persistance retrieveCurrentStartTime];
     // controller.endTime = [Persistance retrieveCurrentEndTime];
-    
-    controller.currentLat = self.currentLat;
-    controller.currentLong = self.currentLong;
+
+    controller.currentLat = delegate.currentLat;
+    controller.currentLong = delegate.currentLong;
     
     extendReservationViewController *controllerer = [mainStoryboard instantiateViewControllerWithIdentifier: @"extendResVC"];
     controllerer.transactioninfo= transact;
@@ -1172,14 +1107,14 @@ typedef struct STargetLocation {
     controller.spot = [Persistance retrieveCurrentSpot];
     ParkifyAppDelegate *delegate = (ParkifyAppDelegate*)[[UIApplication sharedApplication] delegate];
     NSDictionary *actives = [delegate.transactions objectForKey:@"active"];
-    NSDictionary *transact = [actives objectForKey:[[actives allKeys] lastObject]];
+    NSMutableDictionary *transact = [actives objectForKey:[[actives allKeys] lastObject]];
 
     controller.transactionInfo = transact ;
        // controller.startTime = [Persistance retrieveCurrentStartTime];
        // controller.endTime = [Persistance retrieveCurrentEndTime];
         
-        controller.currentLat = self.currentLat;
-        controller.currentLong = self.currentLong;
+        controller.currentLat = delegate.currentLat;
+        controller.currentLong = delegate.currentLong;
         
         self.modalTransitionStyle = UIModalTransitionStyleCoverVertical;
         [self presentViewController:navController animated:true completion:^{}];

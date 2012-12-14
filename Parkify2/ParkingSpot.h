@@ -25,7 +25,7 @@
 
 
 
-@interface ParkingSpot : NSObject<PriceStore, NameIdMappingDelegate>
+@interface ParkingSpot : NSObject<PriceStore, NameIdMappingDelegate, MKAnnotation>
 
 @property (strong, nonatomic) ParkingSpotCollection* parentCollection;
 
@@ -57,6 +57,7 @@
 @property (strong, nonatomic) NSArray* landscapeInfoImageIDs;
 @property (strong, nonatomic) NSArray* landscapeConfImageIDs;
 @property (strong, nonatomic) NSDictionary* standardImageIDs;
+@property (strong, nonatomic) NSObject *parkingSpotAnnotation;
 
 
 

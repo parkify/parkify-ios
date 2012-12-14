@@ -18,6 +18,8 @@
 #import "ParkifyWebViewWrapperController.h"
 #import "ErrorTransformer.h"
 #import "problemSpotViewController.h"
+#import "ParkifyAppDelegate.h"
+#import "ExtraTypes.h"
 
 #define TESTING_V1 true
 
@@ -131,15 +133,18 @@ withPasswordConfirmation:(NSString*)passwordConfirmation
                                                          withZipCode:zipCode
                                                            withPhone:phone];
         id tokenRequest = [Authentication makeTokenRequestWithToken:token];
-#ifdef DEBUGVER
-    NSString *sslorno = @"http";
+    NSString *urlstring = [Api apirootstring];
     
-#else
-    NSString *sslorno = @"https";
+    urlstring = [urlstring stringByAppendingFormat:@"users.json"];
     
-#endif
+    
+    
+    NSURL *url = [NSURL URLWithString:urlstring];
+    
+    
+    
+    
 
-        NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"%@://%@/api/v1/users.json", sslorno,TARGET_SERVER]];
         NSLog(@"%@", [userRequest JSONRepresentation]);
         
         ASIFormDataRequest *request = [ASIFormDataRequest requestWithURL:url];
@@ -166,7 +171,7 @@ withPasswordConfirmation:(NSString*)passwordConfirmation
                 [Persistance saveLastFourDigits:[root objectForKey:@"last_four_digits"]];
                 [Persistance saveFirstName:[[root objectForKey:@"user"] objectForKey:@"first_name"]];
                 [Persistance saveLastName:[[root objectForKey:@"user"] objectForKey:@"last_name"]];
-                
+                [Api registerUserWithCurrentDevice];
                 successBlock(root);
             } else {
                 NSError* error = [ErrorTransformer apiErrorToNSError:[root objectForKey:@"error"]];
@@ -201,7 +206,7 @@ withPasswordConfirmation:(NSString*)passwordConfirmation
     card.addressZip = zipCode;
     
     [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
-    StripeConnection* stripeConnection = [StripeConnection connectionWithPublishableKey:@"pk_XeTF5KrqXMeSyyqApBF4q9qDzniMn"];
+    StripeConnection* stripeConnection = [StripeConnection connectionWithPublishableKey:kStripeToken];
     
     [stripeConnection performRequestWithCard:card
                                      success:^(StripeResponse *response)
@@ -232,15 +237,18 @@ withPasswordConfirmation:(NSString*)passwordConfirmation
         failureBlock(nil);
         return;
     }
-#ifdef DEBUGVER
-    NSString *sslorno = @"http";
+    NSString *urlstring = [Api apirootstring];
     
-#else
-    NSString *sslorno = @"https";
+    urlstring = [urlstring stringByAppendingFormat:@"account/add_card.json?&auth_token=%@", authToken];
     
-#endif
+    
+    
+    NSURL *url = [NSURL URLWithString:urlstring];
+    
+    
+    
 
-    NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"%@//%@/api/v1/account/add_card.json?&auth_token=%@", sslorno, TARGET_SERVER, authToken]];
+
     
     
     ASIFormDataRequest *request = [ASIFormDataRequest requestWithURL:url];
@@ -283,16 +291,16 @@ withPasswordConfirmation:(NSString*)passwordConfirmation
     
     [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
     
-    NSURL *url;
-#ifdef DEBUGVER
-    NSString *sslorno = @"http";
+    NSString *urlstring = [Api apirootstring];
     
-#else
-    NSString *sslorno = @"https";
+    urlstring = [urlstring stringByAppendingFormat:@"users/sign_in.json"];
     
-#endif
+    
+    
+    NSURL *url = [NSURL URLWithString:urlstring];
+    
 
-    url = [NSURL URLWithString:[NSString stringWithFormat:@"%@://%@/api/v1/users/sign_in.json",sslorno, TARGET_SERVER]];
+
     
     //NSLog(@"%@", [userRequest JSONRepresentation]);
     
@@ -387,15 +395,15 @@ withPasswordConfirmation:(NSString*)passwordConfirmation
            withLevelofDetail:(NSString*)lod
                   withSuccess:(SuccessBlock)successBlock
                   withFailure:(FailureBlock)failureBlock {
-    NSString* strUrl;
-    if([lod isEqualToString: @"low"]) {
-        
-        strUrl = [NSString stringWithFormat:@"http://%@/api/v1/resources/%d.json?level_of_detail=%@", TARGET_SERVER, spotID, @"low"];
-    } else {
-        strUrl = [NSString stringWithFormat:@"http://%@/api/v1/resources/%d.json?level_of_detail=%@", TARGET_SERVER, spotID, @"all"];
-    }
     
-    NSURL *url = [NSURL URLWithString:strUrl];
+    NSString *urlstring = [Api apirootstring];
+    
+    urlstring = [urlstring stringByAppendingFormat:@"resources.json/%d.json?level_of_detail=%@",spotID, lod];
+    
+    
+    
+    NSURL *url = [NSURL URLWithString:urlstring];
+
     
     
     ASIHTTPRequest *_request = [ASIHTTPRequest requestWithURL:url];
@@ -429,15 +437,16 @@ withPasswordConfirmation:(NSString*)passwordConfirmation
     
     
     
-    NSString* strUrl;
-    if([lod isEqualToString: @"low"]) {
-        strUrl = [NSString stringWithFormat:@"http://%@/api/v1/resources.json?level_of_detail=%@",TARGET_SERVER, @"low"];
-    } else {
-        strUrl = [NSString stringWithFormat:@"http://%@/api/v1/resources.json?level_of_detail=%@", TARGET_SERVER, @"all"];
-    }
-            
-    NSURL *url = [NSURL URLWithString:strUrl];
-        
+    NSString *urlstring = [Api apirootstring];
+    
+    urlstring = [urlstring stringByAppendingFormat:@"resources.json?level_of_detail=%@", lod];
+    
+    
+    
+    NSURL *url = [NSURL URLWithString:urlstring];
+    
+    
+
     
     ASIHTTPRequest *_request = [ASIHTTPRequest requestWithURL:url];
     __weak ASIHTTPRequest *request = _request;
@@ -515,17 +524,15 @@ withPasswordConfirmation:(NSString*)passwordConfirmation
         failureBlock(nil);
         return;
     }
-#ifdef DEBUGVER
-    NSString *sslorno = @"http";
+    NSString *urlstring = [Api apirootstring];
     
-#else
-    NSString *sslorno = @"https";
+    urlstring = [urlstring stringByAppendingFormat:@"account.json?&auth_token=%@", authToken];
     
-#endif
-
-    NSString* strUrl = [NSString stringWithFormat:@"%@://%@/api/v1/account.json?&auth_token=%@",sslorno, TARGET_SERVER, authToken];
     
-    NSURL *url = [NSURL URLWithString:strUrl];
+    
+    NSURL *url = [NSURL URLWithString:urlstring];
+    
+    
     
     
     ASIHTTPRequest *_request = [ASIHTTPRequest requestWithURL:url];
@@ -562,15 +569,16 @@ withPasswordConfirmation:(NSString*)passwordConfirmation
         failureBlock(nil);
         return;
     }
-#ifdef DEBUGVER
-    NSString *sslorno = @"http";
+    NSString *urlstring = [Api apirootstring];
     
-#else
-    NSString *sslorno = @"https";
+    urlstring = [urlstring stringByAppendingFormat:@"account/account.json?&auth_token=%@", authToken];
     
-#endif
+    
+    
+    NSURL *url = [NSURL URLWithString:urlstring];
+    
+    
 
-    NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"%@://%@/api/v1/account.json?&auth_token=%@", sslorno, TARGET_SERVER, authToken]];
     NSLog(@"%@", [dicIn JSONRepresentation]);
     
     ASIFormDataRequest *request = [ASIFormDataRequest requestWithURL:url];
@@ -615,15 +623,15 @@ withPasswordConfirmation:(NSString*)passwordConfirmation
         failureBlock(error);
         return;
     }
-#ifdef DEBUGVER
-    NSString *sslorno = @"http";
+    NSString *urlstring = [Api apirootstring];
     
-#else
-    NSString *sslorno = @"https";
+    urlstring = [urlstring stringByAppendingFormat:@"account/activate_card.json?&auth_token=%@", authToken];
     
-#endif
-
-    NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"%@://%@/api/v1/account/activate_card.json?&auth_token=%@", sslorno, TARGET_SERVER, authToken]];
+    
+    
+    NSURL *url = [NSURL URLWithString:urlstring];
+    
+    
     
     
     ASIFormDataRequest *request = [ASIFormDataRequest requestWithURL:url];
@@ -665,15 +673,16 @@ withPasswordConfirmation:(NSString*)passwordConfirmation
         failureBlock(nil);
         return;
     }
-#ifdef DEBUGVER
-    NSString *sslorno = @"http";
+    NSString *urlstring = [Api apirootstring];
     
-#else
-    NSString *sslorno = @"https";
+    urlstring = [urlstring stringByAppendingFormat:@"account/add_car.json?&auth_token=%@", authToken];
     
-#endif
+    
+    
+    NSURL *url = [NSURL URLWithString:urlstring];
+    
+    
 
-    NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"%@://%@/api/v1/account/add_car.json?&auth_token=%@", sslorno, TARGET_SERVER, authToken]];
     
     
     ASIFormDataRequest *request = [ASIFormDataRequest requestWithURL:url];
@@ -717,15 +726,17 @@ withPasswordConfirmation:(NSString*)passwordConfirmation
         failureBlock(nil);
         return;
     }
-#ifdef DEBUGVER
-    NSString *sslorno = @"http";
+    NSString *urlstring = [Api apirootstring];
     
-#else
-    NSString *sslorno = @"https";
+    urlstring = [urlstring stringByAppendingFormat:@"account/add_promo.json?&auth_token=%@", authToken];
     
-#endif
+    
+    
+    NSURL *url = [NSURL URLWithString:urlstring];
+    
+    
 
-    NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"%@://%@/api/v1/account/add_promo.json?&auth_token=%@", sslorno, TARGET_SERVER, authToken]];
+
     
     
     ASIFormDataRequest *request = [ASIFormDataRequest requestWithURL:url];
@@ -770,15 +781,16 @@ withPasswordConfirmation:(NSString*)passwordConfirmation
         failureBlock(nil);
         return;
     }
-#ifdef DEBUGVER
-    NSString *sslorno = @"http";
+    NSString *urlstring = [Api apirootstring];
     
-#else
-    NSString *sslorno = @"https";
+    urlstring = [urlstring stringByAppendingFormat:@"account/update_cars.json?&auth_token=%@", authToken];
     
-#endif
+    
+    
+    NSURL *url = [NSURL URLWithString:urlstring];
+    
 
-    NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"%@://%@/api/v1/account/update_cars.json?&auth_token=%@", sslorno, TARGET_SERVER, authToken]];
+
     
     
     ASIFormDataRequest *request = [ASIFormDataRequest requestWithURL:url];
@@ -825,15 +837,14 @@ origPassword:(NSString*)origPassword
     failureBlock(nil);
     return;
   }
-#ifdef DEBUGVER
-    NSString *sslorno = @"http";
+    NSString *urlstring = [Api apirootstring];
     
-#else
-    NSString *sslorno = @"https";
+    urlstring = [urlstring stringByAppendingFormat:@"account/update_password.json?&auth_token=%@", authToken];
     
-#endif
-
-  NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"%@://%@/api/v1/account/update_password.json?&auth_token=%@", sslorno, TARGET_SERVER, authToken]];
+    
+    
+    NSURL *url = [NSURL URLWithString:urlstring];
+    
   
   NSDictionary* passDict = [NSDictionary dictionaryWithObjectsAndKeys:password,@"password", passwordConf, @"password_confirmation", origPassword, @"current_password", nil];
   
@@ -872,15 +883,13 @@ origPassword:(NSString*)origPassword
 + (void)resetPasswordWithEmail:(NSString*)email
            withSuccess:(SuccessBlock)successBlock
            withFailure:(FailureBlock)failureBlock {
-#ifdef DEBUGVER
-    NSString *sslorno = @"http";
+    NSString *urlstring = [Api apirootstring];
     
-#else
-    NSString *sslorno = @"https";
-    
-#endif
+    urlstring = [urlstring stringByAppendingFormat:@"account/reset_password.json"];
 
-  NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"%@://%@/api/v1/account/reset_password.json",sslorno, TARGET_SERVER]];
+    
+    
+    NSURL *url = [NSURL URLWithString:urlstring];
   
   
   
@@ -954,6 +963,8 @@ origPassword:(NSString*)origPassword
             else
             {
                 NSLog(@"Image successfully uploaded");
+                NSLog(@"putobject respones %@", putObjectResponse.request.JSONRepresentation);
+                
 //                [self showAlertMessage:@"The image was successfully uploaded." withTitle:@"Upload Completed"];
             }
             
@@ -964,36 +975,47 @@ origPassword:(NSString*)origPassword
 #pragma mark methods dealing with problem spots
 + (void)sendProblemSpotWithText:(NSString *)problem
                        andImage:(UIImage*)problemImage
-            withASIHTTPDelegate:(id)delegate;
+                  andResourceID:(int)spotid
+                        withLat:(double)latitude
+                        andLong:(double)longitude
+               withAcceptanceID:(int)acceptid
+                    shouldCancel:(BOOL)shouldCancel
+            withASIHTTPDelegate:(id)delegate
 {
-#ifdef DEBUGVER
-    NSString *sslorno = @"http";
+    NSString *urlstring = [Api apirootstring];
     
-#else
-    NSString *sslorno = @"https";
-    
-#endif
+    urlstring = [urlstring stringByAppendingFormat:@"complaints.json?auth_token=%@", [Persistance retrieveAuthToken]];
 
-    NSString* urlString = [[NSString alloc] initWithFormat:@"%@://%@/api/v1/problem_spot.json?auth_token=%@",sslorno, TARGET_SERVER, [Persistance retrieveAuthToken]];
-    NSURL *url = [NSURL URLWithString:urlString];
+    NSURL *url = [NSURL URLWithString:urlstring];
     NSString *filename = [[UIDevice currentDevice] uniqueGlobalDeviceIdentifier];
     if ( [Persistance retrieveAuthToken]){
         filename= [filename stringByAppendingFormat:@"_%@_%@", [Persistance retrieveFirstName],[Persistance retrieveLastName]];
     }
+       
     
     NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
     [dateFormatter setDateFormat:@"dd.MM.yyyy_HH:mm:ss"];
+    NSString *imageurl = @"";
     
+    
+    if(problemImage){
     filename = [filename stringByAppendingFormat:@"_%@.png",[dateFormatter stringFromDate:[NSDate date]]];
    [Api processGrandCentralDispatchUpload:[NSData dataWithData:UIImagePNGRepresentation(problemImage)] withImageName:filename];
     NSLog(@"Logging new problem with text: %@", problem);
-    NSString *imageurl = [NSString stringWithFormat:@"https://s3.amazonaws.com/%@/%@",PICTURE_BUCKET, filename];
+    imageurl = [NSString stringWithFormat:@"https://s3.amazonaws.com/%@/%@",PICTURE_BUCKET, filename];
     NSLog(@"The url is %@", imageurl);
+    }
+    
+    NSDictionary *complaints = [NSDictionary dictionaryWithObjects:[NSArray arrayWithObjects:[NSNumber numberWithInt:spotid-90000], problem, imageurl, [NSNumber numberWithDouble:latitude], [NSNumber numberWithDouble:longitude], nil] forKeys:[NSArray arrayWithObjects:@"resource_offer_id",@"descriptions", @"imageurl", @"latitude",@"longitude", nil]];
+
+    ParkifyAppDelegate *appdelegate = (ParkifyAppDelegate*)[[UIApplication sharedApplication] delegate];
+    [[appdelegate.transactions objectForKey:@"active"] removeObjectForKey:[NSString stringWithFormat:@"%i", spotid]];
+    
     ASIFormDataRequest *request = [ASIFormDataRequest requestWithURL:url];
 
-    [request addPostValue:problem forKey:@"problemText"];
-    [request addPostValue:imageurl forKey:@"problemImageURL"];
-    
+    [request addPostValue:[complaints JSONRepresentation] forKey:@"complaint"];
+    [request addPostValue:[NSNumber numberWithInt:acceptid] forKey:@"acceptanceid"];
+    [request addPostValue:[NSString stringWithFormat:@"%@", shouldCancel ? @"1" : @"0"] forKey:@"shouldCancel"];
     [request addRequestHeader:@"User-Agent" value:@"ASIFormDataRequest"];
     [request addRequestHeader:@"Content-Type" value:@"application/json"];
     [request setRequestMethod:@"POST"];
@@ -1002,7 +1024,192 @@ origPassword:(NSString*)origPassword
     [request startAsynchronous];
 
 }
++ (void)logout{
+    [[Mixpanel sharedInstance] track:@"logout"];
+    
+    [Persistance saveAuthToken:nil];
+    [Persistance saveUserID:[NSNumber numberWithInt:-1]];
+    ParkifyAppDelegate *delegate = [[UIApplication sharedApplication] delegate];
+    delegate.transactions=nil;
+    
 
+}
+
++(void) tryTransacation:(NSObject *)spotinfo withStartTime:(double)minimumValue andEndTime:(double)maximumValue withASIdelegate:(id)asidelegate isPreview:(BOOL)preview withExtraParameter:(NSString*)parameter
+{
+    
+    ParkingSpot *spot = (ParkingSpot*)spotinfo;
+    [[Mixpanel sharedInstance] track:@"transactionpreview"];
+    NSMutableArray* offerIds = [[NSMutableArray alloc] init];
+    for (Offer* offer in spot.offers) {
+
+        if ([offer overlapsWithStartTime:minimumValue endTime:maximumValue])
+            [offerIds addObject:[NSNumber numberWithInt:offer.mId]];
+    }
+    
+    id transactionRequest = [Authentication makeTransactionRequestWithUserToken:[Persistance retrieveAuthToken] withSpotId:spot.mID withStartTime:minimumValue withEndTime:maximumValue withOfferIds:offerIds withLicensePlate:[Persistance retrieveLicensePlateNumber]];
+    
+    NSString *urlstring = [Api apirootstring];
+
+    if(preview)
+        urlstring = [urlstring stringByAppendingFormat:@"acceptances/preview.json?auth_token=%@%@", [Persistance retrieveAuthToken], parameter];
+
+    else
+        urlstring = [urlstring stringByAppendingFormat:@"acceptances.json?auth_token=%@%@", [Persistance retrieveAuthToken], parameter];
+
+    NSURL *url = [NSURL URLWithString:urlstring];
+    
+    NSLog(@"%@", [transactionRequest JSONRepresentation]);
+    ASIFormDataRequest *request = [ASIFormDataRequest requestWithURL:url];
+    [request addPostValue:[transactionRequest JSONRepresentation] forKey:@"transaction"];
+    
+    [request addRequestHeader:@"User-Agent" value:@"ASIFormDataRequest"];
+    [request addRequestHeader:@"Content-Type" value:@"application/json"];
+    [request  setRequestMethod:@"POST"];
+    [request setDelegate:asidelegate];
+    if(preview)
+        request.tag= kPreviewTransaction;
+    else
+        request.tag=kAttempTransaction;
+    
+    [request startAsynchronous];
+    
+}
+
++ (void)registerUDIDandToken:(NSString*)tokenAsString withASIdelegate:(id)asidelegate{
+    NSString *udid = [[UIDevice currentDevice] uniqueGlobalDeviceIdentifier];
+    NSString *urlstring = [Api apirootstring];
+    urlstring = [urlstring stringByAppendingFormat:@"devices.json"];
+    if ([Persistance retrieveAuthToken] != nil) {
+        urlstring = [urlstring stringByAppendingFormat:@"?auth_token=%@", [Persistance retrieveAuthToken]];
+        
+    }
+
+    NSURL *url = [NSURL URLWithString:urlstring];
+    NSLog(@"URL is %@",urlstring );
+    
+    ASIFormDataRequest *request = [ASIFormDataRequest requestWithURL:url];
+    NSLog(@"Device is %@", [[UIDevice currentDevice] model]);
+//    [request addPostValue:[userRequest JSONRepresentation] forKey:@"user"];
+    [request addPostValue:[[UIDevice currentDevice] model] forKey:@"devicetype"];
+    [request addPostValue:udid forKey:@"device_uid"];
+    [request addPostValue:tokenAsString forKey:@"push_token_id"];
+    request.tag = kLoadUDIDandPush;
+    [request addRequestHeader:@"User-Agent" value:@"ASIFormDataRequest"];
+    [request addRequestHeader:@"Content-Type" value:@"application/json"];
+    [request setRequestMethod:@"POST"];
+    [request setDelegate:asidelegate];
+    [request startAsynchronous];
+    
+    
+/*    [request setCompletionBlock:^{
+        [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+        
+        NSString *responseString = [request responseString];
+        NSDictionary * root = [responseString JSONValue];
+        BOOL success = [[root objectForKey:@"success"] boolValue];
+        
+        if(success) {
+            int userID = [[[root objectForKey:@"user"] objectForKey:@"id"] intValue];
+            [Persistance saveUserID:[NSNumber numberWithInt:userID]];
+            [Persistance saveAuthToken:[root objectForKey:@"auth_token"]];
+            [Persistance saveLicensePlateNumber:[root objectForKey:@"license_plate_number"]];
+            [Persistance saveLastFourDigits:[root objectForKey:@"last_four_digits"]];
+            [Persistance saveFirstName:[[root objectForKey:@"user"] objectForKey:@"first_name"]];
+            [Persistance saveLastName:[[root objectForKey:@"user"] objectForKey:@"last_name"]];
+            
+            successBlock(root);
+        } else {
+            NSError* error = [ErrorTransformer apiErrorToNSError:[root objectForKey:@"error"]];
+            failureBlock(error);
+        }
+    }];
+    
+    [request setFailedBlock:^{
+        [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+        failureBlock([request error]);
+    }];
+    */
+
+}
++(void)registerUserWithCurrentDevice{
+    NSString *udid = [[UIDevice currentDevice] uniqueGlobalDeviceIdentifier];
+    NSString *urlstring = [Api apirootstring];
+    urlstring = [urlstring stringByAppendingFormat:@"device_users.json"];
+
+    if ([Persistance retrieveAuthToken] != nil) {
+        urlstring = [urlstring stringByAppendingFormat:@"?auth_token=%@", [Persistance retrieveAuthToken]];
+        
+    }
+    else{
+        NSLog(@"Attempting to register without logging in!");
+        return;
+    }
+    
+    NSURL *url = [NSURL URLWithString:urlstring];
+    NSLog(@"URL is %@",urlstring );
+    
+    ASIFormDataRequest *request = [ASIFormDataRequest requestWithURL:url];
+    NSLog(@"Device is %@", [[UIDevice currentDevice] model]);
+    //    [request addPostValue:[userRequest JSONRepresentation] forKey:@"user"];
+    [request addPostValue:[[UIDevice currentDevice] model] forKey:@"devicetype"];
+    [request addPostValue:udid forKey:@"device_uid"];
+    request.tag = kLoadUDIDandPush;
+    [request addRequestHeader:@"User-Agent" value:@"ASIFormDataRequest"];
+    [request addRequestHeader:@"Content-Type" value:@"application/json"];
+    [request setRequestMethod:@"POST"];
+    [request setCompletionBlock:^{
+        [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+        
+        NSString *responseString = [request responseString];
+        NSDictionary * root = [responseString JSONValue];
+        BOOL success = [[root objectForKey:@"success"] boolValue];
+        
+        if(success) {
+            NSLog(@"Successfully created device user record %@", responseString);
+        
+        } else {
+            NSError* error = [ErrorTransformer apiErrorToNSError:[root objectForKey:@"error"]];
+        }
+    }];
+    
+    [request setFailedBlock:^{
+    }];
+
+    [request startAsynchronous];
+
+}
++(void)getListOfCurrentAcceptances:(id)asidelegate{
+    if ( ![Persistance retrieveAuthToken])
+        return;
+    NSString *urlstring = [Api apirootstring];
+    urlstring = [urlstring stringByAppendingFormat:@"app_transactions.json"];
+    urlstring = [urlstring stringByAppendingFormat:@"?auth_token=%@", [Persistance retrieveAuthToken]];
+    NSURL *url = [NSURL URLWithString:urlstring];
+    NSLog(@"URL is %@",urlstring );
+    
+    ASIFormDataRequest *request = [ASIFormDataRequest requestWithURL:url];
+    NSLog(@"Device is %@", [[UIDevice currentDevice] model]);
+    //    [request addPostValue:[userRequest JSONRepresentation] forKey:@"user"];
+    request.tag = kGetAcceptances;
+    [request addRequestHeader:@"User-Agent" value:@"ASIFormDataRequest"];
+    [request addRequestHeader:@"Content-Type" value:@"application/json"];
+    [request setRequestMethod:@"GET"];
+    [request setDelegate:asidelegate];
+    [request startAsynchronous];
+
+}
++(NSString *)apirootstring{
+#ifdef DEBUGVER
+    NSString *sslorno = @"http";
+    
+#else
+    NSString *sslorno = @"https";
+#endif
+    NSString *urlstring = [NSString stringWithFormat:@"%@://%@/api/%@/", sslorno,TARGET_SERVER, APIVER];
+    return urlstring;
+    
+}
 @end
 
 

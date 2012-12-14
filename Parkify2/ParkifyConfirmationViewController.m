@@ -726,6 +726,7 @@
     
     extendReservationViewController *controller = [mainStoryboard instantiateViewControllerWithIdentifier: @"extendResVC"];
     controller.transactioninfo= self.transactionInfo;
+    controller.spot = self.spot;
     [self.navigationController pushViewController:controller animated:YES];
 
 }
@@ -740,6 +741,9 @@
 
     problemSpotViewController *controller = [mainStoryboard instantiateViewControllerWithIdentifier: @"ProblemSpotVC"];
     self.detailVC=controller;
+    controller.theSpot = self.spot;
+    (( problemSpotViewController*)self.detailVC).transactionInfo = self.transactionInfo;
+
     ((problemSpotViewController*)(self.detailVC)).isLicensePlateProblem=isLicensePlateView;
     [self.navigationController pushViewController:self.detailVC animated:YES];
     
@@ -749,6 +753,9 @@
                                                              bundle: nil];
     
     self.detailVC = [mainStoryboard instantiateViewControllerWithIdentifier: @"troubleFindingVC"];
+    ((troubleFindingSpotViewController*)self.detailVC).theSpot=self.spot;
+    ((troubleFindingSpotViewController*)self.detailVC).transactionInfo=self.self.transactionInfo;
+    
     [self.navigationController pushViewController:self.detailVC animated:YES];
     
 }

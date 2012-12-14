@@ -8,12 +8,15 @@
 
 #import "troubleFindingSpotViewController.h"
 #import "ExtraTypes.h"
+#import "Api.h"
+#import "ParkifyAppDelegate.h"
 @interface troubleFindingSpotViewController ()
 
 @end
 
 @implementation troubleFindingSpotViewController
-
+@synthesize theSpot= _theSpot;
+@synthesize transactionInfo = _transactionInfo;
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
@@ -55,6 +58,10 @@
 }
 
 - (IBAction)refundAndReturn:(id)sender {
+    ParkifyAppDelegate *delegate  = (ParkifyAppDelegate*)[[UIApplication sharedApplication] delegate];
+    [Api sendProblemSpotWithText:@"Can't Find" andImage:NULL andResourceID:self.theSpot.mID withLat:delegate.currentLat andLong:delegate.currentLong withAcceptanceID:[[self.transactionInfo objectForKey:@"acceptanceid"] intValue] shouldCancel:NO withASIHTTPDelegate:NULL];
+
+
     [[[UIAlertView alloc] initWithTitle:@"Refund" message:@"Your refund has been processed. Sorry about the problems!" delegate:self cancelButtonTitle:@"OK" otherButtonTitles: nil] show];
     
 }

@@ -211,8 +211,9 @@
         //Don't create a dict everytime..it's wasteful
         ParkifyAppDelegate *delegate = (ParkifyAppDelegate*)[[UIApplication sharedApplication] delegate];
         NSDictionary *actives = [delegate.transactions objectForKey:@"active"];
-        for (NSDictionary * spot in [root objectForKey:@"spots"]) {
-            
+        NSDictionary *spots = [root objectForKey:@"spots"];
+        for (NSDictionary * spotkey in spots) {
+            NSDictionary *spot = [spots objectForKey:spotkey];
             NSString *idIn =[NSString stringWithFormat:@"%i",[[spot objectForKey:@"id"] intValue]];
             ParkingSpot *actualSpot = [self.allParkingSpots objectForKey:idIn];
             BOOL freeIn = [[spot objectForKey:@"free"] boolValue];

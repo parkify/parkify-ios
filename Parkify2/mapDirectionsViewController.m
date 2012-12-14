@@ -75,7 +75,7 @@ NSString* encodeToPercentEscapeString(NSString *string) {
                                                                          kCFStringEncodingUTF8) ;
 }
 -(void)showCloseView{
-    UIAlertView *closeDirections = [[UIAlertView alloc] initWithTitle:@"Nearby" message:@"Insert info here" delegate:self cancelButtonTitle:@"OK" otherButtonTitles: nil];
+    UIAlertView *closeDirections = [[UIAlertView alloc] initWithTitle:@"Nearby" message:@"You are near your spot. Click back to look at the detailed instructions if you need" delegate:self cancelButtonTitle:@"OK" otherButtonTitles: nil];
     [closeDirections show];
 }
 - (CLRegion*)mapDictionaryToRegion:(NSDictionary*)dictionary {
@@ -105,8 +105,11 @@ NSString* encodeToPercentEscapeString(NSString *string) {
 - (void)locationManager:(CLLocationManager *)manager didStartMonitoringForRegion:(CLRegion *)region {
     NSLog(@"Started monitoring %@ region", region.identifier);
 }
-
+-(void)viewWillAppear:(BOOL)animated    {
+    [[ UIApplication sharedApplication ] setIdleTimerDisabled: YES ];
+}
 -(void)viewWillDisappear:(BOOL)animated{
+    [[ UIApplication sharedApplication ] setIdleTimerDisabled: YES ];
     for (CLRegion *region in [_locationManager.monitoredRegions allObjects])
     {
         [_locationManager stopMonitoringForRegion:region];
@@ -126,6 +129,7 @@ NSString* encodeToPercentEscapeString(NSString *string) {
     _locationManager.delegate = self;
     [_locationManager startUpdatingLocation];
 
+    
     UILabel *titleView = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, 320, 60)];
     [titleView setFont:[UIFont fontWithName:@"Helvetica Light" size:36.0f]];
     [titleView setTextColor:[UIColor colorWithRed:197.0f/255.0f green:211.0f/255.0f blue:247.0f/255.0f alpha:1.0f]];

@@ -12,6 +12,7 @@
 #import "NSObject+SBJson.h"
 #import "Persistance.h"
 #import "ErrorTransformer.h"
+#import "ParkifyAppDelegate.h"
 #import "ExtraTypes.h"
 @interface problemSpotViewController ()
 @property (strong, nonatomic) WaitingMask* waitingMask;
@@ -24,6 +25,8 @@ static void *AVCamFocusModeObserverContext = &AVCamFocusModeObserverContext;
 @synthesize stillImageOutput = _stillImageOutput;
 @synthesize videoPreviewView = _videoPreviewView;
 @synthesize isLicensePlateProblem = _isLicensePlateProblem;
+@synthesize theSpot = _theSpot;
+@synthesize transactionInfo= _transactionInfo;
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
@@ -206,16 +209,16 @@ static void *AVCamFocusModeObserverContext = &AVCamFocusModeObserverContext;
         //[self performSegueWithIdentifier:@"ViewConfirmation" sender:self];
         //NSLog(@"TEST");
         UIAlertView* success = [[UIAlertView alloc] initWithTitle:@"Success" message:@"Your message has successfully been uploaded and your account has been refunded." delegate:self cancelButtonTitle:@"Maps"
-                                                otherButtonTitles:@"New Spot", nil];
+                                                otherButtonTitles:nil];
         success.tag=kAlertViewSuccessProblemUpload;
         [success show];
         
     } else {
         NSError* error = [ErrorTransformer apiErrorToNSError:[root objectForKey:@"error"]];
        //CHANGE CODE BACK GAURAV
-        //UIAlertView* alerter = [[UIAlertView alloc] initWithTitle:@"Error" message:@"Could not contact server" delegate:self cancelButtonTitle:@"Refund spot" otherButtonTitles:@"New Spot", nil];
-        //[alerter show];
-        //alerter.tag = kAlertViewSuccessProblemUpload;
+        UIAlertView* alerter = [[UIAlertView alloc] initWithTitle:@"Error" message:@"Could not contact server" delegate:self cancelButtonTitle:@"Refund spot" otherButtonTitles:@"New Spot", nil];
+        [alerter show];
+        alerter.tag = kAlertViewSuccessProblemUpload;
          [ErrorTransformer errorToAlert:error withDelegate:self];
         
         [self.waitingMask removeFromSuperview];
@@ -254,9 +257,17 @@ static void *AVCamFocusModeObserverContext = &AVCamFocusModeObserverContext;
 }
 
 - (IBAction)sendParkingSpotProblem:(id)sender {
-    
-    [Api sendProblemSpotWithText:[licensePlateTextField text] andImage:self.theProblemImage withASIHTTPDelegate:self ];
-    
+    ParkifyAppDelegate *delegate = (ParkifyAppDelegate*)[[UIApplication sharedApplication] delegate];
+    NSString *problemtext = @"";
+    if (!self.isLicensePlateProblem){
+        problemtext = [licensePlateTextField text];
+    }
+    else{
+        problemtext = [genericProblemTextView text];
+    }
+
+    [Api sendProblemSpotWithText:problemtext andImage:self.theProblemImage andResourceID:self.theSpot.mID withLat:delegate.currentLat andLong:delegate.currentLong withAcceptanceID:[[self.transactionInfo objectForKey:@"acceptanceid"] intValue] shouldCancel:YES withASIHTTPDelegate:self];
+  
     CGRect waitingMaskFrame = self.view.frame;
     waitingMaskFrame.origin.x = 0;
     waitingMaskFrame.origin.y = 0;

@@ -10,8 +10,8 @@
 #import "ParkingSpot.h"
 #import "ParkingSpotCollection.h"
 #import "RangeBar.h"
-
-@interface ParkifySpotViewController : UIViewController <ParkingSpotObserver, UIAlertViewDelegate>
+#import "ASIHTTPRequest.h"
+@interface ParkifySpotViewController : UIViewController <ParkingSpotObserver, UIAlertViewDelegate, ASIHTTPRequestDelegate>
 @property (weak, nonatomic) IBOutlet UILabel *flashingSign;
 
 @property (strong, nonatomic) ParkingSpot* spot;
