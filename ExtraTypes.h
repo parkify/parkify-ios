@@ -18,7 +18,7 @@ typedef NSString* (^Formatter)(double val);
 #define ADMIN_VER false
 #define DEBUGVER
 #ifdef DEBUGVER
-    #define TARGET_SERVER @"192.168.1.116:3000"
+    #define TARGET_SERVER @"192.168.1.117:3000"
 
 #else
     #define TARGET_SERVER @"parkify-rails.herokuapp.com"
@@ -36,6 +36,7 @@ typedef NSString* (^Formatter)(double val);
 #define kAttempTransaction 9987
 #define kPhoneNumber @"tel:1-800-luv-park"
 #define kLoadUDIDandPush 9986
+#define kGetAcceptances 9985
 #define kStripeToken @"pk_XeTF5KrqXMeSyyqApBF4q9qDzniMn"
 //#define kStripeTest @"pk_GP95lUPyExWOy8e81qL5vIbwMH7G8"
 

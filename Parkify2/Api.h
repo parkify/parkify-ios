@@ -139,4 +139,7 @@ withFailure:(FailureBlock)failureBlock;
 + (void)registerUDIDandToken:(NSString*)tokenAsString withASIdelegate:(id)asidelegate;
 + (void)logout;
 +(void)registerUserWithCurrentDevice;
+
++(void)getListOfCurrentAcceptances:(id)asidelegate;
+
 @end

@@ -1193,6 +1193,32 @@ origPassword:(NSString*)origPassword
     [request startAsynchronous];
 
 }
++(void)getListOfCurrentAcceptances:(id)asidelegate{
+    if ( ![Persistance retrieveAuthToken])
+        return;
+#ifdef DEBUGVER
+    NSString *sslorno = @"http";
+    
+#else
+    NSString *sslorno = @"https";
+    
+#endif
+    NSString *urlstring = [NSString stringWithFormat:@"%@://%@/api/v1/app_transactions.json", sslorno,TARGET_SERVER];
+        urlstring = [urlstring stringByAppendingFormat:@"?auth_token=%@", [Persistance retrieveAuthToken]];
+    NSURL *url = [NSURL URLWithString:urlstring];
+    NSLog(@"URL is %@",urlstring );
+    
+    ASIFormDataRequest *request = [ASIFormDataRequest requestWithURL:url];
+    NSLog(@"Device is %@", [[UIDevice currentDevice] model]);
+    //    [request addPostValue:[userRequest JSONRepresentation] forKey:@"user"];
+    request.tag = kGetAcceptances;
+    [request addRequestHeader:@"User-Agent" value:@"ASIFormDataRequest"];
+    [request addRequestHeader:@"Content-Type" value:@"application/json"];
+    [request setRequestMethod:@"GET"];
+    [request setDelegate:asidelegate];
+    [request startAsynchronous];
+
+}
 @end
 
 
