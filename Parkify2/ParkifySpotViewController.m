@@ -136,7 +136,7 @@
     } withPriceSource:self.spot];
 */
     NSLog(@"minVal is %f and selectedMinVal is %f", prevHourMark, currentTime);
-    self.rangeBar = [[RangeBar alloc] initWithFrame:[self.rangeBarContainer bounds] minVal:prevHourMark minimumSelectableValue:prevHourMark maxVal:maxVal minRange:30*60 displayedRange:numHours*60*60 selectedMinVal:currentTime-(30*60) selectedMaxVal:currentTime withTimeFormatter:timeFormatter withPriceFormatter:^NSString *(double val) {
+    self.rangeBar = [[RangeBar alloc] initWithFrame:[self.rangeBarContainer bounds] minVal:prevHourMark minimumSelectableValue:prevHourMark maxVal:maxVal minRange:30*60 displayedRange:numHours*60*60 selectedMinVal:currentTime selectedMaxVal:currentTime+(30*60) withTimeFormatter:timeFormatter withPriceFormatter:^NSString *(double val) {
         if(fmod(val,1.0) >= 0.01) {
             return [NSString stringWithFormat:@"$%0.2f", val];
         } else {
