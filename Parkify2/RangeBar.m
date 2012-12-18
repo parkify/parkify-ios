@@ -351,7 +351,7 @@
     double newVal = lowVal + delVal;
     newVal = MIN(newVal, self.maximumValue);
     //newVal = MAX(newVal, self.selectedMinimumValue + self.minimumRange);
-    if(self.minimumSelectableValue == self.selectedMinimumValue)
+    if(self.minimumSelectableValue == self.minimumValue)
         newVal = MAX(newVal, self.selectedMinimumValue + self.minimumRange);
     else
         newVal = MAX(newVal, self.minimumSelectableValue + self.minimumRange);

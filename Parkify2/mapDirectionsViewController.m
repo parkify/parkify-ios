@@ -180,7 +180,7 @@ NSString* encodeToPercentEscapeString(NSString *string) {
     currWebView.scalesPageToFit = YES;
 
     [self.view addSubview:currWebView];
-    NSLog(@"The url is %@", endpoint);
+//    NSLog(@"The url is %@", endpoint);
     
     [currWebView loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:endpoint]]];
     if (_locationManager == nil) {

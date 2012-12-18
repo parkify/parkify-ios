@@ -20,6 +20,7 @@
 #import "MultiImageViewer.h"
 #import "UIViewController+AppData_ParkingSpotCollection.h"
 #import "ErrorTransformer.h"
+#import "ParkifyAppDelegate.h"
 //#import "PlacedAgent.h"
 
 @interface ParkifySpotViewController ()
@@ -392,7 +393,9 @@
         [self switchToConfirmation:@"DYLAN WHAT?"];
         return;
     }
-    if ([Persistance retrieveAuthToken] == nil) {
+    ParkifyAppDelegate *delegate = (ParkifyAppDelegate*)[[UIApplication sharedApplication] delegate];
+    
+    if ([Persistance retrieveAuthToken] == nil && ![delegate reservationUsed]) {
         
         [Api authenticateModallyFrom:self withSuccess:^(NSDictionary * result)
         {

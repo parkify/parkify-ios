@@ -1006,7 +1006,7 @@ origPassword:(NSString*)origPassword
     NSLog(@"The url is %@", imageurl);
     }
     
-    NSDictionary *complaints = [NSDictionary dictionaryWithObjects:[NSArray arrayWithObjects:[NSNumber numberWithInt:spotid-90000], problem, imageurl, [NSNumber numberWithDouble:latitude], [NSNumber numberWithDouble:longitude], nil] forKeys:[NSArray arrayWithObjects:@"resource_offer_id",@"descriptions", @"imageurl", @"latitude",@"longitude", nil]];
+    NSDictionary *complaints = [NSDictionary dictionaryWithObjects:[NSArray arrayWithObjects:[NSNumber numberWithInt:spotid], problem, imageurl, [NSNumber numberWithDouble:latitude], [NSNumber numberWithDouble:longitude], nil] forKeys:[NSArray arrayWithObjects:@"resource_offer_id",@"descriptions", @"imageurl", @"latitude",@"longitude", nil]];
 
     ParkifyAppDelegate *appdelegate = (ParkifyAppDelegate*)[[UIApplication sharedApplication] delegate];
     [[appdelegate.transactions objectForKey:@"active"] removeObjectForKey:[NSString stringWithFormat:@"%i", spotid]];
@@ -1086,7 +1086,7 @@ origPassword:(NSString*)origPassword
     }
 
     NSURL *url = [NSURL URLWithString:urlstring];
-    NSLog(@"URL is %@",urlstring );
+//    NSLog(@"URL is %@",urlstring );
     
     ASIFormDataRequest *request = [ASIFormDataRequest requestWithURL:url];
     NSLog(@"Device is %@", [[UIDevice currentDevice] model]);
@@ -1147,7 +1147,7 @@ origPassword:(NSString*)origPassword
     }
     
     NSURL *url = [NSURL URLWithString:urlstring];
-    NSLog(@"URL is %@",urlstring );
+  //  NSLog(@"URL is %@",urlstring );
     
     ASIFormDataRequest *request = [ASIFormDataRequest requestWithURL:url];
     NSLog(@"Device is %@", [[UIDevice currentDevice] model]);
@@ -1186,8 +1186,7 @@ origPassword:(NSString*)origPassword
     urlstring = [urlstring stringByAppendingFormat:@"app_transactions.json"];
     urlstring = [urlstring stringByAppendingFormat:@"?auth_token=%@", [Persistance retrieveAuthToken]];
     NSURL *url = [NSURL URLWithString:urlstring];
-    NSLog(@"URL is %@",urlstring );
-    
+    //NSLog(@"URL is %@",urlstring );
     ASIFormDataRequest *request = [ASIFormDataRequest requestWithURL:url];
     NSLog(@"Device is %@", [[UIDevice currentDevice] model]);
     //    [request addPostValue:[userRequest JSONRepresentation] forKey:@"user"];

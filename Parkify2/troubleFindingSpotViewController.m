@@ -59,7 +59,7 @@
 
 - (IBAction)refundAndReturn:(id)sender {
     ParkifyAppDelegate *delegate  = (ParkifyAppDelegate*)[[UIApplication sharedApplication] delegate];
-    [Api sendProblemSpotWithText:@"Can't Find" andImage:NULL andResourceID:self.theSpot.mID withLat:delegate.currentLat andLong:delegate.currentLong withAcceptanceID:[[self.transactionInfo objectForKey:@"acceptanceid"] intValue] shouldCancel:NO withASIHTTPDelegate:NULL];
+    [Api sendProblemSpotWithText:@"Can't Find" andImage:NULL andResourceID:self.theSpot.actualID withLat:delegate.currentLat andLong:delegate.currentLong withAcceptanceID:[[self.transactionInfo objectForKey:@"acceptanceid"] intValue] shouldCancel:NO withASIHTTPDelegate:NULL];
 
 
     [[[UIAlertView alloc] initWithTitle:@"Refund" message:@"Your refund has been processed. Sorry about the problems!" delegate:self cancelButtonTitle:@"OK" otherButtonTitles: nil] show];

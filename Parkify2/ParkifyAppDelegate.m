@@ -24,6 +24,7 @@
 @synthesize  isNew = _isNew;
 @synthesize currentLat = _currentLat;
 @synthesize currentLong = _currentLong;
+@synthesize reservationUsed = _reservationUsed;
 -(NSMutableDictionary*)transactions{
     if (![Persistance retrieveUserID])
         return nil;
@@ -91,6 +92,7 @@ void uncaughtExceptionHandler(NSException *exception) {
     NSSetUncaughtExceptionHandler(&uncaughtExceptionHandler);
     [Persistance updatePersistedDataWithAppVersion];
     isNew = TRUE;
+    reservationUsed=FALSE;
     [Crittercism enableWithAppID:@"50b3bc587e69a33784000002"];
     [Crittercism leaveBreadcrumb:@"App loaded"];
     [Mixpanel sharedInstanceWithToken:@"0ef037a021b6fa3b5a72057c403d1fbd"];
@@ -129,6 +131,7 @@ void uncaughtExceptionHandler(NSException *exception) {
 
         BOOL success = [[root objectForKey:@"success"] boolValue];
         isNew = [[root objectForKey:@"isNew"] boolValue];
+        reservationUsed = [[root objectForKey:@"reservationUsed"] boolValue];
         if(success) {
             NSLog(@"Saved device %@", root);
         } else {
@@ -147,16 +150,21 @@ void uncaughtExceptionHandler(NSException *exception) {
             NSLog(@"There are %i active reservations", [acceptances count]);
             for (NSDictionary *acceptance in acceptances){
             NSLog(@"Active %@", acceptance);
-                if ([alltransactionsonphone objectForKey:[NSString stringWithFormat:@"%i", 90000 + [[acceptance objectForKey:@"resource_offer_id"] intValue] ]]){
-                    [actives setValue:[alltransactionsonphone objectForKey:[NSString stringWithFormat:@"%i", 90000 + [[acceptance objectForKey:@"resource_offer_id"] intValue] ]] forKey:[NSString stringWithFormat:@"%i", 90000 + [[acceptance objectForKey:@"resource_offer_id"] intValue] ]];
+                if ([alltransactionsonphone objectForKey:[NSString stringWithFormat:@"%i",  [[acceptance objectForKey:@"resource_offer_id"] intValue] ]]){
+                    [actives setValue:[alltransactionsonphone objectForKey:[NSString stringWithFormat:@"%i",  [[acceptance objectForKey:@"resource_offer_id"] intValue] ]] forKey:[NSString stringWithFormat:@"%i", [[acceptance objectForKey:@"resource_offer_id"] intValue] ]];
                     
                 }
                 else{
  
-                    ParkingSpot *thisSpot = [self.parkingSpots parkingSpotForID:90000 + [[acceptance objectForKey:@"resource_offer_id"] intValue] ];
-                    
+                    ParkingSpot *thisSpot = [self.parkingSpots parkingSpotForIDFromAll: [[acceptance objectForKey:@"resource_offer_id"] intValue] ];
+                    if (thisSpot){
                     NSMutableDictionary *thetransaction = [Persistance addNewTransaction: thisSpot withStartTime:[[acceptance objectForKey:@"start_time"] doubleValue] andEndTime:[[acceptance objectForKey:@"end_time"] doubleValue] andLastPaymentDetails:[acceptance objectForKey:@"details"] withTransactionID:[acceptance objectForKey:@"id"]];
                     NSLog(@"Transaction not in records, added in %@", thetransaction);
+                    }
+                    else{
+                        NSLog(@"parking spot not there %@", [acceptance objectForKey:@"resource_offer_id"]);
+                    }
+                    
                     //[Persistance addNewTransaction:self.spot withStartTime:self.rangeBar. selectedMinimumValue andEndTime:self.rangeBar.selectedMaximumValue andLastPaymentDetails:[paymentDetails objectForKey:@"details"] withTransactionID:[paymentDetails objectForKey:@"id"]];
 
                 }

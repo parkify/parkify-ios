@@ -17,7 +17,7 @@
 @implementation ParkingSpot
 
 @synthesize parentCollection = _parentCollection;
-
+@synthesize actualID = _actualID;
 @synthesize mID = _mID;
 @synthesize mLat = _mLat;
 @synthesize mLong = _mLong;
@@ -184,7 +184,7 @@ standardImageIDs:(NSDictionary*)standardImageIDs
 }
 
 - (void) updateAsynchronouslyWithLevelOfDetail:(NSString*)lod {
-    [self.parentCollection updateWithRequest:[NSDictionary dictionaryWithObjectsAndKeys:@"one",@"count",[NSNumber numberWithInt:self.mID], @"id", lod, @"level_of_detail", nil]];
+    [self.parentCollection updateWithRequest:[NSDictionary dictionaryWithObjectsAndKeys:@"one",@"count",[NSNumber numberWithInt:self.actualID], @"id", lod, @"level_of_detail", nil]];
 }
 
 
@@ -222,14 +222,11 @@ standardImageIDs:(NSDictionary*)standardImageIDs
     return dictOut;
     
 }
-
 - (BOOL) updateFromDictionary:(NSDictionary*)spot withLevelOfDetail:(NSString*)levelOfDetail {
-    
-        
     //ID
     int idIn = [[spot objectForKey:@"id"] intValue];
-    self.mID = idIn;
-    
+    self.mID = [[spot objectForKey:@"signid"] intValue];
+    self.actualID = idIn;
     Boolean freeIn = [[spot objectForKey:@"free"] boolValue];
     self.mFree = freeIn;
     

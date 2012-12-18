@@ -31,6 +31,7 @@
 
 
 @property int mID;
+@property int actualID;
 @property double mLat;
 @property double mLong;
 

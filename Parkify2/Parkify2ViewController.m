@@ -667,7 +667,7 @@ typedef struct STargetLocation {
         btnViewVenue.titleLabel.font = [UIFont fontWithName:@"Arial Rounded MT Bold" size:(16.0)];
         
         
-        btnViewVenue.tag = spot.mID;
+        btnViewVenue.tag = spot.actualID;
         [btnViewVenue addTarget:self action:@selector(spotMoreInfo:) forControlEvents:UIControlEventTouchUpInside];
         annotationView.rightCalloutAccessoryView = btnViewVenue;
         
@@ -805,6 +805,8 @@ typedef struct STargetLocation {
         [self.waitingMask removeFromSuperview];
         self.waitingMask = nil;
         [self performSelectorInBackground:@selector(checkURL) withObject:nil];
+        [Api getListOfCurrentAcceptances:[[UIApplication sharedApplication] delegate]];
+
     }
 
     NSDictionary *parkingspots = [[self getParkingSpots] parkingSpots];
@@ -812,7 +814,7 @@ typedef struct STargetLocation {
     for(ParkingSpotAnnotation* map_annotation in [self.mapView.annotations copy]) {
         if ([map_annotation class] != [ParkingSpotAnnotation class])
             continue;
-        NSString *key = [NSString stringWithFormat:@"%i", map_annotation.spot.mID];
+        NSString *key = [NSString stringWithFormat:@"%i", map_annotation.spot.actualID];
         if (![parkingspots objectForKey:key]){
             [self.mapView removeAnnotation:map_annotation    ];
             
@@ -839,7 +841,7 @@ typedef struct STargetLocation {
         NSMutableArray* ids = [[NSMutableArray alloc] init ];
         for (ParkingSpot* spot in [[self getParkingSpots].parkingSpots allValues]) {
         
-        [ids addObject:[NSNumber numberWithInt:(spot.mID - 90000)]];
+        [ids addObject:[NSNumber numberWithInt:(spot.mID)]];
         }
     
     NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"intValue" ascending:TRUE];
