@@ -398,7 +398,7 @@ withPasswordConfirmation:(NSString*)passwordConfirmation
     
     NSString *urlstring = [Api apirootstring];
     
-    urlstring = [urlstring stringByAppendingFormat:@"resources.json/%d.json?level_of_detail=%@",spotID, lod];
+    urlstring = [urlstring stringByAppendingFormat:@"resources/%d.json?level_of_detail=%@",spotID, lod];
     
     
     
