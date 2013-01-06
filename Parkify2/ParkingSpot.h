@@ -98,9 +98,14 @@
 
 - (double) currentPrice;
 
+- (NSMutableDictionary*) flatRatePricesForStartTime:(double)startTime;
+
+- (double) findCostWithStartTime:(double)startTime endTime:(double)endTime flatDuration:(double)flatDuration;
+
 - (double) endTime;
 
 - (double) priceFromNowForDurationInSeconds:(double)duration;
+- (double) priceFromStartTime:(double)startTime forDuration:(double)duration forFlatRate:(BOOL)isFlat;
 
 - (void) updateAsynchronouslyWithLevelOfDetail:(NSString*)lod;
 

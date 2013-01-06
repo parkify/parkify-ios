@@ -17,4 +17,6 @@
 + (NSString*) formatDistanceClose:(double)distanceInMiles;
 + (NSString*) formatIdString:(int)idIn;
 + (NSString*) formatSecuredAddressString:(NSString*)address;
++ (NSString*) formatCompactDurationString:(double)duration;
++ (NSString*) formatPriceString:(double)price;
 @end

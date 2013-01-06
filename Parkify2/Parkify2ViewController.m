@@ -13,7 +13,6 @@
 #import "BSForwardGeocoder.h"
 #import "ParkifySpotViewController.h"
 #import <QuartzCore/QuartzCore.h> 
-//#import "UIViewController+overView.h"
 #import "Api.h"
 #import "iToast.h"
 #import "WaitingMask.h"
@@ -23,23 +22,14 @@
 #import "Persistance.h"
 #import "ParkifyAppDelegate.h"
 #import "extendReservationViewController.h"
-//#import "PlacedAgent.h"
 
 #define ORIG_ANNOTATION_WIDTH 54
 #define ORIG_ANNOTATION_HEIGHT 89
-
 #define ANNOTATION_WIDTH (ORIG_ANNOTATION_WIDTH*0.5)
 #define ANNOTATION_HEIGHT (ORIG_ANNOTATION_HEIGHT*0.5)
-
 #define INIT_VIEW_WIDTH_IN_MILES 1.0
-
 #define ZOOM_LEVEL_STREET 13
-
-#define GOOGLE_MAPS true
-
-#define ZOOM_MARGIN_FACTOR (GOOGLE_MAPS? 1.8 : 1.8)
-
-
+#define ZOOM_MARGIN_FACTOR 1.8
 
 typedef enum targetLocationType {
     TARGET_NONE = -1,
@@ -52,25 +42,33 @@ typedef struct STargetLocation {
     CLLocationCoordinate2D location;
 } STargetLocation;
 
+
+
 @interface Parkify2ViewController ()
+
+@property (weak, nonatomic) IBOutlet UIButton *settingsButton;
+@property (weak, nonatomic) IBOutlet UIButton *currentLocationButton;
+@property (weak, nonatomic) IBOutlet UIView *bottomBarView;
+@property (weak, nonatomic) IBOutlet UILabel *bottomBarLabel;
+
 @property (nonatomic, strong) BSForwardGeocoder* forwardGeocoder;
 @property targetLocationType targetType;
 @property BOOL bAlreadyInit;
 @property (nonatomic, strong) LocationAnnotation*  targetLocationAnnotation;
-@property (weak, nonatomic) IBOutlet UIButton *settingsButton;
 @property (nonatomic, strong) WaitingMask* waitingMask;
-@property (weak, nonatomic) IBOutlet UIButton *currentLocationButton;
 @property STargetLocation targetLocation;
-
 @property CGRect addressBarOrigFrame;
-
-@property (weak, nonatomic) IBOutlet UIView *bottomBarView;
-@property (weak, nonatomic) IBOutlet UILabel *bottomBarLabel;
 
 
 @end
 
 @implementation Parkify2ViewController
+
+@synthesize settingsButton = _settingsButton;
+@synthesize currentLocationButton = _currentLocationButton;
+@synthesize bottomBarView = _bottomBarView;
+@synthesize bottomBarLabel = _bottomBarLabel;
+
 @synthesize confirmationButton = _confirmationButton;
 @synthesize mapView = _mapView;
 @synthesize timerPolling = _timerPolling;
@@ -85,21 +83,15 @@ typedef struct STargetLocation {
 
 @synthesize annotations = _annotations;
 
-//@synthesize parkingSpots = _parkingSpots;
-
 @synthesize forwardGeocoder = _forwardGeocoder;
 
 @synthesize targetLocationAnnotation = _targetLocationAnnotation;
 
 @synthesize targetLocation = _targetLocation;
-@synthesize settingsButton = _settingsButton;
 
 @synthesize waitingMask = _waitingMask;
-@synthesize currentLocationButton = _currentLocationButton;
 
 @synthesize addressBarOrigFrame = _addressBarOrigFrame;
-@synthesize bottomBarView = _bottomBarView;
-@synthesize bottomBarLabel = _bottomBarLabel;
 
 
 /*
@@ -806,7 +798,6 @@ typedef struct STargetLocation {
         self.waitingMask = nil;
         [self performSelectorInBackground:@selector(checkURL) withObject:nil];
         [Api getListOfCurrentAcceptances:[[UIApplication sharedApplication] delegate]];
-
     }
 
     NSDictionary *parkingspots = [[self getParkingSpots] parkingSpots];
@@ -815,14 +806,13 @@ typedef struct STargetLocation {
         if ([map_annotation class] != [ParkingSpotAnnotation class])
             continue;
         NSString *key = [NSString stringWithFormat:@"%i", map_annotation.spot.actualID];
-        if (![parkingspots objectForKey:key]){
-            [self.mapView removeAnnotation:map_annotation    ];
-            
+        ParkingSpot* spot = [parkingspots objectForKey:key];
+        if (!spot || !spot.mFree){
+            [self.mapView removeAnnotation:map_annotation];
         }
-        else{
+        else {
             [usedkeys addObject:key];
         }
-        
     }
     for (NSString *key in [parkingspots allKeys]){
         if (![usedkeys containsObject:key]){
@@ -1057,7 +1047,7 @@ typedef struct STargetLocation {
     }
     ParkingSpot* parkMeNowSpot = [[self getParkingSpots] closestAvailableSpotToCoord:self.targetLocation.location];
     if(parkMeNowSpot) {
-        [self openSpotViewControllerWithSpot:[NSString stringWithFormat:@"%i", parkMeNowSpot.mID]];
+        [self openSpotViewControllerWithSpot:[NSString stringWithFormat:@"%i", parkMeNowSpot.actualID]];
     } else {
         [[[iToast makeText:@"No closest available spot"] setGravity:iToastGravityBottom ] show];
     }

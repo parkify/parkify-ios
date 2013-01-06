@@ -159,6 +159,7 @@ standardImageIDs:(NSDictionary*)standardImageIDs
     return toRtn;
 }
 
+
 - (double) endTime {
     double toRtn = 0;
     for (Offer* offer in self.offers) {
@@ -167,6 +168,7 @@ standardImageIDs:(NSDictionary*)standardImageIDs
     return toRtn;
 }
 
+//TODO: move this out and use a more general method.
 - (double) priceFromNowForDurationInSeconds:(double)duration {
     NSDate* currentDate = [NSDate date];
     double currentTime = [currentDate timeIntervalSince1970];
@@ -183,6 +185,16 @@ standardImageIDs:(NSDictionary*)standardImageIDs
     return toRtn;
 }
 
+- (double) priceFromStartTime:(double)startTime forDuration:(double)duration forFlatRate:(BOOL)isFlat {
+    if(isFlat) {
+        return [[self.offers objectAtIndex:0] findCostWithStartTime:startTime endTime:startTime + duration flatDuration:duration];
+    } else {
+        [NSException raise:@"UNIMPLEMENTED" format:@"Method ParingSpot::priceFromStartTime:forDuration:forFlatRate: is unimplemented for input isFlat=false"];
+        return -5; //UNIMPLEMENTED
+    }
+
+}
+
 - (void) updateAsynchronouslyWithLevelOfDetail:(NSString*)lod {
     [self.parentCollection updateWithRequest:[NSDictionary dictionaryWithObjectsAndKeys:@"one",@"count",[NSNumber numberWithInt:self.actualID], @"id", lod, @"level_of_detail", nil]];
 }
@@ -190,7 +202,8 @@ standardImageIDs:(NSDictionary*)standardImageIDs
 
 - (NSDictionary*) asDictionary {
     NSMutableDictionary* dictOut = [[NSMutableDictionary alloc]init];
-    [dictOut setObject:[NSNumber numberWithInt:self.mID] forKey:@"id"];
+    [dictOut setObject:[NSNumber numberWithInt:self.mID] forKey:@"signid"];
+    [dictOut setObject:[NSNumber numberWithInt:self.actualID] forKey:@"id"];
     [dictOut setObject:[NSNumber numberWithBool:self.mFree] forKey:@"free"];
     [dictOut setObject:self.mSpotName forKey:@"title"];
     [dictOut setObject:self.mDesc forKey:@"description"];
@@ -304,11 +317,11 @@ standardImageIDs:(NSDictionary*)standardImageIDs
    // if ([levelOfDetail isEqualToString:@"all"] && freeIn) {
         self.mDesc = [spot objectForKey:@"description"];
         NSMutableArray* offersIn = [[NSMutableArray alloc] init];
-    if (freeIn){
+    //if (freeIn){
         for (NSDictionary* offer in [spot objectForKey:@"offers"]) {
             [offersIn addObject:[[Offer alloc] initFromDictionary:offer]];
         }
-    }
+    //}
         self.offers = offersIn;
 
         self.mAddress = [[spot objectForKey:@"location"] objectForKey:@"location_address"];
@@ -322,6 +335,12 @@ standardImageIDs:(NSDictionary*)standardImageIDs
     return true;
 }
 
+- (NSMutableDictionary*) flatRatePricesForStartTime:(double)startTime {
+    return [((Offer*)[self.offers objectAtIndex:0]) findFixedPricesForStartTime:startTime];
+}
+- (double) findCostWithStartTime:(double)startTime endTime:(double)endTime flatDuration:(double)flatDuration {
+    return [[self.offers objectAtIndex:0] findCostWithStartTime:startTime endTime:endTime flatDuration:flatDuration];
+}
 
 
 

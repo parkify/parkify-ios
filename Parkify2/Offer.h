@@ -13,6 +13,7 @@
 @property double endTime;
 @property double pricePerHour;
 - (id) initFromDictionary:(NSDictionary*)dictIn;
+@property (nonatomic, strong) NSMutableDictionary* flatPrices;
 @end
 
 @interface Offer : NSObject <NSCoding>
@@ -26,11 +27,15 @@
 
 - (id) initFromDictionary:(NSDictionary*)dictIn;
 
+- (double) findCostWithStartTime:(double)startTime endTime:(double)endTime flatDuration:(double)flatDuration;
+
 - (double) findCostWithStartTime:(double)startTime endTime:(double)endTime;
 
 - (BOOL) overlapsWithStartTime:(double)startTime endTime:(double)endTime;
 
 - (NSArray*) findPricesInRange:(double)startTime endTime:(double)endTime;
+
+- (NSMutableDictionary*) findFixedPricesForStartTime:(double)startTime;
 
 
 @end

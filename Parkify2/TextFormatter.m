@@ -94,4 +94,31 @@
     
 }
 
++ (NSString*) formatCompactDurationString:(double)duration {
+    int iDuration = duration;
+    int secondPart = iDuration%60;
+    iDuration -= secondPart;
+    iDuration /= 60; //in minutes
+    int minutePart = iDuration%60;
+    iDuration -= minutePart;
+    iDuration /= 60; //in hours
+    int hourPart = iDuration;
+    
+    NSString* hourString = (hourPart == 0) ? @"" : [NSString stringWithFormat:@"%dh", hourPart];
+    NSString* minuteString = (minutePart == 0) ? @"" : [NSString stringWithFormat:@"%dm", minutePart];
+    NSString* secondString = (secondPart == 0) ? @"" : [NSString stringWithFormat:@"%ds", secondPart];
+    
+    return [NSString stringWithFormat:@"%@%@%@", hourString, minuteString, secondString];
+}
+
++ (NSString*) formatPriceString:(double)price {
+    if (fmod(price,1.0) != 0) {
+        NSNumberFormatter *formatter = [[NSNumberFormatter alloc] init];
+        [formatter setNumberStyle:NSNumberFormatterCurrencyStyle];
+        return [NSString stringWithFormat:@"(%@)", [formatter stringFromNumber:[NSNumber numberWithDouble:price]]];
+    } else {
+        return [NSString stringWithFormat:@"($%d)", (int)price];
+    }
+}
+
 @end

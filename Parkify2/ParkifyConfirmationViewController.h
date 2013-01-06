@@ -21,6 +21,8 @@
 //@property double endTime;
 @property (weak, nonatomic) IBOutlet UIScrollView *mainScrollView;
 
+@property (strong, nonatomic) UIButton* extendButton;
+
 @property (strong, nonatomic) NSString* topBarText;
 @property (weak, nonatomic) IBOutlet UIView *topBarView;
 @property (weak, nonatomic) IBOutlet UILabel *topViewLabel;
@@ -30,6 +32,10 @@
 //TODO: REMOVETHIS
 @property (weak, nonatomic) IBOutlet UIButton *topBarTapped;
 - (IBAction)extendReservation:(id)sender;
+@property (weak, nonatomic) IBOutlet UIImageView *scrollIndicator;
 
 - (IBAction)topBarButtonTapped:(id)sender;
+
+
+
 @end

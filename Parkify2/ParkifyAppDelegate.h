@@ -11,6 +11,7 @@
 #import "User.h"
 #import "ParkingSpotCollection.h"
 #import "ASIHTTPRequest.h"
+#import "NSNull+Debug.h"
 #define APP_VERSION @"v1.3"
 
 

@@ -9,6 +9,8 @@
 #ifndef Parkify2_ExtraTypes_h
 #define Parkify2_ExtraTypes_h
 
+#define PARKIFY_CYAN ([UIColor colorWithRed:(97.0/255.0) green:(189.0/255.0) blue:(250.0/255.0) alpha:1])
+
 typedef void(^CompletionBlock)(void);
 typedef void(^SuccessBlock)(NSDictionary*);
 typedef void(^FailureBlock)(NSError*);

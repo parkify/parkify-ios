@@ -42,12 +42,15 @@
     }
     self.imageIDs = imageIds;
     
+    [self setBackgroundColor:[UIColor clearColor]];
+    
     CGRect relRect = frame;
     relRect.origin = CGPointMake(0,0);
     
     self.pictureScrollView = [[UIScrollView alloc] initWithFrame:relRect];
     [self.pictureScrollView setPagingEnabled:true];
     [self.pictureScrollView setShowsHorizontalScrollIndicator:false ];
+    [self.pictureScrollView setBackgroundColor:[UIColor clearColor]];
     [self addSubview:self.pictureScrollView];
     
     
@@ -86,6 +89,7 @@
                 //lab.text=@"scrollview";
                 
                 UIImageView *imagev=[[UIImageView alloc]initWithFrame:CGRectMake(marginHoriz, marginVert, sub.frame.size.width-2*marginHoriz, sub.frame.size.height-2*marginVert)];
+                [imagev setContentMode:UIViewContentModeScaleAspectFit];
                 
                 
                 int imageID = [[self.imageIDs objectAtIndex:i] intValue];

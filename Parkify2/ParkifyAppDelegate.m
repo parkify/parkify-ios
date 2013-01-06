@@ -108,7 +108,9 @@ void uncaughtExceptionHandler(NSException *exception) {
     //[PlacedAgent initWithAppKey:@"6f15dab4fc2d"];
     //[PlacedAgent logStartSession];
   
-    
+    [[UINavigationBar appearance] setBackgroundImage:[UIImage imageNamed:@"masthead.png"] forBarMetrics:UIBarMetricsDefault];
+    [[UINavigationBar appearance] setContentMode:UIViewContentModeScaleToFill];
+    [[UIBarButtonItem appearance] setTintColor:[UIColor darkGrayColor]];
   
     return YES;
 }

@@ -73,6 +73,9 @@
 
 @synthesize topBarText = _topBarText;
 @synthesize detailVC = _detailVC;
+
+@synthesize extendButton = _extendButton;
+
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
@@ -87,6 +90,7 @@
 {
     [super viewDidLoad];
     
+    [self.mainScrollView setDelegate:self];
     self.scrollableSubviews = [[NSMutableArray alloc] init];
     
     
@@ -100,7 +104,11 @@
     UILabel *titleView = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, 320, 60)];
     [titleView setFont:[UIFont fontWithName:@"Helvetica Light" size:36.0f]];
     [titleView setTextColor:[UIColor colorWithRed:197.0f/255.0f green:211.0f/255.0f blue:247.0f/255.0f alpha:1.0f]];
-    [titleView setText:@"Congratulations!"];
+    [titleView setText:@"Parkify Spot"];
+    [titleView setFont:[UIFont fontWithName:@"HelveticaNeue-BoldItalic" size:18]];
+    [titleView setTextColor:[UIColor lightTextColor]];
+    [titleView setShadowColor:[UIColor darkTextColor]];
+    [titleView setShadowOffset:CGSizeMake(0, -1)];
     [titleView sizeToFit];
     [titleView setBackgroundColor:[UIColor clearColor]];
     [self.navigationItem setTitleView:titleView];
@@ -146,6 +154,7 @@
     [self setTopBarView:nil];
     [self setTopViewLabel:nil];
     [self setTopBarTapped:nil];
+    [self setScrollIndicator:nil];
     [super viewDidUnload];
     // Release any retained subviews of the main view.
 }
@@ -206,13 +215,22 @@
                      }];
 }
 
+-(void)prepExtendButton {
+    CGRect calloutFrame = self.calloutText.frame;
+    self.extendButton = [[UIButton alloc] initWithFrame:CGRectMake(calloutFrame.size.width-90, calloutFrame.size.height-30, 90, 30)];
+    [self.extendButton setBackgroundImage:[UIImage imageNamed:@"small_blue_button.png"] forState:UIControlStateNormal];
+    [self.extendButton setTitle:@"Extend" forState:UIControlStateNormal];
+    [self.extendButton addTarget:self action:@selector(extendReservation:) forControlEvents:UIControlEventTouchUpInside];
+    [self.calloutText addSubview:self.extendButton];
+}
 
 -(void)prepCallout {
     self.calloutText = [[UIWebView alloc] initWithFrame:CGRectMake(0,0,self.view.frame.size.width - 2*CALLOUT_CONTENT_OFFSET,1)];
     self.calloutText.delegate = self;
     self.calloutText.backgroundColor = [UIColor clearColor];
     self.calloutText.opaque = false;
-    [self.calloutText setUserInteractionEnabled:false];
+    [self.calloutText setUserInteractionEnabled:true];
+    self.calloutText.scrollView.scrollEnabled = false;
     
     CGRect calloutFrame = [CalloutView frameThatFits:self.calloutText withCornerRadius:10];
     
@@ -223,14 +241,16 @@
     [self appendSubView:self.congratsCallout];
     
     
+    
+    
     NSString* infoWebViewString;
     
     
     NSString* styleString = @"<style type='text/css'>"
     "body {background-color:transparent; font-family:'HelveticaNeue'; color:rgb(42,45,46);margin:0px;}"
-    ".stressed1 {font-family:'HelveticaNeue-Bold'; font-size:18;}"
-    ".stressed2 {font-family:'HelveticaNeue-Bold'; font-size:15;}"
-    ".stressed3 {font-family:'HelveticaNeue'; font-size:15;}"
+    ".stressed1 {font-family:'HelveticaNeue-Bold'; font-size:16;}"
+    ".stressed2 {font-family:'HelveticaNeue-Bold'; font-size:14;}"
+    ".stressed3 {font-family:'HelveticaNeue'; font-size:14;}"
     ".smallspace {font-size:5;}"
     ".error {color:rgb(255,97,97);}"
     "</style>";
@@ -266,30 +286,18 @@
         infoWebViewString = [NSString stringWithFormat:@"<HTML>"
                              "<HEAD>%@</HEAD>"
                              "<BODY>"
-                             "<div id='content'>"
-                             "<span class='stressed1'>Congratulations!</span>"
-                             "<span class='stressed3'> You bought</span>"
+                             "<span class='stressed1'>Parking Spot ID: #%@</span>"
                              "<br/>"
-                             "<span class='stressed3'>Parking spot with Unique ID: </span>"
-                             "<span class='stressed2'>#%@ </span>"
-                             "<span class='stressed3'>at</span>"
-                             "<br/>"
-                             "<span class='stressed2'>%@</span>"
+                             "<span class='stressed1'>%@</span>"
                              "<span class='smallspace'><br/><br/><br/></span>"
                              "<span class='stressed3'>Your reservation: </span>"
-                             "<span class='stressed2'>%@</span>"
                              "<br/>"
-                             "<span class='stressed3'>Parallel parking: </span>"
-                             "<span class='stressed2'>%@ | </span>"
-                             "<span class='stressed3'>Covered: </span>"
                              "<span class='stressed2'>%@</span>"
-                             "</div></BODY></HTML>",
+                             "<br/>",
                              styleString,
                              [TextFormatter formatIdString:self.spot.mID],
                              self.spot.mAddress,
-                             timeString,
-                             layoutString,
-                             coverageString];
+                             timeString];
     }
     
     
@@ -553,6 +561,8 @@
                                  newCalloutFrame.size.height - self.congratsCallout.frame.size.height);
     
     [self adjustSubView:self.congratsCallout byOffset:offset bySizeIncrease:sizeIncrease animated:true];
+    
+    [self prepExtendButton];
 }
 
 //Capture resize event from the images.
@@ -782,6 +792,19 @@
     
     
 }
+
+- (void)scrollViewDidScroll:(UIScrollView *)sender {
+    // Update the page when more than 50% of the previous/next page is visible
+    [self dissolveScrollIndicator];
+}
+
+- (void) dissolveScrollIndicator {
+    [UIView animateWithDuration:0.8 animations:^{
+        self.scrollIndicator.alpha = 0;
+    }];
+}
+
+
 
 
 @end

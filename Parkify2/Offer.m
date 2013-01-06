@@ -12,11 +12,13 @@
 @synthesize startTime = _startTime;
 @synthesize endTime = _endTime;
 @synthesize pricePerHour = _pricePerHour;
+@synthesize flatPrices = _flatPrices;
 
 - (void)encodeWithCoder:(NSCoder *)aCoder{
     [aCoder encodeDouble:self.startTime forKey:@"starttime"];
     [aCoder encodeDouble:self.endTime forKey:@"endtime"];
     [aCoder encodeDouble:self.pricePerHour forKey:@"priceperhour"];
+    [aCoder encodeObject:self.flatPrices forKey:@"flatprices"];
 }
 
 -(id) initWithCoder:(NSCoder *)aDecoder{
@@ -25,7 +27,7 @@
         self.startTime = [aDecoder decodeDoubleForKey:@"starttime"];
         self.endTime = [aDecoder decodeDoubleForKey:@"endtime"];
         self.pricePerHour = [aDecoder decodeDoubleForKey:@"priceperhour"];
-    
+        self.flatPrices = [aDecoder decodeObjectForKey:@"flatprices"];
     }
     
     return self;
@@ -39,7 +41,13 @@
         self.startTime = [[dictIn objectForKey:@"start_time"] doubleValue];
         self.endTime = [[dictIn objectForKey:@"end_time"] doubleValue];
         self.pricePerHour = [[dictIn objectForKey:@"price_per_hour"] doubleValue];
-        
+        self.flatPrices = [[NSMutableDictionary alloc] init];
+        for (NSNumber* duration in [dictIn objectForKey:@"flat_prices"]) {
+            NSNumber* price = [NSNumber numberWithDouble:[[[dictIn objectForKey:@"flat_prices"] objectForKey:duration] doubleValue]];
+            NSNumber* newKey = [duration copy];
+            [self.flatPrices setObject: price forKey:newKey];
+        }
+        //self.flatPrices = [[dictIn objectForKey:@"flat_prices"] mutableCopy];
     }
     return self;
 }
@@ -91,6 +99,18 @@
     return self;
 }
 
+- (double) findCostWithStartTime:(double)startTime endTime:(double)endTime flatDuration:(double)flatDuration {
+    for (PriceInterval* iterPrice in self.priceList) {
+        if (startTime >= iterPrice.startTime && startTime <= iterPrice.endTime) {
+            NSString* key = [NSString stringWithFormat:@"%d", (int)flatDuration];
+            NSNumber* flatPrice = [iterPrice.flatPrices objectForKey:key];
+            if (flatPrice) {
+                return [flatPrice doubleValue];
+            }
+        }
+    }
+    return 0;
+}
 
 //We assume that startTime and endTime are within this offer's interval of activeness.
 - (double) findCostWithStartTime:(double)startTime endTime:(double)endTime {
@@ -126,6 +146,16 @@
         }
     }
     return toRtn;
+}
+
+- (NSMutableDictionary*) findFixedPricesForStartTime:(double)startTime {
+    for (PriceInterval* iterPrice in self.priceList) {
+        if(startTime >= iterPrice.startTime &&
+           startTime <= iterPrice.endTime) {
+            return iterPrice.flatPrices;
+        }
+    }
+    return [[NSMutableDictionary alloc] init];
 }
 
 @end

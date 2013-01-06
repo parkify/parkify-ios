@@ -21,6 +21,7 @@
 #import "UIViewController+AppData_ParkingSpotCollection.h"
 #import "ErrorTransformer.h"
 #import "ParkifyAppDelegate.h"
+#import "Mixpanel.h"
 //#import "PlacedAgent.h"
 
 @interface ParkifySpotViewController ()
@@ -95,6 +96,8 @@
     //[self addAllPictures];
     //[PlacedAgent logPageView:@"SpotInfoView"];
     
+    [self.timeTypeSelectHourlyButton setSelected:true];
+    
     NSDate* currentDate = [NSDate date];
     
     double currentTime = [currentDate timeIntervalSince1970];
@@ -123,20 +126,10 @@
         [dateFormatter setDateFormat:@"ha"];
         return [dateFormatter stringFromDate:time]; };
     
-    
-    
-    
 
     double maxVal = self.spot.endTime;
-  /*  self.rangeBar = [[RangeBar alloc] initWithFrame:[self.rangeBarContainer bounds] minVal:prevHourMark maxVal:maxVal minRange:30*60 displayedRange:numHours*60*60 selectedMinVal:currentTime selectedMaxVal:currentTime + 1800 withTimeFormatter:timeFormatter withPriceFormatter:^NSString *(double val) {
-        if(fmod(val,1.0) >= 0.01) {
-            return [NSString stringWithFormat:@"$%0.2f", val];
-        } else {
-            return [NSString stringWithFormat:@"$%0.0f", val];
-        }
-    } withPriceSource:self.spot];
-*/
-    NSLog(@"minVal is %f and selectedMinVal is %f", prevHourMark, currentTime);
+    
+    /* rangeBar */
     self.rangeBar = [[RangeBar alloc] initWithFrame:[self.rangeBarContainer bounds] minVal:prevHourMark minimumSelectableValue:prevHourMark maxVal:maxVal minRange:30*60 displayedRange:numHours*60*60 selectedMinVal:currentTime selectedMaxVal:currentTime+(30*60) withTimeFormatter:timeFormatter withPriceFormatter:^NSString *(double val) {
         if(fmod(val,1.0) >= 0.01) {
             return [NSString stringWithFormat:@"$%0.2f", val];
@@ -144,14 +137,13 @@
             return [NSString stringWithFormat:@"$%0.0f", val];
         }
     } withPriceSource:self.spot];
-    
-    
-    //^(double val){return [@"Foo";}
-    
-    
-         
     [self.rangeBar addTarget:self action:@selector(timeIntervalChanged) forControlEvents:UIControlEventValueChanged];
     [self.rangeBarContainer addSubview:self.rangeBar];
+    
+    /* flatRateBar */
+    self.flatRateBar = [[FlatRateBar alloc] initWithFrame:[self.flatRateBarContainer bounds] withPrices:[self.spot flatRatePricesForStartTime:currentTime]];
+    [self.flatRateBar addTarget:self action:@selector(timeIntervalChanged) forControlEvents:UIControlEventValueChanged];
+    [self.flatRateBarContainer addSubview:self.flatRateBar];
     
     [self updateInfo];
     
@@ -169,7 +161,9 @@
 - (void)timeIntervalChanged{
     [UIView animateWithDuration:0.8 animations:^{
         self.flashingSign.alpha = 0;
+        self.demoMask.alpha = 0;
     }];
+    
     [self updateInfo];
 }
 
@@ -188,6 +182,18 @@
     [self setPageControl:nil];
     [self setPictureScrollView:nil];
     [self setMultiImageViewFrame:nil];
+    [self setTimeCenterReference:nil];
+    [self setDurationCenterReference:nil];
+    [self setPriceCenterReference:nil];
+    [self setStartTimeALabel:nil];
+    [self setPriceCurrencyLabel:nil];
+    [self setTimeDurationHourStaticLabel:nil];
+    [self setTimeDurationMinutesLabel:nil];
+    [self setTimeDurationMinutesStaticLabel:nil];
+    [self setTimeTypeSelectHourlyButton:nil];
+    [self setTimeTypeSelectFlatRateButton:nil];
+    [self setFlatRateBarContainer:nil];
+    [self setDemoMask:nil];
     [super viewDidUnload];
     // Release any retained subviews of the main view.
 }
@@ -214,20 +220,7 @@
 /** TODO: Make this javascript-enabled to update it **/
 -(void)fillInfoWebView {
     NSString* infoWebViewString;
-    /*
     NSString* styleString = @"<style type=\"text/css\">"
-    //"body { background-color:transparent; font-family:Marker Felt; font-size:12; color:white}"
-    ".top { background-color:transparent; font-family:\"Arial Rounded MT Bold\"; font-size:14; color:black}"
-    ".top-mid { background-color:transparent; font-family:\"Arial Rounded MT Bold\"; font-size:10; color:#224455;}"
-    ".mid { background-color:transparent; font-family:\"Arial Rounded MT Bold\"; font-size:10; color:#556677;}"
-    ".bottom { background-color:transparent; font-family:\"Arial Rounded MT Bold\"; font-size:16; color:black; }"
-    ".selected { color:#224455; } "
-    ".faded { color:#99AABB; }"
-    ".fake-space {font-size:5;}"
-    "</style>";
-     */
-    NSString* styleString = @"<style type=\"text/css\">"
-    //"body { background-color:transparent; font-family:Marker Felt; font-size:12; color:white}"
     ".l1 { background-color:transparent; font-family:\"HelveticaNeue-Bold\"; font-size:12; color:white}"
     ".l2 { background-color:transparent; font-family:\"HelveticaNeue-Bold\"; font-size:30; color:white;}"
     ".l3 { background-color:transparent; font-family:\"HelveticaNeue-Bold\"; font-size:12; color:white;}"
@@ -256,26 +249,6 @@
         }
 
         
-        /*[NSString stringWithFormat:@"<html>%@<body>"
-         "<span class=l1>Distance away</span></br>"
-         "<span class=l2>%@</span></br>"
-         "<span class=l3>%@</span></br>"
-         "<span class=fake-space></br></span>"
-         "<span class=fake-space></br></span>"
-         "<span class=l4>PARALLEL: %@</span></br>"
-         "<span class=l4>COVERED: %@</span></br>"
-         "<span class=fake-space></br></span>"
-         "<span class=bottom>Current Rate: $%0.2f/hr</span><hr/>"
-         "<span class=top>%@</span><hr/></p>"
-         "</body></html>",
-         styleString,
-         self.distanceString,
-         self.spot.mAddress,
-         layoutString,
-         coverageString,
-         [self.spot currentPrice],
-         self.spot.mDesc];*/
-        
         //Info web view text
         infoWebViewString = [NSString stringWithFormat:@"<html>%@<body>"
                              "<span class=l1>Distance away</span></br>"
@@ -290,9 +263,7 @@
                              self.distanceString,
                              [TextFormatter formatSecuredAddressString:self.spot.mAddress],
                              layoutString,
-                             coverageString,
-                             [self.spot currentPrice],
-                             self.spot.mDesc];
+                             coverageString];
     }
     [self.infoWebView loadHTMLString:infoWebViewString baseURL:nil];
     
@@ -302,7 +273,6 @@
     CGSize fittingSize = [self.infoWebView sizeThatFits:CGSizeZero];
     frame.size = fittingSize;
     self.infoWebView.frame = frame;
- //   self.infoScrollView.contentSize = frame.size;
         
 }
 
@@ -312,7 +282,8 @@
     NSString* infoBody;
     NSString* timeString;
     NSString* priceString;
-    NSString* timeDurationString;
+    NSString* timeDurationHoursString;
+    NSString* timeDurationMinutesString;
     NSString* startTime;
     NSString* endTime;
     NSString* startTimeA;
@@ -324,7 +295,8 @@
         infoBody = @"";
         timeString = @"";
         priceString = @"";
-        timeDurationString = @"";
+        timeDurationHoursString = @"";
+        timeDurationMinutesString = @"";
         startTime = @"";
         endTime = @"";
     }
@@ -345,19 +317,28 @@
             [dateFormatter setDateFormat:@"a"];
             return [dateFormatter stringFromDate:time]; };
 
-    
+        double dStartTime = self.rangeBar.selectedMinimumValue;
+        double dEndTime = self.rangeBar.selectedMaximumValue;
+        if(self.timeTypeSelectFlatRateButton.selected) {
+            dEndTime = dStartTime + [self.flatRateBar selectedDuration];
+        }
         
-        startTime = formatterMain(self.rangeBar.selectedMinimumValue);
-        startTimeA = formatterA(self.rangeBar.selectedMinimumValue);
-        endTime = formatterMain(self.rangeBar.selectedMaximumValue);
-        endTimeA = formatterA(self.rangeBar.selectedMaximumValue);
+        startTime = formatterMain(dStartTime);
+        startTimeA = formatterA(dStartTime);
+        
+        endTime = formatterMain(dEndTime);
+        endTimeA = formatterA(dEndTime);
         
         //Price text
-        double durationInSeconds = (self.rangeBar.selectedMaximumValue - self.rangeBar.selectedMinimumValue);
+        double durationInSeconds = (dEndTime - dStartTime);
         ParkingSpot* spot = self.spot;
         double totalPrice = [spot priceFromNowForDurationInSeconds:durationInSeconds];
         
-        priceString = [NSString stringWithFormat:@"$%0.2f", totalPrice];
+        if(self.timeTypeSelectFlatRateButton.selected) {
+            totalPrice = [spot priceFromStartTime:dStartTime forDuration:durationInSeconds forFlatRate:true];
+        }
+        
+        priceString = [NSString stringWithFormat:@"%0.2f", totalPrice];
         
         //TimeDuration text
         double hoursAndMinutes = round(durationInSeconds/60)/60;
@@ -365,7 +346,8 @@
         int minutes = floor((hoursAndMinutes-hours)*60);
 
         
-        timeDurationString = [NSString stringWithFormat:@"%dh%@%d", hours, (minutes<=9) ? @"0" : @"", minutes ];
+        timeDurationHoursString = [NSString stringWithFormat:@"%d", hours];
+        timeDurationMinutesString = [NSString stringWithFormat:@"%@%d", (minutes<=9) ? @"0" : @"", minutes ];
         
     }
     
@@ -377,16 +359,53 @@
     //self.timeLabel.transform = squish;
     self.priceLabel.text = priceString;
     //self.priceLabel.transform = squish;
-    self.timeDurationLabel.text = timeDurationString;
-    self.startTimeLabel.text = [NSString stringWithFormat:@"%@%@",startTime,startTimeA];
+    
+    self.timeDurationLabel.text = timeDurationHoursString;
+    self.timeDurationMinutesLabel.text = timeDurationMinutesString;
+    
+    self.startTimeLabel.text = startTime;
+    self.startTimeALabel.text = startTimeA;
     self.endTimeALabel.text = endTimeA;
     self.endTimeLabel.text = endTime;
     
-    CGRect frame = self.endTimeALabel.frame;
-    CGSize size = [endTime sizeWithFont:self.endTimeLabel.font];
-    frame.origin.x = self.endTimeLabel.frame.origin.x + size.width + 1;
-    self.endTimeALabel.frame = frame;
+    
+    [self positionLabels:[NSArray arrayWithObjects:self.startTimeLabel, self.startTimeALabel, nil] aroundVertical:self.timeCenterReference.center.x];
+    [self positionLabels:[NSArray arrayWithObjects:self.endTimeLabel, self.endTimeALabel, nil] aroundVertical:self.timeCenterReference.center.x];
+    [self positionLabels:[NSArray arrayWithObjects:self.timeDurationLabel, self.timeDurationHourStaticLabel, self.timeDurationMinutesLabel, self.timeDurationMinutesStaticLabel, nil] aroundVertical:self.durationCenterReference.center.x];
+    [self positionLabels:[NSArray arrayWithObjects:self.priceCurrencyLabel, self.priceLabel, nil] aroundVertical:self.priceCenterReference.center.x];
+    
+    
+    [self.rangeBarContainer setHidden:!self.timeTypeSelectHourlyButton.selected];
+    [self.flatRateBarContainer setHidden:!self.timeTypeSelectFlatRateButton.selected];
+    
+    //CGRect frame = self.endTimeALabel.frame;
+    //CGSize size = [endTime sizeWithFont:self.endTimeLabel.font];
+    //frame.origin.x = self.endTimeLabel.frame.origin.x + size.width + 1;
+    //self.endTimeALabel.frame = frame;
 }
+
+//TODO: Generalize to include other formatting options
+- (void) positionLabels:(NSArray*)labels aroundVertical:(double)centerX{
+    if ([labels count] == 0) {
+        return;
+    }
+    
+    double totalWidth = 0;
+    for (UILabel* label in labels) {
+        totalWidth += [label.text sizeWithFont:label.font].width;
+        totalWidth += (label != [labels lastObject]) ? 1 : 0;
+    }
+    double iterX = centerX - (totalWidth/2.0);
+    for (UILabel* label in labels) {
+        CGRect frame = label.frame;
+        frame.origin.x = iterX;
+        frame.size.width = [label.text sizeWithFont:label.font].width;
+        label.frame = frame;
+        iterX+= 1 + [label.text sizeWithFont:label.font].width;
+    }
+}
+
+
 - (IBAction)parkButtonTapped:(UIButton *)sender {
     BOOL notransactiondebug = false;
     if (notransactiondebug) {
@@ -574,10 +593,6 @@
             //self.errorLabel.text = @"Could not contact server";
             //self.errorLabel.hidden = false;
         }
-
-            
-            
-            
     }
 }
 -(void) requestFinished:(ASIHTTPRequest *)request{
@@ -642,5 +657,20 @@
         NSLog(@"Response: %@", responseString);
 
     }
+}
+- (IBAction)timeTypeSelectButtonTapped:(UIButton *)sender {
+    
+    if(sender.tag == 1) {
+        [self.timeTypeSelectHourlyButton setSelected:true];
+        [self.timeTypeSelectFlatRateButton setSelected:false];
+        [self timeIntervalChanged];
+    } else if (sender.tag == 2) {
+        [self.timeTypeSelectHourlyButton setSelected:false];
+        [self.timeTypeSelectFlatRateButton setSelected:true];
+        [self timeIntervalChanged];
+    } else {
+        return;
+    }
+    
 }
 @end
