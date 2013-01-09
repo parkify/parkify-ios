@@ -42,6 +42,7 @@
         self.endTime = [[dictIn objectForKey:@"end_time"] doubleValue];
         self.pricePerHour = [[dictIn objectForKey:@"price_per_hour"] doubleValue];
         self.flatPrices = [[NSMutableDictionary alloc] init];
+// Entering useless comments
         for (NSString* name in [dictIn objectForKey:@"flat_prices"]) {
             NSMutableDictionary* rate = [[dictIn objectForKey:@"flat_prices"] objectForKey:name];
             [self.flatPrices setObject: rate forKey:[name copy]];
