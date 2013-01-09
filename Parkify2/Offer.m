@@ -42,10 +42,9 @@
         self.endTime = [[dictIn objectForKey:@"end_time"] doubleValue];
         self.pricePerHour = [[dictIn objectForKey:@"price_per_hour"] doubleValue];
         self.flatPrices = [[NSMutableDictionary alloc] init];
-        for (NSNumber* duration in [dictIn objectForKey:@"flat_prices"]) {
-            NSNumber* price = [NSNumber numberWithDouble:[[[dictIn objectForKey:@"flat_prices"] objectForKey:duration] doubleValue]];
-            NSNumber* newKey = [duration copy];
-            [self.flatPrices setObject: price forKey:newKey];
+        for (NSString* name in [dictIn objectForKey:@"flat_prices"]) {
+            NSMutableDictionary* rate = [[dictIn objectForKey:@"flat_prices"] objectForKey:name];
+            [self.flatPrices setObject: rate forKey:[name copy]];
         }
         //self.flatPrices = [[dictIn objectForKey:@"flat_prices"] mutableCopy];
     }
