@@ -85,7 +85,7 @@
     cell.selectionStyle = UITableViewCellEditingStyleNone;
     cell.rightTextField.placeholder = @"xxxxxxxx";
     
-    cell.leftLabel.text = @"8-Digit Code";
+    cell.leftLabel.text = @"Promotion Code";
     cell.rightTextField.text = self.promo.code_text;
 }
 

@@ -26,9 +26,10 @@
 @synthesize currentLong = _currentLong;
 @synthesize reservationUsed = _reservationUsed;
 -(NSMutableDictionary*)transactions{
-    if (![Persistance retrieveUserID])
+    if (![Persistance retrieveAuthToken])
         return nil;
-    if(!transactions){
+    if(!transactions || [Persistance retrieveRefreshTransactions]){
+        [Persistance saveRefreshTransactions:false];
         [Api getListOfCurrentAcceptances:self];
         NSDictionary *trans = [Persistance retrieveTransactions];
 
@@ -108,7 +109,7 @@ void uncaughtExceptionHandler(NSException *exception) {
     //[PlacedAgent initWithAppKey:@"6f15dab4fc2d"];
     //[PlacedAgent logStartSession];
   
-    [[UINavigationBar appearance] setBackgroundImage:[UIImage imageNamed:@"masthead.png"] forBarMetrics:UIBarMetricsDefault];
+    [[UINavigationBar appearance] setBackgroundImage:[UIImage imageNamed:@"masthead_logo.png"] forBarMetrics:UIBarMetricsDefault];
     [[UINavigationBar appearance] setContentMode:UIViewContentModeScaleToFill];
     [[UIBarButtonItem appearance] setTintColor:[UIColor darkGrayColor]];
   

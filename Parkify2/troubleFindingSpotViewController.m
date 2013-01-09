@@ -29,6 +29,7 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+    /*
     UILabel *titleView = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, 320, 60)];
     [titleView setFont:[UIFont fontWithName:@"Helvetica Light" size:36.0f]];
     [titleView setTextColor:[UIColor colorWithRed:197.0f/255.0f green:211.0f/255.0f blue:247.0f/255.0f alpha:1.0f]];
@@ -36,7 +37,8 @@
     [titleView sizeToFit];
     [titleView setBackgroundColor:[UIColor clearColor]];
     [self.navigationItem setTitleView:titleView];
-
+    */
+    
 	// Do any additional setup after loading the view.
 }
 

@@ -38,7 +38,7 @@
     return token;
 }
 
-+ (id) makeTransactionRequestWithUserToken:(NSString*)token withSpotId:(int)spotID withStartTime:(double)startTime withEndTime:(double)endTime withOfferIds:(NSArray*)offerIds withLicensePlate:(NSString*)licensePlate {
++ (id) makeTransactionRequestWithUserToken:(NSString*)token withSpotId:(int)spotID withStartTime:(double)startTime withEndTime:(double)endTime withOfferIds:(NSArray*)offerIds withLicensePlate:(NSString*)licensePlate withPriceType:(NSString*)priceType withFlatRateName:(NSString*)flatRateName {
     NSDictionary *request =  [NSDictionary dictionaryWithObjectsAndKeys:
                               token, @"authentication_token",
                               [[NSNumber alloc] initWithInt:spotID], @"parking_spot_id", 
@@ -46,6 +46,8 @@
                               [[NSNumber alloc] initWithDouble:endTime], @"end_time",
                               offerIds, @"offer_ids",
                               licensePlate, @"license_plate_number",
+                              priceType, @"price_type",
+                              flatRateName, @"flat_rate_name",
                               nil];
         return request;
 }

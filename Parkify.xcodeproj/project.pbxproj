@@ -130,6 +130,8 @@
 		8CBC46831698F0B70038848C /* small_blue_button.png in Resources */ = {isa = PBXBuildFile; fileRef = 8CBC46811698F0B70038848C /* small_blue_button.png */; };
 		8CBC4686169907B30038848C /* masthead.png in Resources */ = {isa = PBXBuildFile; fileRef = 8CBC4684169907B30038848C /* masthead.png */; };
 		8CBC4687169907B30038848C /* masthead@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 8CBC4685169907B30038848C /* masthead@2x.png */; };
+		8CBC468D169A012E0038848C /* masthead_logo@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 8CBC468C169A012E0038848C /* masthead_logo@2x.png */; };
+		8CBC4690169A014B0038848C /* masthead_logo.png in Resources */ = {isa = PBXBuildFile; fileRef = 8CBC468F169A014B0038848C /* masthead_logo.png */; };
 		8CBE7DD11645F7F700467C12 /* BSAddressComponent.m in Sources */ = {isa = PBXBuildFile; fileRef = 8CBE7DCA1645F7F700467C12 /* BSAddressComponent.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		8CBE7DD21645F7F700467C12 /* BSForwardGeocoder.m in Sources */ = {isa = PBXBuildFile; fileRef = 8CBE7DCC1645F7F700467C12 /* BSForwardGeocoder.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		8CBE7DD31645F7F700467C12 /* BSGoogleV3KmlParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 8CBE7DCE1645F7F700467C12 /* BSGoogleV3KmlParser.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
@@ -463,6 +465,8 @@
 		8CBC46811698F0B70038848C /* small_blue_button.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = small_blue_button.png; sourceTree = "<group>"; };
 		8CBC4684169907B30038848C /* masthead.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = masthead.png; sourceTree = "<group>"; };
 		8CBC4685169907B30038848C /* masthead@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "masthead@2x.png"; sourceTree = "<group>"; };
+		8CBC468C169A012E0038848C /* masthead_logo@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "masthead_logo@2x.png"; sourceTree = "<group>"; };
+		8CBC468F169A014B0038848C /* masthead_logo.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = masthead_logo.png; sourceTree = "<group>"; };
 		8CBE7DC91645F7F700467C12 /* BSAddressComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BSAddressComponent.h; sourceTree = "<group>"; };
 		8CBE7DCA1645F7F700467C12 /* BSAddressComponent.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BSAddressComponent.m; sourceTree = "<group>"; };
 		8CBE7DCB1645F7F700467C12 /* BSForwardGeocoder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BSForwardGeocoder.h; sourceTree = "<group>"; };
@@ -1118,6 +1122,8 @@
 		8CBC4654169693070038848C /* Design 10 */ = {
 			isa = PBXGroup;
 			children = (
+				8CBC468F169A014B0038848C /* masthead_logo.png */,
+				8CBC468C169A012E0038848C /* masthead_logo@2x.png */,
 				8CBC4684169907B30038848C /* masthead.png */,
 				8CBC4685169907B30038848C /* masthead@2x.png */,
 				8CBC46801698F0B70038848C /* scroll_down_indicator.png */,
@@ -1485,6 +1491,8 @@
 				8CBC46831698F0B70038848C /* small_blue_button.png in Resources */,
 				8CBC4686169907B30038848C /* masthead.png in Resources */,
 				8CBC4687169907B30038848C /* masthead@2x.png in Resources */,
+				8CBC468D169A012E0038848C /* masthead_logo@2x.png in Resources */,
+				8CBC4690169A014B0038848C /* masthead_logo.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1726,7 +1734,7 @@
 				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_NAME = Parkify;
 				PROVISIONING_PROFILE = "D9C2F81A-2602-4195-AD00-11A07093C066";
-				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "48948ACE-0E57-4A11-83C1-6623711F87B1";
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "D9C2F81A-2602-4195-AD00-11A07093C066";
 				SDKROOT = iphoneos;
 				WRAPPER_EXTENSION = app;
 			};

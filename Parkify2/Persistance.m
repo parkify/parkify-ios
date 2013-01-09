@@ -125,7 +125,10 @@
 }
 
 
-+(void)saveAuthToken:(NSString*)token { 
++(void)saveAuthToken:(NSString*)token {
+    if(token == nil) {
+        [Persistance saveRefreshTransactions:true];
+    }
     [Persistance saveUserRecord:token withName:@"AuthToken"];
 }
 +(NSString*)retrieveAuthToken { 
@@ -227,6 +230,27 @@
 /*+(double)retrieveCurrentEndTime {
     return [[Persistance retrieveUserRecordwithName:@"CurrentEndTime"] doubleValue];
 }*/
+
+
++(void)saveDemoDict:(NSMutableDictionary*)dict {
+    [Persistance saveRecord:dict withName:@"DemoDict"];
+}
++(NSMutableDictionary*)retrieveDemoDict {
+    id toRtn = [Persistance retrieveRecordwithName:@"DemoDict"];
+    if (toRtn) return toRtn;
+    return [[NSMutableDictionary alloc] init];
+}
+
++(void)saveRefreshTransactions:(BOOL)needsRefresh {
+    [Persistance saveRecord:[NSNumber numberWithBool:needsRefresh] withName:@"RefreshTransactions"];
+
+}
++(BOOL)retrieveRefreshTransactions {
+    NSNumber* toRtn = [Persistance retrieveRecordwithName:@"RefreshTransactions"];
+    if (!toRtn) return true;
+    return [toRtn boolValue];
+}
+
 
 +(void)saveCurrentSpot:(ParkingSpot*)spot {
     if (spot) {

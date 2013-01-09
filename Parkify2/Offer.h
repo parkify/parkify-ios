@@ -27,7 +27,7 @@
 
 - (id) initFromDictionary:(NSDictionary*)dictIn;
 
-- (double) findCostWithStartTime:(double)startTime endTime:(double)endTime flatDuration:(double)flatDuration;
+- (double) findCostWithStartTime:(double)startTime endTime:(double)endTime flatRateName:(NSString*)flatRateName;
 
 - (double) findCostWithStartTime:(double)startTime endTime:(double)endTime;
 
@@ -36,6 +36,5 @@
 - (NSArray*) findPricesInRange:(double)startTime endTime:(double)endTime;
 
 - (NSMutableDictionary*) findFixedPricesForStartTime:(double)startTime;
-
 
 @end
