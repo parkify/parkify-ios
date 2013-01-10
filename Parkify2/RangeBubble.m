@@ -216,12 +216,12 @@
             NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
             [dateFormatter setDateFormat:@"ha"];
             
-            //if([[dateFormatter stringFromDate:time] isEqualToString:@"12AM"]) {
-            [dateFormatter setDateFormat:@"EEEE"];
+           // if([[dateFormatter stringFromDate:time] isEqualToString:@"12AM"]) {
+            [dateFormatter setDateFormat:@"EEE"];
             NSString* a = [dateFormatter stringFromDate:time];
             return a;
             //} else {
-            //   return @"";
+             //  return @"";
             // }
             
         };

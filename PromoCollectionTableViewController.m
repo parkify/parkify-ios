@@ -66,6 +66,8 @@
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
     // Return the number of rows in the section.
+    if (self.promos.count==0)
+        return 1;
     return self.promos.count;
 }
 
@@ -78,13 +80,20 @@
     if (!cell.textLabel) {
         cell = [[ExtraDetailTableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:CellIdentifier];
     }
-    
+    if (self.promos.count>0){
     Promo* p = [self.promos objectAtIndex:indexPath.row];
     cell.textLabel.text = p.name;
     cell.detailTextLabel.text = p.description;
     cell.selectionStyle = UITableViewCellEditingStyleNone;
+        cell.textLabel.textAlignment = UITextAlignmentLeft;
 
-    
+
+    }
+    else{
+        cell.textLabel.text = @"Click above to enter a code";
+        cell.textLabel.textAlignment = UITextAlignmentCenter;
+
+    }
     
     return cell;
 
