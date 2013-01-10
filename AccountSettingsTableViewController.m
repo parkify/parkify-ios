@@ -32,7 +32,13 @@
     }
     return self;
 }
+-(void)viewWillAppear:(BOOL)animated{
+    [[self getUser] updateFromServerWithSuccess:^(NSDictionary *d){
+        [self.tableView reloadData];
+    } withFailure:^(NSError *e){}];
+  //  [[self getUser] updateFromServerWithSuccess:^(NSDictionary * d) {
 
+}
 - (void)viewDidLoad
 {
     [super viewDidLoad];

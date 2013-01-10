@@ -155,6 +155,11 @@
         newParkingSpots = [self.parkingSpots mutableCopy];
         
         NSDictionary* spot = [root objectForKey:@"spot"];
+        if (!spot)
+        {
+            NSLog(@"There was no spot returned");
+            return;
+        }
         idIn = [[spot objectForKey:@"id"] intValue];
         
         ParkingSpot* actualSpot = [newParkingSpots objectForKey:[[NSNumber alloc] initWithInt:idIn]];
@@ -209,6 +214,7 @@
         }*/
         
         //Don't create a dict everytime..it's wasteful
+        
         ParkifyAppDelegate *delegate = (ParkifyAppDelegate*)[[UIApplication sharedApplication] delegate];
         NSDictionary *actives = [delegate.transactions objectForKey:@"active"];
         NSDictionary *spots = [root objectForKey:@"spots"];

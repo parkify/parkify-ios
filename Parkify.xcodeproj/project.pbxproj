@@ -1677,8 +1677,8 @@
 		8CA7A1FE15A3DC980051567D /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_IDENTITY = "iPhone Developer: Dylan Jackson (BW94956Y7X)";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Dylan Jackson (BW94956Y7X)";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1.0.2;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1696,8 +1696,8 @@
 				);
 				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_NAME = Parkify;
-				PROVISIONING_PROFILE = "074E23C0-5FA5-4F1D-946D-6945CF410EDA";
-				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "074E23C0-5FA5-4F1D-946D-6945CF410EDA";
+				PROVISIONING_PROFILE = "";
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
 				SDKROOT = iphoneos;
 				WRAPPER_EXTENSION = app;
 			};
