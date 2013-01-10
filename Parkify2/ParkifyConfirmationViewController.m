@@ -90,6 +90,14 @@
 {
     [super viewDidLoad];
     
+    NSMutableDictionary* demoDict = [Persistance retrieveDemoDict];
+    if (![demoDict objectForKey:@"ConfirmationViewControllerDemo"])
+    {
+        [demoDict setObject:[NSNumber numberWithBool:true] forKey:@"ConfirmationViewControllerDemo"];
+        [self.scrollIndicator setAlpha:1.0];
+        [Persistance saveDemoDict:demoDict];
+    }
+    
     [self.mainScrollView setDelegate:self];
     self.scrollableSubviews = [[NSMutableArray alloc] init];
     
@@ -101,6 +109,7 @@
     
     MultiImageViewer* miViewer = [[MultiImageViewer alloc] initWithFrame:CGRectMake(0,0,320,160) withImageIds:self.spot.landscapeConfImageIDs];
     
+    /*
     UILabel *titleView = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, 320, 60)];
     [titleView setFont:[UIFont fontWithName:@"Helvetica Light" size:36.0f]];
     [titleView setTextColor:[UIColor colorWithRed:197.0f/255.0f green:211.0f/255.0f blue:247.0f/255.0f alpha:1.0f]];
@@ -112,6 +121,7 @@
     [titleView sizeToFit];
     [titleView setBackgroundColor:[UIColor clearColor]];
     [self.navigationItem setTitleView:titleView];
+     */
     
     [self appendSubView:miViewer];
     
@@ -273,9 +283,10 @@
             NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
             [dateFormatter setDateFormat:@"h:mm a"];
             return [dateFormatter stringFromDate:time]; };
-        
-        NSString* timeString = [NSString stringWithFormat:@"%@ - %@", formatter([[self.transactionInfo objectForKey:@"starttime"] doubleValue]), formatter([[self.transactionInfo objectForKey:@"endtime"] doubleValue])];
-        
+        NSString* timeString = @"";
+        if (self.transactionInfo) {
+            timeString = [NSString stringWithFormat:@"%@ - %@", formatter([[self.transactionInfo objectForKey:@"starttime"] doubleValue]), formatter([[self.transactionInfo objectForKey:@"endtime"] doubleValue])];
+        }
         //Layout text
         NSString* layoutString = ([self.spot.mSpotLayout isEqualToString:@"parallel"]) ? @"YES" : @"NO";
         //Layout text

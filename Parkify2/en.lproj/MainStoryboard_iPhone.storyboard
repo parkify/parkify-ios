@@ -56,7 +56,7 @@
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES"/>
                                                 <fontDescription key="fontDescription" type="boldSystem" pointSize="18"/>
                                                 <size key="titleShadowOffset" width="0.0" height="1"/>
-                                                <state key="normal" title="Check Nearest Spot!" backgroundImage="blue_button.png">
+                                                <state key="normal" title="Find Nearest Spot!" backgroundImage="blue_button.png">
                                                     <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                                 </state>
@@ -151,7 +151,7 @@
                                         </subviews>
                                         <color key="backgroundColor" white="0.0" alpha="0.5" colorSpace="calibratedWhite"/>
                                     </view>
-                                    <imageView contentMode="scaleToFill" image="masthead.png" id="DJ8-3f-vQ6">
+                                    <imageView contentMode="scaleToFill" image="masthead_logo.png" id="DJ8-3f-vQ6">
                                         <rect key="frame" x="0.0" y="0.0" width="320" height="46"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                     </imageView>
@@ -185,10 +185,6 @@
                                             <action selector="searchButtonTapped:" destination="2" eventType="touchUpInside" id="xBl-5L-lyo"/>
                                         </connections>
                                     </button>
-                                    <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" image="logo.png" id="Iid-Aj-5BL">
-                                        <rect key="frame" x="105" y="3" width="110" height="43"/>
-                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                    </imageView>
                                 </subviews>
                             </scrollView>
                         </subviews>
@@ -198,7 +194,6 @@
                     <navigationItem key="navigationItem" title="Map" id="hua-o1-24O"/>
                     <nil key="simulatedBottomBarMetrics"/>
                     <connections>
-                        <outlet property="_mapView" destination="Ptk-8q-rdV" id="MXo-qh-t6r"/>
                         <outlet property="addressBar" destination="gks-OL-m31" id="OKc-x0-7aV"/>
                         <outlet property="bottomBarButton" destination="Eyg-xZ-FYI" id="CyE-Jb-FYo"/>
                         <outlet property="bottomBarLabel" destination="3Tj-wP-ZSB" id="hqm-UG-lR0"/>
@@ -206,7 +201,6 @@
                         <outlet property="bottomBarSmallReferenceView" destination="IC8-ay-bVN" id="kz4-RE-VcH"/>
                         <outlet property="bottomBarView" destination="ZZb-x4-2mY" id="8ua-mX-g1S"/>
                         <outlet property="confirmationButton" destination="Chl-iI-sRk" id="Ptv-aE-PuD"/>
-                        <outlet property="currentLocationButton" destination="i0w-Y0-sTP" id="F0k-qO-4qO"/>
                         <outlet property="locationButtonLargeReferenceView" destination="grQ-LJ-zwk" id="AMf-MB-8rH"/>
                         <outlet property="locationButtonSmallReferenceView" destination="ZMO-Q8-pfF" id="qSG-0d-TGd"/>
                         <outlet property="mapView" destination="Ptk-8q-rdV" id="sG7-9M-SJF"/>
@@ -336,7 +330,7 @@
                                                     </navigationItem>
                                                 </items>
                                             </navigationBar>
-                                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="Parkify Spot" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumFontSize="10" id="blJ-T5-f6g">
+                                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumFontSize="10" id="blJ-T5-f6g">
                                                 <rect key="frame" x="35" y="1" width="262" height="37"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
                                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
@@ -455,7 +449,7 @@
                                                 <nil key="highlightedColor"/>
                                                 <color key="shadowColor" cocoaTouchSystemColor="darkTextColor"/>
                                             </label>
-                                            <view contentMode="scaleToFill" id="ael-jV-kbI">
+                                            <view alpha="0.0" contentMode="scaleToFill" id="ael-jV-kbI">
                                                 <rect key="frame" x="0.0" y="1" width="320" height="459"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
@@ -505,7 +499,7 @@
                                                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                                     </view>
                                                 </subviews>
-                                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                                                <color key="backgroundColor" white="1" alpha="0.90000000000000002" colorSpace="calibratedWhite"/>
                                             </view>
                                             <view contentMode="scaleToFill" id="4Si-s1-dcS">
                                                 <rect key="frame" x="-1" y="267" width="321" height="137"/>
@@ -569,6 +563,13 @@
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                                     </view>
+                                                    <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="This spot is unavailable for some of the selected duration." textAlignment="center" lineBreakMode="wordWrap" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="kVR-qs-Ctw">
+                                                        <rect key="frame" x="20" y="40" width="282" height="24"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                        <fontDescription key="fontDescription" name="HelveticaNeue-Bold" family="Helvetica Neue" pointSize="10"/>
+                                                        <color key="textColor" red="1" green="0.78043519938650296" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                                        <nil key="highlightedColor"/>
+                                                    </label>
                                                 </subviews>
                                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                             </view>
@@ -604,6 +605,7 @@
                         <outlet property="timeTypeSelectFlatRateButton" destination="VsI-RD-2vo" id="vI3-e4-QUj"/>
                         <outlet property="timeTypeSelectHourlyButton" destination="kgd-7S-1Wn" id="GC3-zK-0M1"/>
                         <outlet property="titleLable" destination="blJ-T5-f6g" id="Uxv-T4-bpP"/>
+                        <outlet property="warningLabel" destination="kVR-qs-Ctw" id="huT-Z6-iVl"/>
                         <segue destination="e4Z-Cq-MDv" kind="modal" identifier="ViewConfirmation" modalTransitionStyle="coverVertical" id="ZuY-RW-Skm"/>
                     </connections>
                 </viewController>
@@ -720,7 +722,7 @@
                                                 <rect key="frame" x="-3" y="329" width="327" height="14"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                                             </imageView>
-                                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" image="scroll_down_indicator.png" id="tYW-Dk-QGm">
+                                            <imageView userInteractionEnabled="NO" alpha="0.0" contentMode="scaleToFill" image="scroll_down_indicator.png" id="tYW-Dk-QGm">
                                                 <rect key="frame" x="262.5" y="286" width="49" height="43"/>
                                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
                                             </imageView>
@@ -785,7 +787,7 @@
             </objects>
             <point key="canvasLocation" x="-410" y="-43"/>
         </scene>
-        <!--Problem Spot View Controller - Problem?-->
+        <!--Problem Spot View Controller-->
         <scene sceneID="6Ll-5S-l0W">
             <objects>
                 <viewController storyboardIdentifier="ProblemSpotVC" id="yRH-GF-inc" customClass="problemSpotViewController" sceneMemberID="viewController">
@@ -978,7 +980,7 @@
                         </subviews>
                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                     </view>
-                    <navigationItem key="navigationItem" title="Problem?" id="UHG-FT-iSk"/>
+                    <navigationItem key="navigationItem" id="UHG-FT-iSk"/>
                     <connections>
                         <outlet property="genericProblemTextView" destination="jQ5-At-w8Z" id="LGb-xm-oCX"/>
                         <outlet property="genericProblemView" destination="EaM-uI-ibZ" id="6eW-v8-4JL"/>
@@ -1631,10 +1633,6 @@
                                     </navigationItem>
                                 </items>
                             </navigationBar>
-                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" image="logo_with_parking_lines.png" id="EcR-NM-lGk">
-                                <rect key="frame" x="103" y="3" width="115" height="43"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                            </imageView>
                         </subviews>
                         <color key="backgroundColor" cocoaTouchSystemColor="scrollViewTexturedBackgroundColor"/>
                     </view>
@@ -1860,7 +1858,7 @@
                                 <color key="tintColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
                                 <items>
                                     <navigationItem id="43G-k6-yWZ">
-                                        <barButtonItem key="leftBarButtonItem" systemItem="cancel" id="RoT-Ay-Svs">
+                                        <barButtonItem key="leftBarButtonItem" title="Map" id="RoT-Ay-Svs">
                                             <color key="tintColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
                                             <connections>
                                                 <action selector="cancelButtonTapped:" destination="Wf0-ET-QlU" id="rB4-CV-Q9M"/>
@@ -2157,6 +2155,13 @@
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                                     </view>
+                                                    <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="This spot is unavailable for some of the selected duration." textAlignment="center" lineBreakMode="wordWrap" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="HnN-1m-iiU">
+                                                        <rect key="frame" x="20" y="40" width="282" height="24"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                        <fontDescription key="fontDescription" name="HelveticaNeue-Bold" family="Helvetica Neue" pointSize="10"/>
+                                                        <color key="textColor" red="1" green="0.78043519939999995" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                                        <nil key="highlightedColor"/>
+                                                    </label>
                                                 </subviews>
                                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                             </view>
@@ -2190,6 +2195,7 @@
                         <outlet property="timeDurationMinutesStaticLabel" destination="vou-02-KGF" id="xIc-gP-QaU"/>
                         <outlet property="timeTypeSelectFlatRateButton" destination="pTf-HD-DdD" id="tYR-bR-iJi"/>
                         <outlet property="timeTypeSelectHourlyButton" destination="wuM-xP-OYM" id="zAy-Dl-XrD"/>
+                        <outlet property="warningLabel" destination="HnN-1m-iiU" id="Eid-qe-rDT"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="uC1-ye-c4Z" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -3073,10 +3079,9 @@
         <image name="info_page_splash.png" width="640" height="832"/>
         <image name="layout_spot_detail_page.png" width="16" height="16"/>
         <image name="location_finder.png" width="67" height="67"/>
-        <image name="logo.png" width="542" height="228"/>
         <image name="logo_with_parking_lines.png" width="603" height="228"/>
         <image name="map_bottom_border.png" width="16" height="16"/>
-        <image name="masthead.png" width="320" height="44"/>
+        <image name="masthead_logo.png" width="320" height="44"/>
         <image name="overlay_gradient.png" width="640" height="315"/>
         <image name="point_up.png" width="63" height="98"/>
         <image name="red_button.png" width="473" height="84"/>
@@ -3090,275 +3095,6 @@
         <image name="spot_view_page_layout_1.png" width="640" height="23"/>
         <image name="start_label_container.png" width="188" height="34"/>
     </resources>
-    <classes>
-        <class className="AccountSettingsNavigationViewController" superclassName="UINavigationController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/AccountSettingsNavigationViewController.h"/>
-        </class>
-        <class className="AccountSettingsTableViewController" superclassName="UITableViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/AccountSettingsTableViewController.h"/>
-            <relationships>
-                <relationship kind="action" name="backButtonTapped:"/>
-                <relationship kind="action" name="saveButtonTapped:"/>
-            </relationships>
-        </class>
-        <class className="CarCollectionTableViewController" superclassName="UITableViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/CarCollectionTableViewController.h"/>
-        </class>
-        <class className="CarTableViewController" superclassName="UITableViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/CarTableViewController.h"/>
-        </class>
-        <class className="CreditCardCollectionTableViewController" superclassName="UITableViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/CreditCardCollectionTableViewController.h"/>
-        </class>
-        <class className="CreditCardTableViewController" superclassName="UITableViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/CreditCardTableViewController.h"/>
-        </class>
-        <class className="ELCTextfieldCell" superclassName="UITableViewCell">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/ELCTextfieldCell.h"/>
-        </class>
-        <class className="ExtraDetailTableViewCell" superclassName="UITableViewCell">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/ExtraDetailTableViewCell.h"/>
-        </class>
-        <class className="ModalSettingsController" superclassName="UITabBarController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/ModalSettingsController.h"/>
-        </class>
-        <class className="Parkify2ViewController" superclassName="UIViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/Parkify2ViewController.h"/>
-            <relationships>
-                <relationship kind="action" name="AddressEntered:"/>
-                <relationship kind="action" name="confirmationButtonTapped:"/>
-                <relationship kind="action" name="myLocationTapped:"/>
-                <relationship kind="action" name="parkMeNowButtonTapped:" candidateClass="UIButton"/>
-                <relationship kind="action" name="searchButtonTapped:"/>
-                <relationship kind="action" name="settingsButtonTapped:" candidateClass="UIButton"/>
-                <relationship kind="outlet" name="addressBar" candidateClass="UISearchBar"/>
-                <relationship kind="outlet" name="bottomBarButton" candidateClass="UIButton"/>
-                <relationship kind="outlet" name="bottomBarLabel" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="bottomBarLargeReferenceView" candidateClass="UIView"/>
-                <relationship kind="outlet" name="bottomBarSmallReferenceView" candidateClass="UIView"/>
-                <relationship kind="outlet" name="bottomBarView" candidateClass="UIView"/>
-                <relationship kind="outlet" name="confirmationButton" candidateClass="UIButton"/>
-                <relationship kind="outlet" name="currentLocationButton" candidateClass="UIButton"/>
-                <relationship kind="outlet" name="locationButtonLargeReferenceView" candidateClass="UIView"/>
-                <relationship kind="outlet" name="locationButtonSmallReferenceView" candidateClass="UIView"/>
-                <relationship kind="outlet" name="mapView" candidateClass="MKMapView"/>
-                <relationship kind="outlet" name="myLocationButton" candidateClass="UIButton"/>
-                <relationship kind="outlet" name="searchBarContainer" candidateClass="UIView"/>
-                <relationship kind="outlet" name="searchBarLargeReferenceView" candidateClass="UIView"/>
-                <relationship kind="outlet" name="searchBarSmallReferenceView" candidateClass="UIImageView"/>
-                <relationship kind="outlet" name="searchButton" candidateClass="UIButton"/>
-                <relationship kind="outlet" name="settingsButton" candidateClass="UIButton"/>
-            </relationships>
-        </class>
-        <class className="ParkifyAboutViewController" superclassName="UIViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/ParkifyAboutViewController.h"/>
-            <relationships>
-                <relationship kind="action" name="callParkify:" candidateClass="UIButton"/>
-                <relationship kind="action" name="closeButtonTapped:" candidateClass="UIBarButtonItem"/>
-                <relationship kind="outlet" name="viewWeb" candidateClass="UIWebView"/>
-            </relationships>
-        </class>
-        <class className="ParkifyConfirmationViewController" superclassName="UIViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/ParkifyConfirmationViewController.h"/>
-            <relationships>
-                <relationship kind="action" name="closeButtonTapped:"/>
-                <relationship kind="action" name="directionsButtonTapped:" candidateClass="UIButton"/>
-                <relationship kind="action" name="extendReservation:"/>
-                <relationship kind="action" name="launchTroubleAlert:"/>
-                <relationship kind="action" name="topBarButtonTapped:"/>
-                <relationship kind="outlet" name="mainScrollView" candidateClass="UIScrollView"/>
-                <relationship kind="outlet" name="scrollIndicator" candidateClass="UIImageView"/>
-                <relationship kind="outlet" name="titleLable" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="topBarTapped" candidateClass="UIButton"/>
-                <relationship kind="outlet" name="topBarView" candidateClass="UIView"/>
-                <relationship kind="outlet" name="topViewLabel" candidateClass="UILabel"/>
-            </relationships>
-        </class>
-        <class className="ParkifySettingsViewController" superclassName="UIViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/ParkifySettingsViewController.h"/>
-            <relationships>
-                <relationship kind="action" name="aboutButtonTapped:" candidateClass="UIButton"/>
-                <relationship kind="action" name="authButtonTapped:" candidateClass="UIButton"/>
-                <relationship kind="action" name="callParkify:" candidateClass="UIButton"/>
-                <relationship kind="action" name="cancelButtonTapped:" candidateClass="UIBarButtonItem"/>
-                <relationship kind="outlet" name="tableView" candidateClass="UITableView"/>
-            </relationships>
-        </class>
-        <class className="ParkifySignInPageViewController" superclassName="UIViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/ParkifySignInPageViewController.h"/>
-            <relationships>
-                <relationship kind="action" name="callParkify:" candidateClass="UIButton"/>
-                <relationship kind="action" name="cancelButtonPressed:" candidateClass="UIBarButtonItem"/>
-                <relationship kind="action" name="forgotPasswordButtonTapped:"/>
-                <relationship kind="action" name="loginButtonPressed:" candidateClass="UIButton"/>
-                <relationship kind="action" name="logoutButtonPressed:" candidateClass="UIButton"/>
-                <relationship kind="action" name="resetPasswordTapped:"/>
-                <relationship kind="action" name="signUpButtonPressed:" candidateClass="UIButton"/>
-                <relationship kind="outlet" name="LoginButton" candidateClass="UIButton"/>
-                <relationship kind="outlet" name="emailField" candidateClass="UITextField"/>
-                <relationship kind="outlet" name="emailLabel" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="errorLabel" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="forgotPasswordButton" candidateClass="UIButton"/>
-                <relationship kind="outlet" name="forgotPasswordLabel" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="greetingLabel" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="loginLabel" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="passwordField" candidateClass="UITextField"/>
-                <relationship kind="outlet" name="passwordLabel" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="scrollView" candidateClass="UIScrollView"/>
-                <relationship kind="outlet" name="signUpButton" candidateClass="UIButton"/>
-                <relationship kind="outlet" name="signUpLabel" candidateClass="UILabel"/>
-            </relationships>
-        </class>
-        <class className="ParkifySignupViewController" superclassName="UIViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/ParkifySignupViewController.h"/>
-            <relationships>
-                <relationship kind="action" name="callParkify:" candidateClass="UIButton"/>
-                <relationship kind="action" name="cancelButtonPressed:" candidateClass="UIBarButtonItem"/>
-                <relationship kind="action" name="signUpTapped:"/>
-                <relationship kind="action" name="tosButtonTapped:"/>
-                <relationship kind="action" name="tosCheckboxTapped:"/>
-                <relationship kind="outlet" name="cardNumberField" candidateClass="UITextField"/>
-                <relationship kind="outlet" name="cardNumberLabel" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="emailField" candidateClass="UITextField"/>
-                <relationship kind="outlet" name="emailLabel" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="errorLabel" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="expirationMonthField" candidateClass="UITextField"/>
-                <relationship kind="outlet" name="expirationMonthLabel" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="expirationYearField" candidateClass="UITextField"/>
-                <relationship kind="outlet" name="expirationYearLabel" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="firstNameField" candidateClass="UITextField"/>
-                <relationship kind="outlet" name="keyboardAvoidingScrollView" candidateClass="TPKeyboardAvoidingScrollView"/>
-                <relationship kind="outlet" name="lastNameField" candidateClass="UITextField"/>
-                <relationship kind="outlet" name="licensePlateField" candidateClass="UITextField"/>
-                <relationship kind="outlet" name="licensePlateLabel" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="nameLabel" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="passwordField" candidateClass="UITextField"/>
-                <relationship kind="outlet" name="passwordLabel" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="phoneField" candidateClass="UITextField"/>
-                <relationship kind="outlet" name="phoneLabel" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="scrollView" candidateClass="UIScrollView"/>
-                <relationship kind="outlet" name="securityNumberField" candidateClass="UITextField"/>
-                <relationship kind="outlet" name="securityNumberLabel" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="signUpButton" candidateClass="UIButton"/>
-                <relationship kind="outlet" name="tosCheckbox" candidateClass="UIButton"/>
-                <relationship kind="outlet" name="zipField" candidateClass="UITextField"/>
-                <relationship kind="outlet" name="zipLabel" candidateClass="UILabel"/>
-            </relationships>
-        </class>
-        <class className="ParkifySpotViewController" superclassName="UIViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/ParkifySpotViewController.h"/>
-            <relationships>
-                <relationship kind="action" name="closeButtonTapped:"/>
-                <relationship kind="action" name="parkButtonTapped:" candidateClass="UIButton"/>
-                <relationship kind="action" name="timeTypeSelectButtonTapped:" candidateClass="UIButton"/>
-                <relationship kind="outlet" name="demoMask" candidateClass="UIView"/>
-                <relationship kind="outlet" name="durationCenterReference" candidateClass="UIImageView"/>
-                <relationship kind="outlet" name="endTimeALabel" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="endTimeLabel" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="flashingSign" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="flatRateBarContainer" candidateClass="UIView"/>
-                <relationship kind="outlet" name="infoWebView" candidateClass="UIWebView"/>
-                <relationship kind="outlet" name="multiImageViewFrame" candidateClass="UIView"/>
-                <relationship kind="outlet" name="pageControl" candidateClass="UIPageControl"/>
-                <relationship kind="outlet" name="pictureScrollView" candidateClass="UIScrollView"/>
-                <relationship kind="outlet" name="priceCenterReference" candidateClass="UIImageView"/>
-                <relationship kind="outlet" name="priceCurrencyLabel" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="priceLabel" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="rangeBarContainer" candidateClass="UIView"/>
-                <relationship kind="outlet" name="startTimeALabel" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="startTimeLabel" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="taxLabel" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="timeCenterReference" candidateClass="UIImageView"/>
-                <relationship kind="outlet" name="timeDurationHourStaticLabel" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="timeDurationLabel" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="timeDurationMinutesLabel" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="timeDurationMinutesStaticLabel" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="timeTypeSelectFlatRateButton" candidateClass="UIButton"/>
-                <relationship kind="outlet" name="timeTypeSelectHourlyButton" candidateClass="UIButton"/>
-                <relationship kind="outlet" name="titleLable" candidateClass="UILabel"/>
-            </relationships>
-        </class>
-        <class className="ParkifyWebViewWrapperController" superclassName="UIViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/ParkifyWebViewWrapperController.h"/>
-            <relationships>
-                <relationship kind="action" name="callParkify:" candidateClass="UIButton"/>
-                <relationship kind="action" name="closeButtonTapped:" candidateClass="UIBarButtonItem"/>
-                <relationship kind="outlet" name="viewWeb" candidateClass="UIWebView"/>
-            </relationships>
-        </class>
-        <class className="PasswordTableViewController" superclassName="UITableViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/PasswordTableViewController.h"/>
-        </class>
-        <class className="PromoCollectionTableViewController" superclassName="UITableViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/PromoCollectionTableViewController.h"/>
-        </class>
-        <class className="PromoTableViewController" superclassName="UITableViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/PromoTableViewController.h"/>
-        </class>
-        <class className="RangeBar" superclassName="UIControl">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/RangeBar.h"/>
-        </class>
-        <class className="TPKeyboardAvoidingScrollView" superclassName="UIScrollView">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/TPKeyboardAvoidingScrollView.h"/>
-        </class>
-        <class className="extendReservationViewController" superclassName="UIViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/extendReservationViewController.h"/>
-            <relationships>
-                <relationship kind="action" name="closeButtonTapped:"/>
-                <relationship kind="action" name="parkButtonTapped:" candidateClass="UIButton"/>
-                <relationship kind="action" name="timeTypeSelectButtonTapped:" candidateClass="UIButton"/>
-                <relationship kind="outlet" name="durationCenterReference" candidateClass="UIImageView"/>
-                <relationship kind="outlet" name="endTimeALabel" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="endTimeLabel" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="flashingSign" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="flatRateBarContainer" candidateClass="UIView"/>
-                <relationship kind="outlet" name="infoWebView" candidateClass="UIWebView"/>
-                <relationship kind="outlet" name="multiImageViewFrame" candidateClass="UIView"/>
-                <relationship kind="outlet" name="priceCenterReference" candidateClass="UIImageView"/>
-                <relationship kind="outlet" name="priceCurrencyLabel" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="priceLabel" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="rangeBarContainer" candidateClass="UIView"/>
-                <relationship kind="outlet" name="startTimeALabel" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="startTimeLabel" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="timeCenterReference" candidateClass="UIImageView"/>
-                <relationship kind="outlet" name="timeDurationHourStaticLabel" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="timeDurationLabel" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="timeDurationMinutesLabel" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="timeDurationMinutesStaticLabel" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="timeTypeSelectFlatRateButton" candidateClass="UIButton"/>
-                <relationship kind="outlet" name="timeTypeSelectHourlyButton" candidateClass="UIButton"/>
-            </relationships>
-        </class>
-        <class className="mapDirectionsViewController" superclassName="UIViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/mapDirectionsViewController.h"/>
-        </class>
-        <class className="problemSpotViewController" superclassName="UIViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/problemSpotViewController.h"/>
-            <relationships>
-                <relationship kind="action" name="captureStillImage:"/>
-                <relationship kind="action" name="closeButtonTapped:"/>
-                <relationship kind="action" name="discardImage:"/>
-                <relationship kind="action" name="sendParkingSpotProblem:"/>
-                <relationship kind="outlet" name="genericProblemTextView" candidateClass="UITextView"/>
-                <relationship kind="outlet" name="genericProblemView" candidateClass="UIView"/>
-                <relationship kind="outlet" name="imagePreviewHolder" candidateClass="UIView"/>
-                <relationship kind="outlet" name="imagePreviewView" candidateClass="UIImageView"/>
-                <relationship kind="outlet" name="licensePlateProblemInfoView" candidateClass="UIView"/>
-                <relationship kind="outlet" name="licensePlateTextField" candidateClass="UITextField"/>
-                <relationship kind="outlet" name="txtLabelTakePic" candidateClass="UILabel"/>
-                <relationship kind="outlet" name="videoPreviewView" candidateClass="UIView"/>
-            </relationships>
-        </class>
-        <class className="troubleFindingSpotViewController" superclassName="UIViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/troubleFindingSpotViewController.h"/>
-            <relationships>
-                <relationship kind="action" name="closeButtonTapped:"/>
-                <relationship kind="action" name="launchDirections:"/>
-                <relationship kind="action" name="launchPhone:"/>
-                <relationship kind="action" name="refundAndReturn:"/>
-            </relationships>
-        </class>
-    </classes>
     <simulatedMetricsContainer key="defaultSimulatedMetrics">
         <simulatedStatusBarMetrics key="statusBar"/>
         <simulatedOrientationMetrics key="orientation"/>

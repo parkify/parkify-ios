@@ -96,6 +96,14 @@
     //[self addAllPictures];
     //[PlacedAgent logPageView:@"SpotInfoView"];
     
+    NSMutableDictionary* demoDict = [Persistance retrieveDemoDict];
+    if (![demoDict objectForKey:@"SpotViewControllerDemo"])
+    {
+        [demoDict setObject:[NSNumber numberWithBool:true] forKey:@"SpotViewControllerDemo"];
+        [self.demoMask setAlpha:1.0];
+        [Persistance saveDemoDict:demoDict];
+    }
+    
     [self.timeTypeSelectHourlyButton setSelected:true];
     
     NSDate* currentDate = [NSDate date];
@@ -194,6 +202,7 @@
     [self setTimeTypeSelectFlatRateButton:nil];
     [self setFlatRateBarContainer:nil];
     [self setDemoMask:nil];
+    [self setWarningLabel:nil];
     [super viewDidUnload];
     // Release any retained subviews of the main view.
 }
@@ -288,7 +297,7 @@
     NSString* endTime;
     NSString* startTimeA;
     NSString* endTimeA;
-    
+    self.warningLabel.alpha = 0;
     
     if(self.spot == nil) {
         infoTitle = @"Spot not found";
@@ -301,7 +310,7 @@
         endTime = @"";
     }
     else {
-        infoTitle = [NSString stringWithFormat:@"Parkify Spot"];
+        //infoTitle = [NSString stringWithFormat:@"Parkify Spot"];
         infoBody = self.spot.mDesc; 
         
         //Time text
@@ -321,6 +330,11 @@
         double dEndTime = self.rangeBar.selectedMaximumValue;
         if(self.timeTypeSelectFlatRateButton.selected) {
             dEndTime = dStartTime + [self.flatRateBar selectedDuration];
+            if (dEndTime > [self.spot endTime]) {
+                self.warningLabel.text = @"This spot is unavailable for some of the selected duration.";
+                self.warningLabel.alpha = 1;
+            }
+            dEndTime = MIN(dEndTime, [self.spot endTime]);
         }
         
         startTime = formatterMain(dStartTime);
@@ -335,7 +349,7 @@
         double totalPrice = [spot priceFromNowForDurationInSeconds:durationInSeconds];
         
         if(self.timeTypeSelectFlatRateButton.selected) {
-            totalPrice = [spot priceFromStartTime:dStartTime forDuration:durationInSeconds forFlatRate:true];
+            totalPrice = [self.flatRateBar selectedPrice];
         }
         
         priceString = [NSString stringWithFormat:@"%0.2f", totalPrice];
@@ -353,8 +367,8 @@
     
     CGAffineTransform squish = [TextFormatter transformForSpotViewText];
     //self.taxLabel.transform = squish;
-    self.titleLable.text = infoTitle;
-    [self setTitle:infoTitle];
+    //self.titleLable.text = infoTitle;
+    //[self setTitle:infoTitle];
    // self.timeLabel.text = timeString;
     //self.timeLabel.transform = squish;
     self.priceLabel.text = priceString;
@@ -407,9 +421,8 @@
 
 
 - (IBAction)parkButtonTapped:(UIButton *)sender {
-    BOOL notransactiondebug = false;
-    if (notransactiondebug) {
-        [self switchToConfirmation:@"DYLAN WHAT?"];
+    if (NOTRANSACTIONDEBUG) {
+        [self switchToConfirmation:nil];
         return;
     }
     ParkifyAppDelegate *delegate = (ParkifyAppDelegate*)[[UIApplication sharedApplication] delegate];
@@ -472,16 +485,21 @@
         UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:controller];
         [navController.navigationBar setTintColor:[UIColor blackColor]];
         controller.spot = self.spot;
-        NSMutableDictionary *thetransaction = [Persistance addNewTransaction:self.spot withStartTime:self.rangeBar. selectedMinimumValue andEndTime:self.rangeBar.selectedMaximumValue andLastPaymentDetails:[paymentDetails objectForKey:@"details"] withTransactionID:[paymentDetails objectForKey:@"id"]];
-        [[Mixpanel sharedInstance] track:@"launchConfirmationVC" properties:thetransaction];
-        
+        if(paymentDetails != nil) {
+            NSMutableDictionary *thetransaction = [Persistance addNewTransaction:self.spot withStartTime:self.rangeBar. selectedMinimumValue andEndTime:self.rangeBar.selectedMaximumValue andLastPaymentDetails:[paymentDetails objectForKey:@"details"] withTransactionID:[paymentDetails objectForKey:@"id"]];
+            [[Mixpanel sharedInstance] track:@"launchConfirmationVC" properties:thetransaction];
+            controller.transactionInfo = thetransaction;
+            controller.topBarText = [paymentDetails objectForKey:@"details"];
+            [Persistance saveCurrentSpot:self.spot];
+        } else {
+             controller.topBarText = @"";
+        }
      
         controller.currentLat = self.currentLat;
         controller.currentLong = self.currentLong;
-        controller.transactionInfo = thetransaction;
-        controller.topBarText = [paymentDetails objectForKey:@"details"];
         
-        [Persistance saveCurrentSpot:self.spot];
+        
+        
         
         parent.modalTransitionStyle = UIModalTransitionStyleCoverVertical;
         [parent presentViewController:navController animated:true completion:^{}];
@@ -499,7 +517,18 @@
     self.waitingMask = [[WaitingMask alloc] initWithFrame:waitingMaskFrame];
     [self.view addSubview:self.waitingMask];
     
-    [Api tryTransacation:self.spot withStartTime:self.rangeBar.selectedMinimumValue andEndTime:self.rangeBar.selectedMaximumValue withASIdelegate:self isPreview:FALSE withExtraParameter:@""];
+    double dStartTime = self.rangeBar.selectedMinimumValue;
+    double dEndTime = self.rangeBar.selectedMaximumValue;
+    NSString* priceType = @"hourly";
+    NSString* flatRateName = @"";
+    if(self.timeTypeSelectFlatRateButton.selected) {
+        dEndTime = dStartTime + [self.flatRateBar selectedDuration];
+        dEndTime = MIN(dEndTime, [self.spot endTime]);
+        priceType = @"flat_rate";
+        flatRateName = [self.flatRateBar selectedFlatRateName];
+    }
+    
+    [Api tryTransacation:self.spot withStartTime:dStartTime andEndTime:dEndTime withASIdelegate:self isPreview:FALSE withPriceType:priceType withFlatRateName:flatRateName withExtraParameter:@""];
     
     return;
 
@@ -516,9 +545,20 @@
     
     self.waitingMask = [[WaitingMask alloc] initWithFrame:waitingMaskFrame];
     [self.view addSubview:self.waitingMask];
+    
+    double dStartTime = self.rangeBar.selectedMinimumValue;
+    double dEndTime = self.rangeBar.selectedMaximumValue;
+    NSString* priceType = @"hourly";
+    NSString* flatRateName = @"";
+    if(self.timeTypeSelectFlatRateButton.selected) {
+        dEndTime = dStartTime + [self.flatRateBar selectedDuration];
+        dEndTime = MIN(dEndTime, [self.spot endTime]);
+        priceType = @"flat_rate";
+        flatRateName = [self.flatRateBar selectedFlatRateName];
 
-    [Api tryTransacation:self.spot withStartTime:self.rangeBar.selectedMinimumValue andEndTime:self.rangeBar.selectedMaximumValue withASIdelegate:self isPreview:TRUE withExtraParameter:@""];
+    }
 
+    [Api tryTransacation:self.spot withStartTime:dStartTime andEndTime:dEndTime withASIdelegate:self isPreview:TRUE withPriceType:priceType withFlatRateName:flatRateName withExtraParameter:@""];
     return;
    
 }

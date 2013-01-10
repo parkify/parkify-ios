@@ -20,6 +20,8 @@
 
 - (IBAction)bubbleWasTapped:(id)sender;
 
+- (NSString*)selectedFlatRateName;
 - (double)selectedDuration;
+- (double)selectedPrice;
 
 @end

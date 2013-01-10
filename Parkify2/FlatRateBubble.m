@@ -14,6 +14,8 @@
 
 @implementation FlatRateBubble
 
+@synthesize flatRateName = _flatRateName;
+
 - (id)initWithFrame:(CGRect)frame
 {
     self = [super initWithFrame:frame];
@@ -22,6 +24,20 @@
         [self setBackgroundImage:[UIImage imageNamed:@"flat_rate_bubble_unselected"] forState:UIControlStateNormal];
         [self setBackgroundImage:[UIImage imageNamed:@"flat_rate_bubble_selected"] forState:UIControlStateSelected];
         [self setAdjustsImageWhenHighlighted:false];
+        
+        //self.titleLabel.lineBreakMode = NSLineBreakByWordWrapping;
+        self.titleLabel.textAlignment = NSTextAlignmentCenter;
+        self.titleLabel.numberOfLines = 3;
+        if ([self.titleLabel respondsToSelector:@selector(setMinimumFontSize::)]) {
+            [self.titleLabel setMinimumFontSize:8.0];
+        } else if ([self.titleLabel respondsToSelector:@selector(setMinimumScaleFactor:)]) {
+            [self.titleLabel setMinimumScaleFactor:8.0];
+        }
+        
+        self.titleLabel.adjustsFontSizeToFitWidth = YES;
+        self.titleLabel.lineBreakMode = NSLineBreakByClipping;
+        
+        
     }
     return self;
 }

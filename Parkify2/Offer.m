@@ -98,11 +98,10 @@
     return self;
 }
 
-- (double) findCostWithStartTime:(double)startTime endTime:(double)endTime flatDuration:(double)flatDuration {
+- (double) findCostWithStartTime:(double)startTime endTime:(double)endTime flatRateName:(NSString*)flatRateName {
     for (PriceInterval* iterPrice in self.priceList) {
         if (startTime >= iterPrice.startTime && startTime <= iterPrice.endTime) {
-            NSString* key = [NSString stringWithFormat:@"%d", (int)flatDuration];
-            NSNumber* flatPrice = [iterPrice.flatPrices objectForKey:key];
+            NSNumber* flatPrice = [iterPrice.flatPrices objectForKey:flatRateName];
             if (flatPrice) {
                 return [flatPrice doubleValue];
             }

@@ -16,7 +16,7 @@
 
 + (id) makeTokenRequestWithToken:(NSString*)token;
 
-+ (id) makeTransactionRequestWithUserToken:(NSString*)token withSpotId:(int)spotID withStartTime:(double)startTime withEndTime:(double)endTime withOfferIds:(NSArray*)offerIds withLicensePlate:(NSString*)licensePlate ;
++ (id) makeTransactionRequestWithUserToken:(NSString*)token withSpotId:(int)spotID withStartTime:(double)startTime withEndTime:(double)endTime withOfferIds:(NSArray*)offerIds withLicensePlate:(NSString*)licensePlate withPriceType:(NSString*)priceType withFlatRateName:(NSString*)flatRateName;
 
 + (id) makeUserLoginRequest:(NSString *)email withPassword:(NSString *)password;
 

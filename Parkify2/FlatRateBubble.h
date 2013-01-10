@@ -14,4 +14,6 @@
 + (double) height;
 + (double) padding;
 
+@property (strong, nonatomic) NSString* flatRateName;
+
 @end

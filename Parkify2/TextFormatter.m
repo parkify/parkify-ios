@@ -51,6 +51,42 @@
 }
 
 + (NSString*) formatSecuredAddressString:(NSString*)address {
+    
+    
+    //find the street address part.
+    NSMutableArray* addressComponents = [[address componentsSeparatedByString:@","] mutableCopy];
+    if(addressComponents.count == 0) {
+        return address;
+    }
+    NSString* first = [addressComponents objectAtIndex:0];
+    
+    //find the number of the street address part.
+    NSMutableArray* firstComponents = [[first componentsSeparatedByString:@" "] mutableCopy];
+    if(firstComponents.count == 0) {
+        return address;
+    }
+    NSString* numericalPart = [firstComponents objectAtIndex:0];
+    
+    //check if first part is a number
+    NSLocale *l_en = [[NSLocale alloc] initWithLocaleIdentifier: @"en_US"];
+    NSNumberFormatter *f = [[NSNumberFormatter alloc] init];
+    [f setLocale: l_en];
+    if(![f numberFromString: numericalPart]) {
+        return address;
+    }
+    
+    //now stitch back together without the .
+    
+    [firstComponents removeObjectAtIndex:0];
+    
+    first = [firstComponents componentsJoinedByString:@" "];
+    [addressComponents setObject:first atIndexedSubscript:0];
+    address = [addressComponents componentsJoinedByString:@","];
+    return address;
+}
+
+/* defunct */
++ (NSString*) formatSecuredAddressStringWithAsterix:(NSString*)address {
     //find the street address part.
     NSMutableArray* addressComponents = [[address componentsSeparatedByString:@","] mutableCopy];
     if(addressComponents.count == 0) {
@@ -81,15 +117,10 @@
     }
     
     //now stitch back together.
-    
     [firstComponents setObject:numericalPart atIndexedSubscript:0];
-    
     first = [firstComponents componentsJoinedByString:@" "];
-    
     [addressComponents setObject:first atIndexedSubscript:0];
-    
     address = [addressComponents componentsJoinedByString:@","];
-
     return address;
     
 }

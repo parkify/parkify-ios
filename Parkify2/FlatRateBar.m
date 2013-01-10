@@ -38,13 +38,15 @@
         self.flatRateSubLabels = [[NSMutableArray alloc] init];
         
         NSMutableArray* orderedKeys = [[NSMutableArray alloc] init];
-        for (NSNumber* flatTime in self.flatPrices) {
-            [orderedKeys addObject:flatTime];
+        for (NSString* flatDurationName in self.flatPrices) {
+            [orderedKeys addObject:flatDurationName];
         }
         [orderedKeys sortUsingComparator:^NSComparisonResult(id obj1, id obj2) {
-            if ([obj1 doubleValue] < [obj2 doubleValue])
+            double duration1 = [[[self.flatPrices objectForKey:obj1] objectForKey:@"duration"] doubleValue];
+            double duration2 = [[[self.flatPrices objectForKey:obj2] objectForKey:@"duration"] doubleValue];
+            if ( duration1 < duration2)
                 return NSOrderedAscending;
-            if ([obj1 doubleValue] > [obj2 doubleValue])
+            if (duration1 > duration2)
                 return NSOrderedDescending;
             return NSOrderedSame;
         }];
@@ -52,7 +54,7 @@
         
         int i=0;
         //form bubbles.
-        for (NSNumber* flatTime in orderedKeys) {
+        for (NSString* flatName in orderedKeys) {
             if (i >= MAX_BUBBLE_COUNT) {
                 break;
             }
@@ -60,17 +62,17 @@
             FlatRateBubble* bubble = [[FlatRateBubble alloc] initWithFrame:CGRectZero];
             [self.flatRateBubbles addObject:bubble];
             
-            bubble.tag = [flatTime intValue];
-            NSString* durationString = [TextFormatter formatCompactDurationString:[flatTime doubleValue]];
+            bubble.flatRateName = flatName;
+            //NSString* durationString = [TextFormatter formatCompactDurationString:[flatTime doubleValue]];
             
-            [bubble setTitle:durationString forState:UIControlStateSelected];
-            [bubble setTitle:durationString forState:UIControlStateNormal];
+            [bubble setTitle:flatName forState:UIControlStateSelected];
+            [bubble setTitle:flatName forState:UIControlStateNormal];
             
             [bubble addTarget:self action:@selector(bubbleWasTapped:) forControlEvents:UIControlEventTouchUpInside];
             
             [bubble setSelected:(i==0)];
             
-            NSString* priceString = [TextFormatter formatPriceString: [[self.flatPrices objectForKey:flatTime] doubleValue]];
+            NSString* priceString = [TextFormatter formatPriceString: [[[self.flatPrices objectForKey:flatName] objectForKey:@"price" ] doubleValue]];
             
             CGSize labelSize = [priceString sizeWithFont:[UIFont fontWithName:@"HelveticaNeue-Italic" size:12]];
             UILabel* label = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, labelSize.width, labelSize.height)];
@@ -142,10 +144,21 @@
     [self sendActionsForControlEvents:UIControlEventValueChanged];
 }
 
-- (double)selectedDuration {
-    return [self selectedBubble].tag;
+- (NSString*)selectedFlatRateName {
+    return ((FlatRateBubble*)[self selectedBubble]).flatRateName;
 }
 
+- (double)selectedDuration {
+    NSString* flatRateName = [self selectedFlatRateName];
+    return [[[self.flatPrices objectForKey:flatRateName] objectForKey:@"duration"] doubleValue];
+}
+
+- (double)selectedPrice {
+    NSString* flatRateName = [self selectedFlatRateName];
+    return [[[self.flatPrices objectForKey:flatRateName] objectForKey:@"price"] doubleValue];
+}
+
+ 
 /*
 // Only override drawRect: if you perform custom drawing.
 // An empty implementation adversely affects performance during animation.

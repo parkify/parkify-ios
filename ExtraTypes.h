@@ -28,6 +28,8 @@ typedef NSString* (^Formatter)(double val);
 
 #endif
 
+#define NOTRANSACTIONDEBUG false
+
 
 
 #define kGenericErrorAlertTag 6727

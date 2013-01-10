@@ -63,6 +63,7 @@ static void *AVCamFocusModeObserverContext = &AVCamFocusModeObserverContext;
     [super viewDidLoad];
     
     //setup Navbar apperance
+    /*
     self.navigationController.navigationBar.tintColor = [UIColor blackColor];
     [[UINavigationBar appearance] setTintColor:[UIColor blackColor]];
 
@@ -73,6 +74,7 @@ static void *AVCamFocusModeObserverContext = &AVCamFocusModeObserverContext;
     [titleView sizeToFit];
     [titleView setBackgroundColor:[UIColor clearColor]];
     [self.navigationItem setTitleView:titleView];
+    */
     
     //check if its for licnese plates or generic problems
     if (!self.isLicensePlateProblem){

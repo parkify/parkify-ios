@@ -1035,7 +1035,7 @@ origPassword:(NSString*)origPassword
 
 }
 
-+(void) tryTransacation:(NSObject *)spotinfo withStartTime:(double)minimumValue andEndTime:(double)maximumValue withASIdelegate:(id)asidelegate isPreview:(BOOL)preview withExtraParameter:(NSString*)parameter
++(void) tryTransacation:(NSObject *)spotinfo withStartTime:(double)minimumValue andEndTime:(double)maximumValue withASIdelegate:(id)asidelegate isPreview:(BOOL)preview withPriceType:(NSString*)priceType withFlatRateName:(NSString*)flatRateName withExtraParameter:(NSString*)parameter
 {
     
     ParkingSpot *spot = (ParkingSpot*)spotinfo;
@@ -1047,7 +1047,7 @@ origPassword:(NSString*)origPassword
             [offerIds addObject:[NSNumber numberWithInt:offer.mId]];
     }
     
-    id transactionRequest = [Authentication makeTransactionRequestWithUserToken:[Persistance retrieveAuthToken] withSpotId:spot.mID withStartTime:minimumValue withEndTime:maximumValue withOfferIds:offerIds withLicensePlate:[Persistance retrieveLicensePlateNumber]];
+    id transactionRequest = [Authentication makeTransactionRequestWithUserToken:[Persistance retrieveAuthToken] withSpotId:spot.mID withStartTime:minimumValue withEndTime:maximumValue withOfferIds:offerIds withLicensePlate:[Persistance retrieveLicensePlateNumber] withPriceType:priceType withFlatRateName:flatRateName];
     
     NSString *urlstring = [Api apirootstring];
 

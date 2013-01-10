@@ -45,6 +45,11 @@
 +(void)saveLastPaymentInfoDetails:(NSString*)lpid;
 +(NSString*)retrieveLastPaymentInfoDetails;
 
++(void)saveDemoDict:(NSMutableDictionary*)dict;
++(NSMutableDictionary*)retrieveDemoDict;
+
++(void)saveRefreshTransactions:(BOOL)needsRefresh;
++(BOOL)retrieveRefreshTransactions;
 
 
 +(void)saveFirstName:(NSString*)name;
