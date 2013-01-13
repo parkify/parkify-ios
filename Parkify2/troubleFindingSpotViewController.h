@@ -9,11 +9,12 @@
 #import <UIKit/UIKit.h>
 #import "ParkingSpot.h"
 #import "ASIHTTPRequest.h"
+#import "Acceptance.h"
 @interface troubleFindingSpotViewController : UIViewController<UIAlertViewDelegate, ASIHTTPRequestDelegate>
 {
     
 }
-@property (nonatomic, strong)NSMutableDictionary *transactionInfo;
+@property (nonatomic, strong)Acceptance *transactionInfo;
 @property(nonatomic, strong)ParkingSpot *theSpot;
 
 - (IBAction)closeButtonTapped:(id)sender;

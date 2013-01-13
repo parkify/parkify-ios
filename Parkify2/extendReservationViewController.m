@@ -16,6 +16,7 @@
 #import "WaitingMask.h"
 #import "ErrorTransformer.h"
 #import "ParkifyConfirmationViewController.h"
+#import "ParkifyAppDelegate.h"
 @interface extendReservationViewController ()
 @property (strong, nonatomic) WaitingMask* waitingMask;
 
@@ -154,11 +155,15 @@
         return [dateFormatter stringFromDate:time]; };
     
 
-    self.spot = [[self getParkingSpots] parkingSpotForIDFromAll:[[self.transactioninfo objectForKey:@"spotid"] intValue]];
+    self.spot = [[self getParkingSpots] parkingSpotForIDFromAll:[[self.transactioninfo spotid] intValue]];
     
     double maxVal = self.spot.endTime;
-   
-    self.rangeBar = [[RangeBar alloc] initWithFrame:[self.rangeBarContainer bounds] minVal:prevHourMark minimumSelectableValue:[[self.transactioninfo objectForKey:@"endtime"] doubleValue] maxVal:maxVal minRange:30*60 displayedRange:numHours*60*60 selectedMinVal:[[self.transactioninfo objectForKey:@"starttime"] doubleValue] selectedMaxVal:[[self.transactioninfo objectForKey:@"endtime"] doubleValue]+30*60 withTimeFormatter:timeFormatter withPriceFormatter:^NSString *(double val) {
+    //double maxVal = [[[[self transactioninfo] offers] objectAtIndex:0] endTime];
+    double starttime = [[self.transactioninfo starttime] doubleValue];
+    double endtime = [[self.transactioninfo endttime] doubleValue];
+
+//    double endtime = [[self.transactioninfo endttime ] doubleValue];
+    self.rangeBar = [[RangeBar alloc] initWithFrame:[self.rangeBarContainer bounds] minVal:prevHourMark minimumSelectableValue:endtime maxVal:maxVal minRange:30*60 displayedRange:numHours*60*60 selectedMinVal:starttime selectedMaxVal:endtime+30*60 withTimeFormatter:timeFormatter withPriceFormatter:^NSString *(double val) {
         if(fmod(val,1.0) >= 0.01) {
             return [NSString stringWithFormat:@"$%0.2f", val];
         } else {
@@ -224,11 +229,11 @@
             [dateFormatter setDateFormat:@"a"];
             return [dateFormatter stringFromDate:time]; };
         
-        double dStartTime = [[self.transactioninfo objectForKey:@"endtime"] doubleValue];
+        double dStartTime = [[self.transactioninfo endttime] doubleValue];
         double dEndTime = self.rangeBar.selectedMaximumValue;
         double dStartOrig = self.rangeBar.selectedMinimumValue;
         if(self.timeTypeSelectFlatRateButton.selected) {
-            dEndTime = [[self.transactioninfo objectForKey:@"endtime"] doubleValue] + [self.flatRateBar selectedDuration];
+            dEndTime = [[self.transactioninfo endttime] doubleValue] + [self.flatRateBar selectedDuration];
             
             if (dEndTime > [self.spot endTime]) {
                 self.warningLabel.text = @"This spot is unavailable for some of the selected duration.";
@@ -360,10 +365,23 @@
         UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:controller];
         [navController.navigationBar setTintColor:[UIColor blackColor]];
         controller.spot = self.spot;
-        NSMutableDictionary *thetransaction = [Persistance addNewTransaction:self.spot withStartTime:self.rangeBar. selectedMinimumValue andEndTime:self.rangeBar.selectedMaximumValue andLastPaymentDetails:[paymentDetails objectForKey:@"details"] withTransactionID:[paymentDetails objectForKey:@"id"]];
-        [[Mixpanel sharedInstance] track:@"launchConfirmationVC" properties:thetransaction];
+        Acceptance *thetransaction = [Persistance addNewTransaction:self.spot withStartTime:self.rangeBar. selectedMinimumValue andEndTime:self.rangeBar.selectedMaximumValue andLastPaymentDetails:[paymentDetails objectForKey:@"details"] withTransactionID:[paymentDetails objectForKey:@"id"] ];
+        ParkifyAppDelegate *delegate = (ParkifyAppDelegate*)[[UIApplication sharedApplication] delegate];
+        NSMutableDictionary *actives = [delegate.transactions objectForKey:@"active"];
+        NSString *key = [NSString stringWithFormat:@"%@", self.transactioninfo.acceptid];
+
+        if ([actives objectForKey:key   ]){
+            [actives removeObjectForKey:key];
+        }
+        else{
+            NSNumber *key = [NSNumber numberWithInt:[self.transactioninfo.acceptid intValue]];
+            if ([actives objectForKey:key]){
+                [actives removeObjectForKey:key];
+            }
+        }
+        [[delegate.transactions objectForKey:@"active"] removeObjectForKey:self.transactioninfo.acceptid];
         
-        
+        [[Mixpanel sharedInstance] track:@"launchConfirmationVC" properties:nil];
         controller.currentLat = self.currentLat;
         controller.currentLong = self.currentLong;
         controller.transactionInfo = thetransaction;
@@ -401,7 +419,7 @@
 
     }
     
-    [Api tryTransacation:self.spot withStartTime:dStartTime andEndTime:dEndTime withASIdelegate:self isPreview:FALSE withPriceType:priceType withFlatRateName:flatRateName withExtraParameter:[NSString stringWithFormat:@"&extend=true&acceptanceid=%@", [self.transactioninfo objectForKey:@"acceptanceid"]]];
+    [Api tryTransacation:self.spot withStartTime:dStartTime andEndTime:dEndTime withASIdelegate:self isPreview:FALSE withPriceType:priceType withFlatRateName:flatRateName withExtraParameter:[NSString stringWithFormat:@"&extend=true&acceptanceid=%@", [self.transactioninfo acceptid]]];
     
     
     
@@ -446,7 +464,7 @@
         flatRateName = [self.flatRateBar selectedFlatRateName];
     }
     
-    [Api tryTransacation:self.spot withStartTime:dStartTime andEndTime:dEndTime withASIdelegate:self isPreview:TRUE withPriceType:priceType withFlatRateName:flatRateName withExtraParameter:[NSString stringWithFormat:@"&extend=true&acceptanceid=%@", [self.transactioninfo objectForKey:@"acceptanceid"]]];
+    [Api tryTransacation:self.spot withStartTime:dStartTime andEndTime:dEndTime withASIdelegate:self isPreview:TRUE withPriceType:priceType withFlatRateName:flatRateName withExtraParameter:[NSString stringWithFormat:@"&extend=true&acceptanceid=%@", [self.transactioninfo acceptid]]];
     
     return;
 }
@@ -578,7 +596,9 @@
             
             //[self performSegueWithIdentifier:@"ViewConfirmation" sender:self];
             //NSLog(@"TEST");
-        } else {
+        }
+        else {
+            
             [[Mixpanel sharedInstance] track:@"RealTransactionFailure" properties:root];
             NSError* error = [ErrorTransformer apiErrorToNSError:[root objectForKey:@"error"]];
             [ErrorTransformer errorToAlert:error withDelegate:self];

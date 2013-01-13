@@ -8,10 +8,10 @@
 
 #import <Foundation/Foundation.h>
 #import "ParkingSpot.h"
-
+#import "Acceptance.h"
 @interface Persistance : NSObject
 
-+(NSMutableDictionary*)addNewTransaction:(ParkingSpot*)spot withStartTime:(double)timeIn andEndTime:(double)timeOut andLastPaymentDetails:(NSString*)details withTransactionID:(NSString*)acceptanceid;
++(Acceptance*)addNewTransaction:(ParkingSpot*)spot withStartTime:(double)timeIn andEndTime:(double)timeOut andLastPaymentDetails:(NSString*)details withTransactionID:(NSString*)acceptanceid;
 +(NSDictionary*)retrieveTransactions;
 +(void)saveUserID:(NSNumber*)user;
 +(NSNumber*)retrieveUserID;

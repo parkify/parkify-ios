@@ -168,6 +168,7 @@
 		8CE81F051625059A004260CC /* RangeBubble.m in Sources */ = {isa = PBXBuildFile; fileRef = 8CE81F0416250599004260CC /* RangeBubble.m */; };
 		8CF0743F15E6E844002ABE82 /* ParkifyAboutControllerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8CF0743E15E6E844002ABE82 /* ParkifyAboutControllerViewController.m */; };
 		8CF0744215E6EC48002ABE82 /* ParkifySettingsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8CF0744115E6EC48002ABE82 /* ParkifySettingsViewController.m */; };
+		F615692E169F2AF300F521E0 /* Acceptance.m in Sources */ = {isa = PBXBuildFile; fileRef = F615692D169F2AF300F521E0 /* Acceptance.m */; };
 		F6303458165AF9930050F555 /* extendReservationViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = F6303457165AF9930050F555 /* extendReservationViewController.m */; };
 		F647131D165203FE004D9289 /* mapDirectionsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = F647131C165203FE004D9289 /* mapDirectionsViewController.m */; };
 		F6471325165422EF004D9289 /* NativeBridge.js in Sources */ = {isa = PBXBuildFile; fileRef = F6471324165422EF004D9289 /* NativeBridge.js */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
@@ -515,6 +516,8 @@
 		8CF0743E15E6E844002ABE82 /* ParkifyAboutControllerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ParkifyAboutControllerViewController.m; sourceTree = "<group>"; };
 		8CF0744015E6EC48002ABE82 /* ParkifySettingsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ParkifySettingsViewController.h; sourceTree = "<group>"; };
 		8CF0744115E6EC48002ABE82 /* ParkifySettingsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ParkifySettingsViewController.m; sourceTree = "<group>"; };
+		F615692C169F2AF300F521E0 /* Acceptance.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Acceptance.h; sourceTree = "<group>"; };
+		F615692D169F2AF300F521E0 /* Acceptance.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Acceptance.m; sourceTree = "<group>"; };
 		F6303456165AF9930050F555 /* extendReservationViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = extendReservationViewController.h; sourceTree = "<group>"; };
 		F6303457165AF9930050F555 /* extendReservationViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = extendReservationViewController.m; sourceTree = "<group>"; };
 		F647131B165203FE004D9289 /* mapDirectionsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mapDirectionsViewController.h; sourceTree = "<group>"; };
@@ -907,6 +910,8 @@
 				F6471324165422EF004D9289 /* NativeBridge.js */,
 				8C78946115AE5F3100576C4D /* Authentication.h */,
 				8C78946215AE5F3100576C4D /* Authentication.m */,
+				F615692C169F2AF300F521E0 /* Acceptance.h */,
+				F615692D169F2AF300F521E0 /* Acceptance.m */,
 				8C74008A15AF9D9900007F63 /* Persistance.h */,
 				8C74008B15AF9D9900007F63 /* Persistance.m */,
 				8C862BE915B5188300769F43 /* Api.h */,
@@ -1598,6 +1603,7 @@
 				8C6D3613168B8573009F5649 /* NSNull+Debug.m in Sources */,
 				8CBC466A1696B31A0038848C /* FlatRateBar.m in Sources */,
 				8CBC466D1696B69C0038848C /* FlatRateBubble.m in Sources */,
+				F615692E169F2AF300F521E0 /* Acceptance.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -312,14 +312,14 @@ standardImageIDs:(NSDictionary*)standardImageIDs
      */
     self.standardImageIDs = [[spot objectForKey:@"standard"] copy];
     
-    
-
-   // if ([levelOfDetail isEqualToString:@"all"] && freeIn) {
+       // if ([levelOfDetail isEqualToString:@"all"] && freeIn) {
         self.mDesc = [spot objectForKey:@"description"];
         NSMutableArray* offersIn = [[NSMutableArray alloc] init];
     //if (freeIn){
         for (NSDictionary* offer in [spot objectForKey:@"offers"]) {
             [offersIn addObject:[[Offer alloc] initFromDictionary:offer]];
+            NSLog(@"For spot id %i offer %@", self.actualID, offer);
+
         }
     //}
         self.offers = offersIn;

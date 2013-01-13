@@ -1009,7 +1009,7 @@ origPassword:(NSString*)origPassword
     NSDictionary *complaints = [NSDictionary dictionaryWithObjects:[NSArray arrayWithObjects:[NSNumber numberWithInt:spotid], problem, imageurl, [NSNumber numberWithDouble:latitude], [NSNumber numberWithDouble:longitude], nil] forKeys:[NSArray arrayWithObjects:@"resource_offer_id",@"descriptions", @"imageurl", @"latitude",@"longitude", nil]];
 
     ParkifyAppDelegate *appdelegate = (ParkifyAppDelegate*)[[UIApplication sharedApplication] delegate];
-    [[appdelegate.transactions objectForKey:@"active"] removeObjectForKey:[NSString stringWithFormat:@"%i", spotid]];
+    [[appdelegate.transactions objectForKey:@"active"] removeObjectForKey:[NSString stringWithFormat:@"%i", acceptid]];
     
     ASIFormDataRequest *request = [ASIFormDataRequest requestWithURL:url];
 

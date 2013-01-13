@@ -8,7 +8,7 @@
 
 #import <UIKit/UIKit.h>
 #import "ParkingSpot.h"
-
+#import "Acceptance.h"  
 @interface ParkifyConfirmationViewController : UIViewController <UIScrollViewDelegate, UIWebViewDelegate, UIAlertViewDelegate   >
 - (IBAction)closeButtonTapped:(id)sender;
 @property (nonatomic, strong) ParkingSpot* spot;
@@ -26,7 +26,7 @@
 @property (strong, nonatomic) NSString* topBarText;
 @property (weak, nonatomic) IBOutlet UIView *topBarView;
 @property (weak, nonatomic) IBOutlet UILabel *topViewLabel;
-@property (nonatomic, weak) NSMutableDictionary *transactionInfo;
+@property (nonatomic, weak) Acceptance *transactionInfo;
 - (IBAction)launchTroubleAlert:(id)sender;
 
 //TODO: REMOVETHIS

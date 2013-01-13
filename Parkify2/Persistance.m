@@ -7,7 +7,7 @@
 //
 #import "Persistance.h"
 #import "ParkifyAppDelegate.h"
-
+#import "Acceptance.h"  
 @interface  Persistance()
 + (void) saveUserRecord:(id)record withName:(NSString*)name;
 + (id) retrieveUserRecordwithName:(NSString*)name;
@@ -179,17 +179,24 @@
 }
 
 
-+(NSMutableDictionary*)addNewTransaction:(ParkingSpot*)spot withStartTime:(double)timeIn andEndTime:(double)timeOut andLastPaymentDetails:(NSString*)details withTransactionID:(NSString*)acceptanceid
++(Acceptance*)addNewTransaction:(ParkingSpot*)spot withStartTime:(double)timeIn andEndTime:(double)timeOut andLastPaymentDetails:(NSString*)details withTransactionID:(NSString*)acceptanceid
 {
     NSMutableDictionary *newTransaction = [NSMutableDictionary dictionaryWithObjects:[NSArray arrayWithObjects:[NSNumber numberWithInt:spot.actualID], details, [NSNumber numberWithDouble:timeIn],[NSNumber numberWithDouble:timeOut],@"1",spot.offers, acceptanceid, nil] forKeys:[NSArray arrayWithObjects:@"spotid",@"lastpayment", @"starttime",@"endtime",@"active" ,@"offers",@"acceptanceid", nil]];
+    Acceptance *newAcceptance = [[Acceptance alloc] init:newTransaction];
+    
     ParkifyAppDelegate *delegate = (ParkifyAppDelegate*)[[UIApplication sharedApplication] delegate];
     NSLog(@"Saving transaciton %@", newTransaction);
-    [[delegate.transactions objectForKey:@"active"] setValue:newTransaction forKey:[NSString stringWithFormat:@"%i", spot.actualID]];
+    [[delegate.transactions objectForKey:@"active"] setValue:newAcceptance forKey:acceptanceid];
+    [[delegate.transactions objectForKey:@"all"] setValue:newAcceptance forKey:acceptanceid];
+
+    /*
+     [[delegate.transactions objectForKey:@"active"] setValue:newTransaction forKey:[NSString stringWithFormat:@"%i", spot.actualID]];
     [[delegate.transactions objectForKey:@"all"] setValue:newTransaction forKey:[NSString stringWithFormat:@"%i", spot.actualID]];
+     */
     NSLog(@"Saving transaction %@", newTransaction);
     [Persistance saveUserPlist:delegate.transactions withName:@"transactionarray"];
 //    [Persistance saveUserRecord:delegate.transactions withName:@"transactionarray"];
-    return newTransaction;
+    return newAcceptance;
 }
 +(NSDictionary*)retrieveTransactions{
     return [Persistance retrievePlistWithName:@"transactionarray"];

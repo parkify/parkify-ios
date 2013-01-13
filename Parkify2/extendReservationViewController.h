@@ -11,7 +11,7 @@
 #import "ParkingSpotCollection.h"
 #import "RangeBar.h"
 #import "FlatRateBar.h"
-
+#import "Acceptance.h"
 #import "ASIHTTPRequest.h"
 @interface extendReservationViewController : UIViewController<ParkingSpotObserver, UIAlertViewDelegate, ASIHTTPRequestDelegate  >
 @property (weak, nonatomic) IBOutlet UILabel *flashingSign;
@@ -43,7 +43,7 @@
 @property (weak, nonatomic) IBOutlet UIView *rangeBarContainer;
 - (IBAction)parkButtonTapped:(UIButton *)sender;
 
-@property (nonatomic, weak) NSDictionary *transactioninfo;
+@property (nonatomic, weak) Acceptance *transactioninfo;
 
 @property (weak, nonatomic) IBOutlet UILabel *startTimeALabel;
 @property (weak, nonatomic) IBOutlet UILabel *startTimeLabel;

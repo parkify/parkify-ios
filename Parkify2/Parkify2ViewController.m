@@ -22,7 +22,7 @@
 #import "Persistance.h"
 #import "ParkifyAppDelegate.h"
 #import "extendReservationViewController.h"
-
+#import "Acceptance.h"
 #define ORIG_ANNOTATION_WIDTH 54
 #define ORIG_ANNOTATION_HEIGHT 89
 #define ANNOTATION_WIDTH (ORIG_ANNOTATION_WIDTH*0.5)
@@ -348,17 +348,29 @@ typedef struct STargetLocation {
     int numOfRes=0;
     NSMutableDictionary *actives = [[delegate.transactions objectForKey:@"active"] copy];
     for (NSString *transactionkey in actives){
-        NSMutableDictionary *transaction = [actives objectForKey:transactionkey];
-        double startTime = [[transaction objectForKey:@"starttime"] doubleValue];
-        double endTime =[[transaction objectForKey:@"endtime"] doubleValue];
-        
+        Acceptance *transaction = [actives objectForKey:transactionkey];
+        double startTime;
+        double endTime;
+        if ([transaction class] == [Acceptance class]){
+            startTime = [transaction.starttime doubleValue];
+            endTime = [transaction.endttime doubleValue];
+
+        }
+/*        NSMutableDictionary *transaction = [actives objectForKey:transactionkey];
+        */
+        else{
+            startTime = [[((NSMutableDictionary*)transaction) objectForKey:@"starttime"] doubleValue];
+            endTime =[[((NSMutableDictionary*)transaction) objectForKey:@"endtime"] doubleValue];
+        }
         if ((currentTime >= startTime) && (currentTime <= endTime)){
-            [transaction setValue:@"1" forKey:@"active"];
+            transaction.active=TRUE;
+            //[transaction setValue:@"1" forKey:@"active"];
             numOfRes++;
         }
         else{
             [[delegate.transactions objectForKey:@"active"] removeObjectForKey:transactionkey];
-            [transaction setValue:@"0" forKey:@"active"];
+            transaction.active=FALSE;
+//            [transaction setValue:@"0" forKey:@"active"];
             
         }
 
@@ -390,8 +402,9 @@ typedef struct STargetLocation {
         
         
         NSMutableDictionary *actives =  [[((ParkifyAppDelegate*)[[UIApplication sharedApplication] delegate]) transactions] objectForKey:@"active"];
-        NSDictionary *transact = [actives objectForKey:[[actives allKeys] lastObject]];
-        double endTime = [[transact objectForKey:@"endtime"] doubleValue];
+        Acceptance *transact = [actives objectForKey:[[actives allKeys] lastObject]];
+        
+        double endTime = [[transact endttime] doubleValue];
         self.bottomBarLabel.text = [NSString stringWithFormat:@"   (%i)   Reservation ends at %@        Details ", numRes, formatter(endTime)];
         self.bottomBarLabel.textAlignment = UITextAlignmentRight;
         
@@ -444,13 +457,15 @@ typedef struct STargetLocation {
         if ([command isEqualToString:@"extend"]){
             
             
-            NSString *key = [kvPairs objectForKey:@"spotid"];
+            //    NSString *key = [kvPairs objectForKey:@"spotid"];
+            NSString *key = [kvPairs objectForKey:@"acceptid"];
             if(!key)
                 return;
             if ( [[delegate.transactions objectForKey:@"active"] objectForKey:key])
                 [self performSelectorOnMainThread:@selector(launchExtendReservation:) withObject:key waitUntilDone:NO];
-            else if(   [[self getParkingSpots] parkingSpotForID:[key intValue]]){
-                [self performSelectorOnMainThread:@selector(openSpotViewControllerWithSpot:) withObject:key waitUntilDone:NO];
+            else if(   [[self getParkingSpots] parkingSpotForID:[[kvPairs objectForKey:@"spotid"] intValue]]){
+            //  else if(   [[self getParkingSpots] parkingSpotForID:[key intValue]]){
+            [self performSelectorOnMainThread:@selector(openSpotViewControllerWithSpot:) withObject:key waitUntilDone:NO];
             }
 
         }
@@ -1061,7 +1076,7 @@ typedef struct STargetLocation {
     controller.spot = [Persistance retrieveCurrentSpot];
     ParkifyAppDelegate *delegate = (ParkifyAppDelegate*)[[UIApplication sharedApplication] delegate];
     NSDictionary *actives = [delegate.transactions objectForKey:@"active"];
-    NSMutableDictionary *transact = [actives objectForKey:key];
+    Acceptance *transact = [actives objectForKey:key];
     
     controller.transactionInfo = transact ;
     // controller.startTime = [Persistance retrieveCurrentStartTime];
@@ -1093,7 +1108,7 @@ typedef struct STargetLocation {
     controller.spot = [Persistance retrieveCurrentSpot];
     ParkifyAppDelegate *delegate = (ParkifyAppDelegate*)[[UIApplication sharedApplication] delegate];
     NSDictionary *actives = [delegate.transactions objectForKey:@"active"];
-    NSMutableDictionary *transact = [actives objectForKey:[[actives allKeys] lastObject]];
+    Acceptance *transact = [actives objectForKey:[[actives allKeys] lastObject]];
 
     controller.transactionInfo = transact ;
        // controller.startTime = [Persistance retrieveCurrentStartTime];

@@ -486,8 +486,8 @@
         [navController.navigationBar setTintColor:[UIColor blackColor]];
         controller.spot = self.spot;
         if(paymentDetails != nil) {
-            NSMutableDictionary *thetransaction = [Persistance addNewTransaction:self.spot withStartTime:self.rangeBar. selectedMinimumValue andEndTime:self.rangeBar.selectedMaximumValue andLastPaymentDetails:[paymentDetails objectForKey:@"details"] withTransactionID:[paymentDetails objectForKey:@"id"]];
-            [[Mixpanel sharedInstance] track:@"launchConfirmationVC" properties:thetransaction];
+            Acceptance *thetransaction = [Persistance addNewTransaction:self.spot withStartTime:self.rangeBar. selectedMinimumValue andEndTime:self.rangeBar.selectedMaximumValue andLastPaymentDetails:[paymentDetails objectForKey:@"details"] withTransactionID:[paymentDetails objectForKey:@"id"] ];
+            [[Mixpanel sharedInstance] track:@"launchConfirmationVC" properties:nil];
             controller.transactionInfo = thetransaction;
             controller.topBarText = [paymentDetails objectForKey:@"details"];
             [Persistance saveCurrentSpot:self.spot];

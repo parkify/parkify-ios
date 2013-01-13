@@ -14,6 +14,7 @@
 #import "ExtraTypes.h"
 #import "SBJson.h"
 #import "ErrorTransformer.h"
+#import "Acceptance.h"
 @implementation ParkifyAppDelegate
 
 @synthesize window = _window;
@@ -44,8 +45,18 @@
             NSDictionary *aller = [trans objectForKey:@"all"];
             for (NSString *transactionkey in aller){
                 NSDictionary *transaction = [aller objectForKey:transactionkey];
-                NSMutableDictionary *thistransaction = [NSMutableDictionary dictionaryWithDictionary:transaction];
+                NSObject *thistransaction;
+                if ([transaction class] == [Acceptance class]){
+                    [alltrans setValue:transaction forKey: ((Acceptance*)transaction).acceptid ];
+
+                }
+                else{
+                    NSLog(@"Old data..letting it get deleted");
+                /*thistransaction = [NSMutableDictionary dictionaryWithDictionary:transaction];
                 NSLog(@"transaction is %@", transaction);
+                    [alltrans setValue:thistransaction forKey:[NSString stringWithFormat:@"%i", [[transaction objectForKey:@"acceptanceid"] intValue] ]];
+*/
+                }
             //    double startTime = [[transaction objectForKey:@"starttime"] doubleValue];
              //   double endTime =[[transaction objectForKey:@"endtime"] doubleValue];
              //
@@ -57,7 +68,6 @@
                  //   [thistransaction setValue:@"0" forKey:@"active"];
 
 //                }
-                [alltrans setValue:thistransaction forKey:[NSString stringWithFormat:@"%i", [[thistransaction objectForKey:@"spotid"] intValue] ]];
 
 
             }
@@ -153,26 +163,31 @@ void uncaughtExceptionHandler(NSException *exception) {
             NSLog(@"There are %i active reservations", [acceptances count]);
             for (NSDictionary *acceptance in acceptances){
             NSLog(@"Active %@", acceptance);
-                if ([alltransactionsonphone objectForKey:[NSString stringWithFormat:@"%i",  [[acceptance objectForKey:@"resource_offer_id"] intValue] ]]){
-                    [actives setValue:[alltransactionsonphone objectForKey:[NSString stringWithFormat:@"%i",  [[acceptance objectForKey:@"resource_offer_id"] intValue] ]] forKey:[NSString stringWithFormat:@"%i", [[acceptance objectForKey:@"resource_offer_id"] intValue] ]];
+                if ([[acceptance objectForKey:@"status"] isEqualToString:@"extended"])
+                    continue;
+                NSNumber *keyer = [NSNumber numberWithInt:[[acceptance objectForKey:@"id"] intValue] ];
+                if ([alltransactionsonphone objectForKey:keyer])
+                
+                {
+                    [actives setValue:[alltransactionsonphone objectForKey:keyer] forKey:[NSString stringWithFormat:@"%@", keyer]];
+//                    [actives setValue:[alltransactionsonphone objectForKey:[NSString stringWithFormat:@"%i",  [[acceptance objectForKey:@"id"] intValue] ]] forKey:[NSString stringWithFormat:@"%i", [[acceptance objectForKey:@"id"] intValue] ]];
                     
                 }
                 else{
- 
                     ParkingSpot *thisSpot = [self.parkingSpots parkingSpotForIDFromAll: [[acceptance objectForKey:@"resource_offer_id"] intValue] ];
                     if (thisSpot){
-                    NSMutableDictionary *thetransaction = [Persistance addNewTransaction: thisSpot withStartTime:[[acceptance objectForKey:@"start_time"] doubleValue] andEndTime:[[acceptance objectForKey:@"end_time"] doubleValue] andLastPaymentDetails:[acceptance objectForKey:@"details"] withTransactionID:[acceptance objectForKey:@"id"]];
+                    Acceptance *thetransaction = [Persistance addNewTransaction: thisSpot withStartTime:[[acceptance objectForKey:@"start_time"] doubleValue] andEndTime:[[acceptance objectForKey:@"end_time"] doubleValue] andLastPaymentDetails:[acceptance objectForKey:@"details"] withTransactionID:[acceptance objectForKey:@"id"]];
                     NSLog(@"Transaction not in records, added in %@", thetransaction);
                     }
                     else{
                         NSLog(@"parking spot not there %@", [acceptance objectForKey:@"resource_offer_id"]);
-                    }
+                    } 
                     
                     //[Persistance addNewTransaction:self.spot withStartTime:self.rangeBar. selectedMinimumValue andEndTime:self.rangeBar.selectedMaximumValue andLastPaymentDetails:[paymentDetails objectForKey:@"details"] withTransactionID:[paymentDetails objectForKey:@"id"]];
-
                 }
-       
             }
+            //Check for standalone acceptances or an extensions
+
         }
 
     }

@@ -12,7 +12,7 @@
 #import "ParkingSpotCollection.h"
 #import "ASIHTTPRequest.h"
 #import "NSNull+Debug.h"
-#define APP_VERSION @"v1.3"
+#define APP_VERSION @"v1.4"
 
 
 @interface ParkifyAppDelegate : UIResponder <UIApplicationDelegate, ASIHTTPRequestDelegate>

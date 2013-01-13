@@ -233,7 +233,6 @@
     [self.extendButton addTarget:self action:@selector(extendReservation:) forControlEvents:UIControlEventTouchUpInside];
     [self.calloutText addSubview:self.extendButton];
 }
-
 -(void)prepCallout {
     self.calloutText = [[UIWebView alloc] initWithFrame:CGRectMake(0,0,self.view.frame.size.width - 2*CALLOUT_CONTENT_OFFSET,1)];
     self.calloutText.delegate = self;
@@ -285,7 +284,9 @@
             return [dateFormatter stringFromDate:time]; };
         NSString* timeString = @"";
         if (self.transactionInfo) {
-            timeString = [NSString stringWithFormat:@"%@ - %@", formatter([[self.transactionInfo objectForKey:@"starttime"] doubleValue]), formatter([[self.transactionInfo objectForKey:@"endtime"] doubleValue])];
+            double endtime = [[self.transactionInfo endttime] doubleValue];
+   
+            timeString = [NSString stringWithFormat:@"%@ - %@", formatter([[self.transactionInfo starttime] doubleValue]), formatter(endtime)];
         }
         //Layout text
         NSString* layoutString = ([self.spot.mSpotLayout isEqualToString:@"parallel"]) ? @"YES" : @"NO";
@@ -775,7 +776,7 @@
     
     self.detailVC = [mainStoryboard instantiateViewControllerWithIdentifier: @"troubleFindingVC"];
     ((troubleFindingSpotViewController*)self.detailVC).theSpot=self.spot;
-    ((troubleFindingSpotViewController*)self.detailVC).transactionInfo=self.self.transactionInfo;
+    ((troubleFindingSpotViewController*)self.detailVC).transactionInfo=self.transactionInfo;
     
     [self.navigationController pushViewController:self.detailVC animated:YES];
     

@@ -268,8 +268,8 @@ static void *AVCamFocusModeObserverContext = &AVCamFocusModeObserverContext;
         problemtext = [genericProblemTextView text];
     }
 
-    [Api sendProblemSpotWithText:problemtext andImage:self.theProblemImage andResourceID:self.theSpot.actualID withLat:delegate.currentLat andLong:delegate.currentLong withAcceptanceID:[[self.transactionInfo objectForKey:@"acceptanceid"] intValue] shouldCancel:YES withASIHTTPDelegate:self];
-  
+    [Api sendProblemSpotWithText:problemtext andImage:self.theProblemImage andResourceID:self.theSpot.actualID withLat:delegate.currentLat andLong:delegate.currentLong withAcceptanceID:[[self.transactionInfo acceptid] intValue] shouldCancel:YES withASIHTTPDelegate:self];
+    [[delegate.transactions objectForKey:@"active"] removeObjectForKey:[self.transactionInfo acceptid]];
     CGRect waitingMaskFrame = self.view.frame;
     waitingMaskFrame.origin.x = 0;
     waitingMaskFrame.origin.y = 0;
