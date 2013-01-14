@@ -22,6 +22,7 @@
     BOOL isNew;
     BOOL reservationUsed;
 }
+
 @property double currentLat;
 @property double currentLong;
 @property (nonatomic, assign) BOOL reservationUsed;

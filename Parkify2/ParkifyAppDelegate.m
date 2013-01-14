@@ -163,7 +163,7 @@ void uncaughtExceptionHandler(NSException *exception) {
             NSLog(@"There are %i active reservations", [acceptances count]);
             for (NSDictionary *acceptance in acceptances){
             NSLog(@"Active %@", acceptance);
-                if ([[acceptance objectForKey:@"status"] isEqualToString:@"extended"])
+                if (![[acceptance objectForKey:@"active"] boolValue])
                     continue;
                 NSNumber *keyer = [NSNumber numberWithInt:[[acceptance objectForKey:@"id"] intValue] ];
                 if ([alltransactionsonphone objectForKey:keyer])

@@ -161,7 +161,6 @@
     } else {
         NSLog(@"%@", [TBXML elementName:tbxml.rootXMLElement]);
     }
-    
     //TRAVERSE EACH DIRECTION (IF ANY)
     TBXMLElement * root = tbxml.rootXMLElement;
     NSString* midHtml = @"";
