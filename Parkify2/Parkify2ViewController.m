@@ -263,7 +263,8 @@ typedef struct STargetLocation {
         self.bAlreadyInit = true;
         [self.mapView setNeedsDisplay];
     }
-    
+    ParkifyAppDelegate *delegate = (ParkifyAppDelegate*)[[UIApplication sharedApplication] delegate];
+    [Api getListOfCurrentAcceptances:delegate];
     [self updateBottomBar];
     self.timerDuration = 10;
     [self refreshSpots];
@@ -362,6 +363,12 @@ typedef struct STargetLocation {
             startTime = [[((NSMutableDictionary*)transaction) objectForKey:@"starttime"] doubleValue];
             endTime =[[((NSMutableDictionary*)transaction) objectForKey:@"endtime"] doubleValue];
         }
+/*
+        NSDate *start = [NSDate dateWithTimeIntervalSince1970:startTime];
+        NSDate *end = [NSDate dateWithTimeIntervalSince1970:endTime];
+        NSDate *current = [NSDate dateWithTimeIntervalSince1970:currentTime];
+        NSLog(@"\n%@\n%@\n%@", start,end, current);
+        */
         if ((currentTime >= startTime) && (currentTime <= endTime)){
             transaction.active=TRUE;
             //[transaction setValue:@"1" forKey:@"active"];
@@ -1105,10 +1112,12 @@ typedef struct STargetLocation {
     UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:controller];
     [navController.navigationBar setTintColor:[UIColor blackColor]];
 
-    controller.spot = [Persistance retrieveCurrentSpot];
+;
     ParkifyAppDelegate *delegate = (ParkifyAppDelegate*)[[UIApplication sharedApplication] delegate];
     NSDictionary *actives = [delegate.transactions objectForKey:@"active"];
     Acceptance *transact = [actives objectForKey:[[actives allKeys] lastObject]];
+    
+    controller.spot =  [delegate.parkingSpots parkingSpotForIDFromAll: [[transact spotid] intValue] ];
 
     controller.transactionInfo = transact ;
        // controller.startTime = [Persistance retrieveCurrentStartTime];
