@@ -318,8 +318,7 @@ standardImageIDs:(NSDictionary*)standardImageIDs
     //if (freeIn){
         for (NSDictionary* offer in [spot objectForKey:@"offers"]) {
             [offersIn addObject:[[Offer alloc] initFromDictionary:offer]];
-            NSLog(@"For spot id %i offer %@", self.actualID, offer);
-
+            
         }
     //}
         self.offers = offersIn;
