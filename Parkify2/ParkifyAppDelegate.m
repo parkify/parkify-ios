@@ -122,7 +122,12 @@ void uncaughtExceptionHandler(NSException *exception) {
     [[UINavigationBar appearance] setBackgroundImage:[UIImage imageNamed:@"masthead_logo.png"] forBarMetrics:UIBarMetricsDefault];
     [[UINavigationBar appearance] setContentMode:UIViewContentModeScaleToFill];
     [[UIBarButtonItem appearance] setTintColor:[UIColor darkGrayColor]];
-  
+    
+    
+    
+    self.locationManager = [[CLLocationManager alloc] init];
+    self.locationManager.desiredAccuracy = kCLLocationAccuracyBest;
+    [self.locationManager startUpdatingLocation];
     return YES;
 }
 - (BOOL)application:(UIApplication *)application handleOpenURL:(NSURL *)url {
@@ -241,6 +246,7 @@ void uncaughtExceptionHandler(NSException *exception) {
 - (void)applicationWillTerminate:(UIApplication *)application
 {
     // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
+    [self.locationManager stopUpdatingLocation];
 }
 
 

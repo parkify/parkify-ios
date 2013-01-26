@@ -10,6 +10,9 @@
 #import "ParkingSpot.h"
 #import "Acceptance.h"  
 @interface ParkifyConfirmationViewController : UIViewController <UIScrollViewDelegate, UIWebViewDelegate, UIAlertViewDelegate   >
+
+
+
 - (IBAction)closeButtonTapped:(id)sender;
 @property (nonatomic, strong) ParkingSpot* spot;
 - (IBAction)directionsButtonTapped:(UIButton *)sender;

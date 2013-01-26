@@ -82,7 +82,7 @@ static void *AVCamFocusModeObserverContext = &AVCamFocusModeObserverContext;
         genericProblemView.hidden=NO;
         [[genericProblemTextView layer] setCornerRadius:10.0f];
         [genericProblemTextView setClipsToBounds:YES];
-        UIAlertView* alerter = [[UIAlertView alloc] initWithTitle:@"Sorry" message:@"Please let us know your problem with this spot" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"It is too small", @"There is some obstruction", @"Other (please describe below)", nil];
+        UIAlertView* alerter = [[UIAlertView alloc] initWithTitle:@"Sorry" message:@"Please let us know about your problem with this spot" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"It is too small", @"There is some obstruction", @"Other (please describe below)", nil];
         [alerter show];
         alerter.tag = kAlertViewChoicesForProblems;
     }
@@ -197,7 +197,6 @@ static void *AVCamFocusModeObserverContext = &AVCamFocusModeObserverContext;
             [genericProblemTextView setText:@"Spot too small"];
         else if(buttonIndex==2){
             [genericProblemTextView setText:@"There is an obstruction: "];
-            
         }
 
     }

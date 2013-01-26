@@ -1,13 +1,13 @@
 //
-//  ParkifyConfirmationViewController.m
-//  Parkify2
+//  ConfirmationPage.m
+//  Parkify
 //
-//  Created by Me on 7/9/12.
-//  Copyright (c) 2012 __MyCompanyName__. All rights reserved.
+//  Created by Me on 1/23/13.
+//
 //
 
-#import "ParkifyConfirmationViewController.h"
-#import <QuartzCore/QuartzCore.h> 
+#import "ConfirmationPage.h"
+#import <QuartzCore/QuartzCore.h>
 #import "ExtraTypes.h"
 #import "TextFormatter.h"
 #import "Api.h"
@@ -21,11 +21,10 @@
 #import "MyWebView.h"
 #import "mapDirectionsViewController.h"
 #import "extendReservationViewController.h"
-//#import "PlacedAgent.h"
 
 #define CALLOUT_CONTENT_OFFSET 20
 
-@interface ParkifyConfirmationViewController ()
+@interface ConfirmationPage ()
 @property (strong, nonatomic) NSMutableArray * scrollableSubviews;
 
 @property (strong, nonatomic) UIWebView* calloutText;
@@ -41,22 +40,15 @@
 
 @property (strong, nonatomic) UIWebView* telText;
 
-@property (nonatomic, strong) UIViewController *detailVC;
-
-
 @end
 
-@implementation ParkifyConfirmationViewController
-@synthesize transactionInfo = _transactionInfo;
-//@synthesize startTime = _startTime;
-//@synthesize endTime = _endTime;
+@implementation ConfirmationPage
+
 @synthesize mainScrollView = _mainScrollView;
 
-@synthesize titleLable = _titleLable;
-@synthesize spot = _spot;
+@synthesize reservation = _reservation;
 
-@synthesize currentLat = _currentLat;
-@synthesize currentLong = _currentLong;
+@synthesize spot = _spot;
 
 @synthesize scrollableSubviews = _scrollableSubviews;
 
@@ -72,23 +64,47 @@
 @synthesize telText = _telText;
 
 @synthesize topBarText = _topBarText;
-@synthesize detailVC = _detailVC;
 
 @synthesize extendButton = _extendButton;
 
-- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
+
+//I suggest you don't use this one.
+- (id)initWithFrame:(CGRect)frame
 {
-    self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
+    return [self initWithFrame:frame withSpot:nil withReservation:nil];
+}
+
+
+/*
+ 
+ 
+ 
+ controller.spot = self.spot;
+ if(paymentDetails != nil) {
+ Acceptance *thetransaction = [Persistance addNewTransaction:self.spot withStartTime:self.rangeBar. selectedMinimumValue andEndTime:self.rangeBar.selectedMaximumValue andLastPaymentDetails:[paymentDetails objectForKey:@"details"] withTransactionID:[paymentDetails objectForKey:@"id"] ];
+ [[Mixpanel sharedInstance] track:@"launchConfirmationVC" properties:nil];
+ controller.transactionInfo = thetransaction;
+ controller.topBarText = [paymentDetails objectForKey:@"details"];
+ [Persistance saveCurrentSpot:self.spot];
+ } else {
+ controller.topBarText = @"";
+ }
+ 
+ controller.currentLat = self.currentLat;
+ controller.currentLong = self.currentLong;
+ 
+
+ */
+
+- (id)initWithFrame:(CGRect)frame withSpot:(ParkingSpot *)spot withReservation:(Acceptance *)reservation
+{
+    self = [super initWithFrame:frame];
     if (self) {
-        // Custom initialization
-    }
-    return self;
-}
--(void)viewWillAppear:(BOOL)animated{
-}
-- (void)viewDidLoad
-{
-    [super viewDidLoad];
+        // Initialization code
+    
+    self.spot = spot;
+    self.reservation = reservation;
+    self.topBarText = reservation.lastPaymentInfo;
     
     NSMutableDictionary* demoDict = [Persistance retrieveDemoDict];
     if (![demoDict objectForKey:@"ConfirmationViewControllerDemo"])
@@ -97,24 +113,27 @@
         [self.scrollIndicator setAlpha:1.0];
         [Persistance saveDemoDict:demoDict];
     }
+        UIScrollView* sview = [[UIScrollView alloc] initWithFrame:CGRectMake(5, 5, frame.size.width-10, frame.size.height-10)];
+    self.mainScrollView = sview;
+    sview.layer.borderColor = [UIColor blackColor].CGColor;
+    sview.layer.borderWidth = 2.0f;
+    sview.backgroundColor = [UIColor colorWithWhite:0.17 alpha:1];
+    [self addSubview:self.mainScrollView];
+        
     
     [self.mainScrollView setDelegate:self];
     self.scrollableSubviews = [[NSMutableArray alloc] init];
     
+    [self.mainScrollView setShowsVerticalScrollIndicator:false];
     
-    
-    
-    UIView* testView1 = [[UIView alloc] initWithFrame:CGRectMake(0,0,320,160)];
-    testView1.backgroundColor = [UIColor clearColor];
-    
-    MultiImageViewer* miViewer = [[MultiImageViewer alloc] initWithFrame:CGRectMake(0,0,320,160) withImageIds:self.spot.landscapeConfImageIDs];
+    MultiImageViewer* miViewer = [[MultiImageViewer alloc] initWithFrame:CGRectMake(0,0,self.mainScrollView.frame.size.width,self.mainScrollView.frame.size.width*0.5) withImageIds:self.spot.landscapeConfImageIDs];
     
     
     [self appendSubView:miViewer];
     
     [self prepCallout];
     
-    [self prepDirections];
+        //[self prepDirections];
     
     [self prepNotes];
     
@@ -128,23 +147,9 @@
     } else {
         [self.topBarView setHidden:true];
     }
-    
-}
-
-- (void)viewDidUnload
-{
-    [self setMainScrollView:nil];
-    [self setTopBarView:nil];
-    [self setTopViewLabel:nil];
-    [self setTopBarTapped:nil];
-    [self setScrollIndicator:nil];
-    [super viewDidUnload];
-    // Release any retained subviews of the main view.
-}
-
-- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
-{
-    return (interfaceOrientation == UIInterfaceOrientationPortrait);
+        
+    }
+    return self;
 }
 
 
@@ -207,7 +212,7 @@
     [self.calloutText addSubview:self.extendButton];
 }
 -(void)prepCallout {
-    self.calloutText = [[UIWebView alloc] initWithFrame:CGRectMake(0,0,self.view.frame.size.width - 2*CALLOUT_CONTENT_OFFSET,1)];
+    self.calloutText = [[UIWebView alloc] initWithFrame:CGRectMake(0,0,self.mainScrollView.frame.size.width - 2*CALLOUT_CONTENT_OFFSET,1)];
     self.calloutText.delegate = self;
     self.calloutText.backgroundColor = [UIColor clearColor];
     self.calloutText.opaque = false;
@@ -216,7 +221,7 @@
     
     CGRect calloutFrame = [CalloutView frameThatFits:self.calloutText withCornerRadius:10];
     
-    calloutFrame.origin.x = (self.view.frame.size.width - calloutFrame.size.width) / 2.0;
+    calloutFrame.origin.x = (self.mainScrollView.frame.size.width - calloutFrame.size.width) / 2.0;
     calloutFrame.origin.y = -8;
     
     self.congratsCallout = [[CalloutView alloc] initWithFrame:calloutFrame withXOffset:40 withCornerRadius:10 withInnerView:self.calloutText];
@@ -256,17 +261,17 @@
             [dateFormatter setDateFormat:@"h:mm a"];
             return [dateFormatter stringFromDate:time]; };
         NSString* timeString = @"";
-        if (self.transactionInfo) {
-            double endtime = [[self.transactionInfo endttime] doubleValue];
-   
-            timeString = [NSString stringWithFormat:@"%@ - %@", formatter([[self.transactionInfo starttime] doubleValue]), formatter(endtime)];
+        if (self.reservation) {
+            double endtime = [[self.reservation endttime] doubleValue];
+            
+            timeString = [NSString stringWithFormat:@"%@ - %@", formatter([[self.reservation starttime] doubleValue]), formatter(endtime)];
         }
         //Layout text
         NSString* layoutString = ([self.spot.mSpotLayout isEqualToString:@"parallel"]) ? @"YES" : @"NO";
         //Layout text
         NSString* coverageString = ([self.spot.mSpotCoverage isEqualToString:@"covered"]) ? @"YES" : @"NO";
         
-
+        
         
         infoWebViewString = [NSString stringWithFormat:@"<HTML>"
                              "<HEAD>%@</HEAD>"
@@ -292,7 +297,7 @@
 }
 
 -(void)prepDirections {
-    self.directionsText = [[UIWebView alloc] initWithFrame:CGRectMake(0,0,self.view.frame.size.width,1)];
+    self.directionsText = [[UIWebView alloc] initWithFrame:CGRectMake(0,0,self.mainScrollView.frame.size.width,1)];
     self.directionsText.delegate = self;
     self.directionsText.backgroundColor = [UIColor clearColor];
     self.directionsText.opaque = false;
@@ -319,7 +324,7 @@
     ".direction {margin-top:10px;}"
     "</style>"
     ;
-     
+    
     if(!self.spot) {
         infoWebViewString = [NSString stringWithFormat:@"<HTML>"
                              "<HEAD>%@</HEAD>"
@@ -327,18 +332,18 @@
                              "</BODY></HTML>", styleString];
     } else {
         /*
-        
-        infoWebViewString = [NSString stringWithFormat:@"<HTML>"
-                             "<HEAD>%@</HEAD>"
-                             "<BODY>"
-                             "<div id='content'>"
-                             "<span class='stressed1'>How to find your spot</span>"
-                             "<br/>"
-                             "<div class='direction'><img id=target src='%@'/>blahblahblah adsfsda mewownwefkl nawlnflwef mkwefjwlke flkawefklwaemf wekfmlkwe mweafwelkfm lkwemakwefmlkwem awkemfewk.</div>"
-                             
-                             "</div></BODY></HTML>",
-                             styleString,
-                             [NSString stringWithFormat:@"http://%@/images/%d?image_attachment=true&style=original", TARGET_SERVER, [[self.spot.imageIDs objectAtIndex:0] intValue]]];
+         
+         infoWebViewString = [NSString stringWithFormat:@"<HTML>"
+         "<HEAD>%@</HEAD>"
+         "<BODY>"
+         "<div id='content'>"
+         "<span class='stressed1'>How to find your spot</span>"
+         "<br/>"
+         "<div class='direction'><img id=target src='%@'/>blahblahblah adsfsda mewownwefkl nawlnflwef mkwefjwlke flkawefklwaemf wekfmlkwe mweafwelkfm lkwemakwefmlkwem awkemfewk.</div>"
+         
+         "</div></BODY></HTML>",
+         styleString,
+         [NSString stringWithFormat:@"http://%@/images/%d?image_attachment=true&style=original", TARGET_SERVER, [[self.spot.imageIDs objectAtIndex:0] intValue]]];
          */
         
         DirectionsControl* dControl = [[DirectionsControl alloc] initWithFrame:CGRectZero withDirections:self.spot.mDirections withResolutionDelegate:self.spot];
@@ -352,7 +357,7 @@
 }
 
 -(void) prepNotes {
-    self.notesText = [[UIWebView alloc] initWithFrame:CGRectMake(0,0,self.view.frame.size.width,1)];
+    self.notesText = [[UIWebView alloc] initWithFrame:CGRectMake(0,0,self.mainScrollView.frame.size.width,1)];
     self.notesText.delegate = self;
     self.notesText.backgroundColor = [UIColor clearColor];
     self.notesText.opaque = false;
@@ -363,7 +368,7 @@
     NSString* infoWebViewString;
     NSString* styleString = @"<style type='text/css'>"
     "body {background-color:transparent; font-family:'HelveticaNeue'; color:rgb(200,200,200); font-size:15; left-margin:0px; left-padding: 0px;}"
-    "ul {list-style-position:inside; margin-left:0px; padding-left: 1px;}"
+    "ul {list-style-position:inside; margin-left:0px; padding-left: 1px; padding-right: 1px;}"
     "</style>";
     
     if(!self.spot) {
@@ -392,15 +397,15 @@
 }
 
 -(void) prepWarning {
-    self.warningText = [[UIWebView alloc] initWithFrame:CGRectMake(0,0,self.view.frame.size.width,1)];
+    self.warningText = [[UIWebView alloc] initWithFrame:CGRectMake(0,0,self.mainScrollView.frame.size.width,1)];
     self.warningText.delegate = self;
     self.warningText.backgroundColor = [UIColor clearColor];
     self.warningText.opaque = false;
     [self.warningText setUserInteractionEnabled:false];
     
-    self.warningContainer = [[UIView alloc] initWithFrame:CGRectMake(0,0,self.view.frame.size.width,1)];
+    self.warningContainer = [[UIView alloc] initWithFrame:CGRectMake(0,0,self.frame.size.width,1)];
     
-    self.warningBackground = [[UIImageView alloc] initWithFrame:CGRectMake(0,0,self.view.frame.size.width,1)];
+    self.warningBackground = [[UIImageView alloc] initWithFrame:CGRectMake(0,0,self.mainScrollView.frame.size.width,1)];
     self.warningBackground.image = [UIImage imageNamed:@"warning_background.png"];
     
     [self.warningContainer addSubview:self.warningBackground];
@@ -414,7 +419,7 @@
     ".stressed1 {font-family:'HelveticaNeue-Bold'; font-size:18;}"
     ".stressed2 {font-family:'HelveticaNeue-Bold'; font-size:15;}"
     ".stressed3 {font-family:'HelveticaNeue'; font-size:15;}"
-    "ul {list-style-position:inside; margin-left:0px; padding-left: 1px; list-style-image: url(warning.png);}"
+    "ul {list-style-position:inside; margin-left:0px; padding-left: 1px; padding-right: 1px;list-style-image: url(warning.png);}"
     "</style>";
     
     if(!self.spot) {
@@ -445,7 +450,7 @@
 }
 
 -(void) prepTel {
-    self.telText = [[UIWebView alloc] initWithFrame:CGRectMake(0,0,self.view.frame.size.width,1)];
+    self.telText = [[UIWebView alloc] initWithFrame:CGRectMake(0,0,self.mainScrollView.frame.size.width,1)];
     self.telText.delegate = self;
     self.telText.backgroundColor = [UIColor clearColor];
     self.telText.opaque = false;
@@ -474,7 +479,7 @@
                              "<HEAD>%@</HEAD>"
                              "<BODY>"
                              
-                             "<span class='stressed2'>Need Help? Call <a href='tel:1-855-727-5439'>1-855-Parkify</a></span>"                             
+                             "<span class='stressed2'><centered>Need Help? Call <a href='tel:1-855-727-5439'>1-855-Parkify</a></centered></span>"
                              "</BODY></HTML>",
                              styleString
                              ];
@@ -525,7 +530,7 @@
         
         //also background image
         self.warningBackground.frame = frame;
-    
+        
         CGPoint offset = CGPointMake(0,0);
         CGSize sizeIncrease = CGSizeMake(0, height - prevHeight);
         [self adjustSubView:self.warningContainer byOffset:offset bySizeIncrease:sizeIncrease animated:true];
@@ -535,15 +540,15 @@
         CGSize sizeIncrease = CGSizeMake(0, height - prevHeight);
         [self adjustSubView:self.telText byOffset:offset bySizeIncrease:sizeIncrease animated:true];
     }
-
-
-
+    
+    
+    
 }
 - (void)finishSettingUpCallout {
     CGRect newCalloutFrame = [self.congratsCallout frameThatFits];
     CGPoint offset = CGPointMake(0,0);
     CGSize sizeIncrease = CGSizeMake(newCalloutFrame.size.width - self.congratsCallout.frame.size.width,
-                                 newCalloutFrame.size.height - self.congratsCallout.frame.size.height);
+                                     newCalloutFrame.size.height - self.congratsCallout.frame.size.height);
     
     [self adjustSubView:self.congratsCallout byOffset:offset bySizeIncrease:sizeIncrease animated:true];
     
@@ -560,132 +565,6 @@
     } else {
         return true;
     }
-}
-
-/*
--(void)updateInfo {
-    //Info box
-    NSString* infoTitle;
-    NSString* infoBody;
-    NSString* timeString;
-    NSString* priceString;
-    
-    if(self.spot == nil) {
-        infoTitle = @"Spot not found";
-        infoBody = @"";
-        timeString = @"";
-        priceString = @"";
-        
-    }
-    else {
-        infoTitle = [NSString stringWithFormat:@"Parkify Spot"];
-        infoBody = self.spot.mDesc; 
-        
-        //Time text
-        Formatter formatter = ^(double val) {
-            NSDate* time = [[NSDate alloc] initWithTimeIntervalSince1970:val];
-            NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-            [dateFormatter setDateFormat:@"h:mm a"];
-            return [dateFormatter stringFromDate:time]; };
-        
-        timeString = [NSString stringWithFormat:@"Time Booked: %@ - %@", formatter(self.startTime), formatter(self.endTime)];
-        
-        //Price text
-        double durationInSeconds = (self.endTime - self.startTime);
-        double totalPrice;
-        if(self.spot.offers.count > 0) {
-             totalPrice = [self.spot priceFromNowForDurationInSeconds:durationInSeconds];
-            
-            [Persistance saveLastAmountCharged:totalPrice];
-        } else {
-            totalPrice = [Persistance retrieveLastAmountCharged];
-        }
-        priceString = [NSString stringWithFormat:@"$%0.2f Charged to ************%@", totalPrice, [Persistance retrieveLastFourDigits]];
-        
-    }
-    CGAffineTransform squish = [TextFormatter transformForSpotViewText];
-    self.titleLable.text = infoTitle;
-    [self.infoBox setText:infoBody];
-    self.timeLabel.text = timeString;
-    self.timeLabel.transform = squish;
-    self.priceLabel.text = priceString;
-    self.priceLabel.transform = squish;
-    
-}
-*/
-
-- (IBAction)closeButtonTapped:(id)sender {
-    [[Mixpanel sharedInstance] track:@"dismissConfirmationVC"];
-
-    [self dismissViewControllerAnimated:true completion:^{}];
-}
-
-- (IBAction)directionsButtonTapped:(UIButton *)sender {
-    UIStoryboard *mainStoryboard = [UIStoryboard storyboardWithName:@"MainStoryboard_iPhone"
-                                                             bundle: nil];
-
-    mapDirectionsViewController *newMaps = [mainStoryboard instantiateViewControllerWithIdentifier: @"mapDirectionsVC"];;
-    
-    //MyWebView *newMaps = [[MyWebView alloc] initWithFrame:self.view.frame];
-    
-    newMaps.reservation = self.transactionInfo;
-    newMaps.spot = self.spot;
-    
-    
-    
-    [[Mixpanel sharedInstance] track:@"directionsButtonTapped"];
-
-    [self.navigationController pushViewController:newMaps animated:YES];
-//    [self.view addSubview:newMaps];
-    return;
-    
-    
-    Class itemClass = [MKMapItem class];
-    if (itemClass && [itemClass respondsToSelector:@selector(openMapsWithItems:launchOptions:)]) {
-        // ios >= 6
-        
-        CLLocationCoordinate2D end;
-        end.latitude = self.spot.mLat;
-        end.longitude = self.spot.mLong;
-        
-        
-        NSArray* addressComponents = [self.spot.mAddress componentsSeparatedByString:@","];
-        NSMutableArray* trimmedAddressComponents = [[NSMutableArray alloc] init];
-        for (NSString* str in addressComponents) {
-            [trimmedAddressComponents addObject:[str stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]]];
-        }
-        
-        
-        NSArray* addressKeysAll = [NSArray arrayWithObjects:kABPersonAddressStreetKey,
-            kABPersonAddressCityKey,
-            kABPersonAddressStateKey,
-            kABPersonAddressZIPKey,
-            kABPersonAddressCountryKey,
-            kABPersonAddressCountryCodeKey, nil];
-        
-        NSRange matchedRange;
-        matchedRange.location = 0;
-        matchedRange.length = [addressComponents count];
-        
-                
-        NSDictionary* addressDictionary = [NSDictionary dictionaryWithObjects:trimmedAddressComponents forKeys:[addressKeysAll subarrayWithRange:matchedRange]];
-        
-        // NSDictionary addressDictionary =
-        
-        MKPlacemark* endPlacemark = [[MKPlacemark alloc] initWithCoordinate:end addressDictionary:addressDictionary];
-        //MKPlacemark* endPlacemark = [[MKPlacemark alloc] initWithCoordinate:end addressDictionary:nil];
-        NSArray* startAndEnd = [NSArray arrayWithObjects:[MKMapItem mapItemForCurrentLocation], [[MKMapItem alloc] initWithPlacemark:endPlacemark], nil];
-        
-        NSDictionary* options = [NSDictionary dictionaryWithObjectsAndKeys:MKLaunchOptionsDirectionsModeDriving, MKLaunchOptionsDirectionsModeKey, nil];
-        [MKMapItem openMapsWithItems:startAndEnd launchOptions:options];
-    } else {
-        // ios < 6
-        NSString* url = [NSString stringWithFormat: @"http://maps.google.com/maps?saddr=%f,%f&daddr=%f,%f",
-                         self.currentLat,self.currentLong,//currentLocation.latitude, currentLocation.longitude,
-                         self.spot.mLat, self.spot.mLong];//[address stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
-        [[UIApplication sharedApplication] openURL: [NSURL URLWithString: url]];
-    }
-    
 }
 
 -(void) prepTopBar {
@@ -715,81 +594,30 @@
 }
 
 - (IBAction)extendReservation:(id)sender {
-    [[Mixpanel sharedInstance] track:@"launchExtendReservationVC"];
-    UIStoryboard *mainStoryboard = [UIStoryboard storyboardWithName:@"MainStoryboard_iPhone"
-                                                             bundle: nil];
+    [self sendActionsForControlEvents:
+     ExtendReservationRequestedActionEvent];
     
-    extendReservationViewController *controller = [mainStoryboard instantiateViewControllerWithIdentifier: @"extendResVC"];
-    controller.transactioninfo= self.transactionInfo;
-    controller.spot = self.spot;
-    [self.parentViewController.navigationController pushViewController:controller animated:YES];
-
 }
 
 - (IBAction)topBarButtonTapped:(id)sender {
     [self hideTopBar:0.0];
 }
-#pragma mark Gaurav code for trouble
--(void)launchProblemSpotVC:(BOOL)isLicensePlateView{
-    UIStoryboard *mainStoryboard = [UIStoryboard storyboardWithName:@"MainStoryboard_iPhone"
-                                                             bundle: nil];
 
-    problemSpotViewController *controller = [mainStoryboard instantiateViewControllerWithIdentifier: @"ProblemSpotVC"];
-    self.detailVC=controller;
-    controller.theSpot = self.spot;
-    (( problemSpotViewController*)self.detailVC).transactionInfo = self.transactionInfo;
-
-    ((problemSpotViewController*)(self.detailVC)).isLicensePlateProblem=isLicensePlateView;
-    [self.navigationController pushViewController:self.detailVC animated:YES];
+- (void)moreToLeft:(BOOL)isMore {
     
 }
--(void)launchtroubleFindingVC{
-    UIStoryboard *mainStoryboard = [UIStoryboard storyboardWithName:@"MainStoryboard_iPhone"
-                                                             bundle: nil];
-    
-    self.detailVC = [mainStoryboard instantiateViewControllerWithIdentifier: @"troubleFindingVC"];
-    ((troubleFindingSpotViewController*)self.detailVC).theSpot=self.spot;
-    ((troubleFindingSpotViewController*)self.detailVC).transactionInfo=self.transactionInfo;
-    
-    [self.navigationController pushViewController:self.detailVC animated:YES];
-    
-}
-#pragma mark alert view delegate
--(void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex{
-    if (alertView.tag == kProblemAlertView && buttonIndex != alertView.cancelButtonIndex){
-        if (buttonIndex == 1)
-            [self launchProblemSpotVC:TRUE];
-        else if(buttonIndex==2){
-            [self launchProblemSpotVC:FALSE];
-            
-            NSLog(@"Launch without the license plate stuff");
-        }
-        else{
-            [self launchtroubleFindingVC];
-            NSLog(@"Launch directions");
-        }
-    }
-}
-- (IBAction)launchTroubleAlert:(id)sender {
-    UIAlertView *problemWithSpot = [[UIAlertView alloc] initWithTitle:@"Uh-oh" message:@"Please let us know what problem you are having we'll be happy to give you a refund." delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Somebody is in my spot",@"The spot is unusable", @"I cannot find my spot!", nil];
-    [problemWithSpot show];
-    problemWithSpot.tag = kProblemAlertView;
-    
+- (void)moreToRight:(BOOL)isMore {
     
 }
 
-- (void)scrollViewDidScroll:(UIScrollView *)sender {
-    // Update the page when more than 50% of the previous/next page is visible
-    [self dissolveScrollIndicator];
+
+/*
+// Only override drawRect: if you perform custom drawing.
+// An empty implementation adversely affects performance during animation.
+- (void)drawRect:(CGRect)rect
+{
+    // Drawing code
 }
-
-- (void) dissolveScrollIndicator {
-    [UIView animateWithDuration:0.8 animations:^{
-        self.scrollIndicator.alpha = 0;
-    }];
-}
-
-
-
+*/
 
 @end

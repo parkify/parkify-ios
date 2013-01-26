@@ -22,6 +22,7 @@
 #import "ErrorTransformer.h"
 #import "ParkifyAppDelegate.h"
 #import "Mixpanel.h"
+#import "mapDirectionsViewController.h"
 //#import "PlacedAgent.h"
 
 @interface ParkifySpotViewController ()
@@ -149,9 +150,13 @@
     [self.rangeBarContainer addSubview:self.rangeBar];
     
     /* flatRateBar */
-    self.flatRateBar = [[FlatRateBar alloc] initWithFrame:[self.flatRateBarContainer bounds] withPrices:[self.spot flatRatePricesForStartTime:currentTime]];
-    [self.flatRateBar addTarget:self action:@selector(timeIntervalChanged) forControlEvents:UIControlEventValueChanged];
-    [self.flatRateBarContainer addSubview:self.flatRateBar];
+    NSMutableDictionary* flatRatePrices = [self.spot flatRatePricesForStartTime:currentTime];
+    if([flatRatePrices count] > 0) {
+        self.flatRateBar = [[FlatRateBar alloc] initWithFrame:[self.flatRateBarContainer bounds] withPrices:flatRatePrices];
+        [self.flatRateBar addTarget:self action:@selector(timeIntervalChanged) forControlEvents:UIControlEventValueChanged];
+        [self.flatRateBarContainer addSubview:self.flatRateBar];
+    }
+    
     
     [self updateInfo];
     
@@ -203,6 +208,8 @@
     [self setFlatRateBarContainer:nil];
     [self setDemoMask:nil];
     [self setWarningLabel:nil];
+    [self setMiddleTimeControlLabel:nil];
+    [self setReserveButton:nil];
     [super viewDidUnload];
     // Release any retained subviews of the main view.
 }
@@ -251,7 +258,7 @@
         }
         
         NSString* coverageString = @"";
-        if ([self.spot.mSpotLayout isEqualToString:@"covered"]) {
+        if ([self.spot.mSpotCoverage isEqualToString:@"covered"]) {
             coverageString = @"<span class=faded>YES</span>"    ;
         } else {
             coverageString = @"<span class=selected>NO</span>";
@@ -298,6 +305,11 @@
     NSString* startTimeA;
     NSString* endTimeA;
     self.warningLabel.alpha = 0;
+    self.warningLabel.text = @"";
+    self.middleTimeControlLabel.alpha = 0;
+    self.middleTimeControlLabel.text = @"";
+    
+    [self.reserveButton setEnabled:true];
     
     if(self.spot == nil) {
         infoTitle = @"Spot not found";
@@ -308,6 +320,7 @@
         timeDurationMinutesString = @"";
         startTime = @"";
         endTime = @"";
+        [self.reserveButton setEnabled:false];
     }
     else {
         //infoTitle = [NSString stringWithFormat:@"Parkify Spot"];
@@ -390,7 +403,24 @@
     
     
     [self.rangeBarContainer setHidden:!self.timeTypeSelectHourlyButton.selected];
-    [self.flatRateBarContainer setHidden:!self.timeTypeSelectFlatRateButton.selected];
+    
+    
+    
+    if(self.timeTypeSelectFlatRateButton.selected) {
+        if(self.flatRateBar) {
+            [self.flatRateBarContainer setHidden:false];
+        }
+        else {
+            self.middleTimeControlLabel.text = @"There are currently no flat rate prices for this spot.";
+            self.middleTimeControlLabel.alpha = 1;
+            [self.flatRateBarContainer setHidden:true];
+            [self.reserveButton setEnabled:false];
+        }
+    } else {
+        [self.flatRateBarContainer setHidden:true];
+    }
+    
+    
     
     //CGRect frame = self.endTimeALabel.frame;
     //CGSize size = [endTime sizeWithFont:self.endTimeLabel.font];
@@ -481,26 +511,36 @@
         UIStoryboard *mainStoryboard = [UIStoryboard storyboardWithName:@"MainStoryboard_iPhone"
                                                                  bundle: nil];
         
-        ParkifyConfirmationViewController* controller = [mainStoryboard instantiateViewControllerWithIdentifier: @"ConfirmationVC"];
+        mapDirectionsViewController* controller = [mainStoryboard instantiateViewControllerWithIdentifier: @"DirectionsVC"];
         UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:controller];
         [navController.navigationBar setTintColor:[UIColor blackColor]];
         controller.spot = self.spot;
+        
+        Acceptance *reservation = nil;
+        
+        
         if(paymentDetails != nil) {
-            Acceptance *thetransaction = [Persistance addNewTransaction:self.spot withStartTime:self.rangeBar. selectedMinimumValue andEndTime:self.rangeBar.selectedMaximumValue andLastPaymentDetails:[paymentDetails objectForKey:@"details"] withTransactionID:[paymentDetails objectForKey:@"id"] ];
+            double dStartTime = self.rangeBar.selectedMinimumValue;
+            double dEndTime = self.rangeBar.selectedMaximumValue;
+            if(self.timeTypeSelectFlatRateButton.selected) {
+                dEndTime = dStartTime + [self.flatRateBar selectedDuration];
+                if (dEndTime > [self.spot endTime]) {
+                    self.warningLabel.text = @"This spot is unavailable for some of the selected duration.";
+                    self.warningLabel.alpha = 1;
+                }
+                dEndTime = MIN(dEndTime, [self.spot endTime]);
+            }
+            
+            
+            
+            reservation = [Persistance addNewTransaction:self.spot withStartTime:dStartTime andEndTime:dEndTime andLastPaymentDetails:[paymentDetails objectForKey:@"details"] withTransactionID:[paymentDetails objectForKey:@"id"] ];
             [[Mixpanel sharedInstance] track:@"launchConfirmationVC" properties:nil];
-            controller.transactionInfo = thetransaction;
-            controller.topBarText = [paymentDetails objectForKey:@"details"];
             [Persistance saveCurrentSpot:self.spot];
-        } else {
-             controller.topBarText = @"";
         }
-     
-        controller.currentLat = self.currentLat;
-        controller.currentLong = self.currentLong;
         
-        
-        
-        
+        controller.reservation = reservation;
+        controller.showTopBar = true;
+                
         parent.modalTransitionStyle = UIModalTransitionStyleCoverVertical;
         [parent presentViewController:navController animated:true completion:^{}];
     }

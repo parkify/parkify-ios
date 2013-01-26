@@ -25,7 +25,9 @@
 @property (weak, nonatomic) IBOutlet UIButton *timeTypeSelectHourlyButton;
 @property (weak, nonatomic) IBOutlet UIButton *timeTypeSelectFlatRateButton;
 - (IBAction)timeTypeSelectButtonTapped:(UIButton *)sender;
+@property (weak, nonatomic) IBOutlet UILabel *middleTimeControlLabel;
 
+@property (weak, nonatomic) IBOutlet UIButton *reserveButton;
 
 @property (weak, nonatomic) IBOutlet UIWebView *infoWebView;
 @property (weak, nonatomic) IBOutlet UILabel *timeDurationLabel;

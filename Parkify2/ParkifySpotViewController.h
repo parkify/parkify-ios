@@ -18,6 +18,8 @@
 
 @property (strong, nonatomic) ParkingSpot* spot;
 
+@property (weak, nonatomic) IBOutlet UIButton *reserveButton;
+@property (weak, nonatomic) IBOutlet UILabel *middleTimeControlLabel;
 @property (weak, nonatomic) IBOutlet UILabel *warningLabel;
 @property double currentLat;
 @property double currentLong;

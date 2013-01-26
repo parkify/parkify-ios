@@ -1047,7 +1047,7 @@ origPassword:(NSString*)origPassword
             [offerIds addObject:[NSNumber numberWithInt:offer.mId]];
     }
     
-    id transactionRequest = [Authentication makeTransactionRequestWithUserToken:[Persistance retrieveAuthToken] withSpotId:spot.mID withStartTime:minimumValue withEndTime:maximumValue withOfferIds:offerIds withLicensePlate:[Persistance retrieveLicensePlateNumber] withPriceType:priceType withFlatRateName:flatRateName];
+    id transactionRequest = [Authentication makeTransactionRequestWithUserToken:[Persistance retrieveAuthToken] withSpotId:spot.actualID withStartTime:minimumValue withEndTime:maximumValue withOfferIds:offerIds withLicensePlate:[Persistance retrieveLicensePlateNumber] withPriceType:priceType withFlatRateName:flatRateName];
     
     NSString *urlstring = [Api apirootstring];
 

@@ -17,6 +17,8 @@
 #import "ErrorTransformer.h"
 #import "ParkifyConfirmationViewController.h"
 #import "ParkifyAppDelegate.h"
+#import "mapDirectionsViewController.h"
+
 @interface extendReservationViewController ()
 @property (strong, nonatomic) WaitingMask* waitingMask;
 
@@ -72,7 +74,7 @@
         }
         
         NSString* coverageString = @"";
-        if ([self.spot.mSpotLayout isEqualToString:@"covered"]) {
+        if ([self.spot.mSpotCoverage isEqualToString:@"covered"]) {
             coverageString = @"<span class=faded>YES</span>"    ;
         } else {
             coverageString = @"<span class=selected>NO</span>";
@@ -175,9 +177,13 @@
     //[self.view bringSubviewToFront:self.rangeBarContainer];
     
     /* flatRateBar */
-    self.flatRateBar = [[FlatRateBar alloc] initWithFrame:[self.flatRateBarContainer bounds] withPrices:[self.spot flatRatePricesForStartTime:currentTime]];
-    [self.flatRateBar addTarget:self action:@selector(timeIntervalChanged) forControlEvents:UIControlEventValueChanged];
-    [self.flatRateBarContainer addSubview:self.flatRateBar];
+    NSMutableDictionary* flatRatePrices = [self.spot flatRatePricesForStartTime:currentTime];
+    if([flatRatePrices count] > 0) {
+        self.flatRateBar = [[FlatRateBar alloc] initWithFrame:[self.flatRateBarContainer bounds] withPrices:flatRatePrices];
+        [self.flatRateBar addTarget:self action:@selector(timeIntervalChanged) forControlEvents:UIControlEventValueChanged];
+        [self.flatRateBarContainer addSubview:self.flatRateBar];
+    }
+    
     
     [self updateInfo];
     
@@ -201,6 +207,11 @@
     NSString* startTimeA;
     NSString* endTimeA;
     self.warningLabel.alpha = 0;
+    self.warningLabel.text = @"";
+    self.middleTimeControlLabel.alpha = 0;
+    self.middleTimeControlLabel.text = @"";
+    
+    [self.reserveButton setEnabled:true];
     
     if(self.spot == nil) {
         //infoTitle = @"Spot not found";
@@ -211,6 +222,7 @@
         timeDurationMinutesString = @"";
         startTime = @"";
         endTime = @"";
+        [self.reserveButton setEnabled:false];
     }
     else {
         //infoTitle = [NSString stringWithFormat:@"Parkify Spot"];
@@ -295,8 +307,22 @@
     
     
     [self.rangeBarContainer setHidden:!self.timeTypeSelectHourlyButton.selected];
-    [self.flatRateBarContainer setHidden:!self.timeTypeSelectFlatRateButton.selected];
     
+    
+    
+    if(self.timeTypeSelectFlatRateButton.selected) {
+        if(self.flatRateBar) {
+            [self.flatRateBarContainer setHidden:false];
+        }
+        else {
+            self.middleTimeControlLabel.text = @"There are currently no flat rate prices for this spot.";
+            self.middleTimeControlLabel.alpha = 1;
+            [self.flatRateBarContainer setHidden:true];
+            [self.reserveButton setEnabled:false];
+        }
+    } else {
+        [self.flatRateBarContainer setHidden:true];
+    }
     //CGRect frame = self.endTimeALabel.frame;
     //CGSize size = [endTime sizeWithFont:self.endTimeLabel.font];
     //frame.origin.x = self.endTimeLabel.frame.origin.x + size.width + 1;
@@ -361,11 +387,19 @@
         UIStoryboard *mainStoryboard = [UIStoryboard storyboardWithName:@"MainStoryboard_iPhone"
                                                                  bundle: nil];
         
-        ParkifyConfirmationViewController* controller = [mainStoryboard instantiateViewControllerWithIdentifier: @"ConfirmationVC"];
+        mapDirectionsViewController* controller = [mainStoryboard instantiateViewControllerWithIdentifier: @"DirectionsVC"];
         UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:controller];
         [navController.navigationBar setTintColor:[UIColor blackColor]];
         controller.spot = self.spot;
-        Acceptance *thetransaction = [Persistance addNewTransaction:self.spot withStartTime:self.rangeBar. selectedMinimumValue andEndTime:self.rangeBar.selectedMaximumValue andLastPaymentDetails:[paymentDetails objectForKey:@"details"] withTransactionID:[paymentDetails objectForKey:@"id"] ];
+        
+        double dStartTime = self.rangeBar.minimumSelectableValue;
+        double dEndTime = self.rangeBar.selectedMaximumValue;
+        if(self.timeTypeSelectFlatRateButton.selected) {
+            dEndTime = dStartTime + [self.flatRateBar selectedDuration];
+            dEndTime = MIN(dEndTime, [self.spot endTime]);
+        }
+        
+        Acceptance *reservation = [Persistance addNewTransaction:self.spot withStartTime:[[paymentDetails objectForKey:@"start_time"] doubleValue] andEndTime:[[paymentDetails objectForKey:@"end_time"] doubleValue] andLastPaymentDetails:[paymentDetails objectForKey:@"details"] withTransactionID:[paymentDetails objectForKey:@"id"] ];
         ParkifyAppDelegate *delegate = (ParkifyAppDelegate*)[[UIApplication sharedApplication] delegate];
         NSMutableDictionary *actives = [delegate.transactions objectForKey:@"active"];
         NSString *key = [NSString stringWithFormat:@"%@", self.transactioninfo.acceptid];
@@ -381,11 +415,9 @@
         }
         [[delegate.transactions objectForKey:@"active"] removeObjectForKey:self.transactioninfo.acceptid];
         
-        [[Mixpanel sharedInstance] track:@"launchConfirmationVC" properties:nil];
-        controller.currentLat = self.currentLat;
-        controller.currentLong = self.currentLong;
-        controller.transactionInfo = thetransaction;
-        controller.topBarText = [paymentDetails objectForKey:@"details"];
+        [[Mixpanel sharedInstance] track:@"launchDirectionsVC" properties:nil];
+        controller.reservation = reservation;
+        controller.showTopBar = true;
         
         [Persistance saveCurrentSpot:self.spot];
         
@@ -630,6 +662,8 @@
 
 - (void)viewDidUnload {
     [self setWarningLabel:nil];
+    [self setMiddleTimeControlLabel:nil];
+    [self setReserveButton:nil];
     [super viewDidUnload];
 }
 @end

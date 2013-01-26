@@ -243,7 +243,7 @@
     [Persistance saveRecord:dict withName:@"DemoDict"];
 }
 +(NSMutableDictionary*)retrieveDemoDict {
-    id toRtn = [Persistance retrieveRecordwithName:@"DemoDict"];
+    id toRtn = [[Persistance retrieveRecordwithName:@"DemoDict"] mutableCopy];
     if (toRtn) return toRtn;
     return [[NSMutableDictionary alloc] init];
 }

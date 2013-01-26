@@ -23,10 +23,36 @@
 #import "ParkifyAppDelegate.h"
 #import "extendReservationViewController.h"
 #import "Acceptance.h"
+#import "mapDirectionsViewController.h"
+
+#define USING_NEW_PIN
+
+
+
+#ifndef USING_NEW_PIN
 #define ORIG_ANNOTATION_WIDTH 54
 #define ORIG_ANNOTATION_HEIGHT 89
 #define ANNOTATION_WIDTH (ORIG_ANNOTATION_WIDTH*0.5)
 #define ANNOTATION_HEIGHT (ORIG_ANNOTATION_HEIGHT*0.5)
+#define ANNOTATION_IMAGE @"black_spot_marker_cool.png"
+
+
+#define ANNOTATION_RELATIVE_HORIZ_OFFSET 0.0
+#endif
+
+#ifdef USING_NEW_PIN
+#define ORIG_ANNOTATION_WIDTH 219 
+//213
+#define ORIG_ANNOTATION_HEIGHT 229 
+//221
+#define ANNOTATION_TIP_HORIZ 92
+#define ANNOTATION_WIDTH (ORIG_ANNOTATION_WIDTH*0.2)
+#define ANNOTATION_HEIGHT (ORIG_ANNOTATION_HEIGHT*0.2)
+#define ANNOTATION_IMAGE @"blue_pin_2.png" //@"blue_pin.png"
+#define ANNOTATION_RELATIVE_HORIZ_OFFSET (-((ORIG_ANNOTATION_WIDTH/2.0)-ANNOTATION_TIP_HORIZ) * 0.2)
+#endif
+
+
 #define INIT_VIEW_WIDTH_IN_MILES 1.0
 #define ZOOM_LEVEL_STREET 13
 #define ZOOM_MARGIN_FACTOR 1.8
@@ -76,7 +102,6 @@ typedef struct STargetLocation {
 @property CGRect addressBarOrigFrame;
 @property CLLocationCoordinate2D lastSearchedLocation;
 @property (strong, nonatomic) NSTimer *timerPolling;
-@property (nonatomic, retain) CLLocationManager *locationManager;
 
 @end
 
@@ -113,7 +138,6 @@ typedef struct STargetLocation {
 @synthesize addressBarOrigFrame = _addressBarOrigFrame;
 @synthesize lastSearchedLocation = _lastSearchedLocation;
 @synthesize timerPolling = _timerPolling;
-@synthesize locationManager = _locationManager;
 
 
 @synthesize timerDuration = _timerDuration;
@@ -198,6 +222,9 @@ typedef struct STargetLocation {
 {
     //[self.navigationController setNavigationBarHidden:NO animated:animated];
     [self stopPolling];
+    ParkifyAppDelegate *delegate = (ParkifyAppDelegate*)[[UIApplication sharedApplication] delegate];
+    [delegate.locationManager stopUpdatingLocation];
+    [delegate.locationManager setDelegate:nil];
     [super viewWillDisappear:animated];
 }
 
@@ -222,10 +249,9 @@ typedef struct STargetLocation {
         delegate.currentLat = 37.872679;
         delegate.currentLong = -122.266797;
         
-        self.locationManager = [[CLLocationManager alloc] init];
-        self.locationManager.delegate = self;
-        self.locationManager.desiredAccuracy = kCLLocationAccuracyBest;
-        [self.locationManager startUpdatingLocation];
+        delegate.locationManager.delegate = self;
+        delegate.locationManager.desiredAccuracy = kCLLocationAccuracyBest;
+        [delegate.locationManager startUpdatingLocation];
         self.mapView.delegate = self;
         
         STargetLocation initTarget;
@@ -233,9 +259,9 @@ typedef struct STargetLocation {
         
         initTarget.type = TARGET_NONE;
         
-        if(self.locationManager.location != nil) {
-            delegate.currentLat = self.locationManager.location.coordinate.latitude;
-            delegate.currentLong = self.locationManager.location.coordinate.longitude;
+        if(delegate.locationManager.location != nil) {
+            delegate.currentLat = delegate.locationManager.location.coordinate.latitude;
+            delegate.currentLong = delegate.locationManager.location.coordinate.longitude;
             initTarget.type = TARGET_CURRENT_LOCATION;
         }
         
@@ -670,11 +696,11 @@ typedef struct STargetLocation {
         UIImage* img;
         if([spot.mSpotType isEqualToString: @"premium"])
         {
-            img=[UIImage imageNamed:@"black_spot_marker_cool.png"];
+            img=[UIImage imageNamed:ANNOTATION_IMAGE];
         } else if ([spot.mSpotType isEqualToString: @"charging"]) {
-            img=[UIImage imageNamed:@"black_spot_marker_cool.png"];
+            img=[UIImage imageNamed:ANNOTATION_IMAGE];
         } else {
-            img=[UIImage imageNamed:@"black_spot_marker_cool.png"];
+            img=[UIImage imageNamed:ANNOTATION_IMAGE];
         }
         
         annotationView.image=img;
@@ -708,7 +734,7 @@ typedef struct STargetLocation {
         [btnViewVenue addTarget:self action:@selector(spotMoreInfo:) forControlEvents:UIControlEventTouchUpInside];
         annotationView.rightCalloutAccessoryView = btnViewVenue;
         
-        annotationView.centerOffset = CGPointMake(0, -annotationView.frame.size.height/2);
+        annotationView.centerOffset = CGPointMake(ANNOTATION_RELATIVE_HORIZ_OFFSET, -annotationView.frame.size.height/2);
         
         return annotationView;
     } else if ([annotation isKindOfClass:[LocationAnnotation class]]) {
@@ -1068,7 +1094,7 @@ typedef struct STargetLocation {
 // --END ADDRESS BAR-- //
 
 
-
+/* ??? */
 -(void)launchExtendReservation:(NSString *)key{
     [self stopPolling];
     self.navigationController.modalPresentationStyle = UIModalPresentationCurrentContext;
@@ -1076,24 +1102,21 @@ typedef struct STargetLocation {
     UIStoryboard *mainStoryboard = [UIStoryboard storyboardWithName:@"MainStoryboard_iPhone"
                                                              bundle: nil];
     
-    ParkifyConfirmationViewController* controller = [mainStoryboard instantiateViewControllerWithIdentifier: @"ConfirmationVC"];
+    mapDirectionsViewController* controller = [mainStoryboard instantiateViewControllerWithIdentifier: @"DirectionsVC"];
     UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:controller];
     [navController.navigationBar setTintColor:[UIColor blackColor]];
     
     controller.spot = [Persistance retrieveCurrentSpot];
     ParkifyAppDelegate *delegate = (ParkifyAppDelegate*)[[UIApplication sharedApplication] delegate];
     NSDictionary *actives = [delegate.transactions objectForKey:@"active"];
-    Acceptance *transact = [actives objectForKey:key];
+    Acceptance *reservation = [actives objectForKey:key];
     
-    controller.transactionInfo = transact ;
-    // controller.startTime = [Persistance retrieveCurrentStartTime];
-    // controller.endTime = [Persistance retrieveCurrentEndTime];
-
-    controller.currentLat = delegate.currentLat;
-    controller.currentLong = delegate.currentLong;
+    controller.reservation = reservation;
+    controller.showTopBar = true;
+    
     
     extendReservationViewController *controllerer = [mainStoryboard instantiateViewControllerWithIdentifier: @"extendResVC"];
-    controllerer.transactioninfo= transact;
+    controllerer.transactioninfo= reservation;
     [controller.navigationController pushViewController:controllerer animated:NO];
 
     self.modalTransitionStyle = UIModalTransitionStyleCoverVertical;
@@ -1108,26 +1131,21 @@ typedef struct STargetLocation {
         UIStoryboard *mainStoryboard = [UIStoryboard storyboardWithName:@"MainStoryboard_iPhone"
                                                                  bundle: nil];
         
-        ParkifyConfirmationViewController* controller = [mainStoryboard instantiateViewControllerWithIdentifier: @"ConfirmationVC"];
+        mapDirectionsViewController* controller = [mainStoryboard instantiateViewControllerWithIdentifier: @"DirectionsVC"];
     UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:controller];
     [navController.navigationBar setTintColor:[UIColor blackColor]];
 
 ;
     ParkifyAppDelegate *delegate = (ParkifyAppDelegate*)[[UIApplication sharedApplication] delegate];
     NSDictionary *actives = [delegate.transactions objectForKey:@"active"];
-    Acceptance *transact = [actives objectForKey:[[actives allKeys] lastObject]];
+    Acceptance *reservation = [actives objectForKey:[[actives allKeys] lastObject]];
     
-    controller.spot =  [delegate.parkingSpots parkingSpotForIDFromAll: [[transact spotid] intValue] ];
+    controller.spot =  [delegate.parkingSpots parkingSpotForIDFromAll: [[reservation spotid] intValue] ];
 
-    controller.transactionInfo = transact ;
-       // controller.startTime = [Persistance retrieveCurrentStartTime];
-       // controller.endTime = [Persistance retrieveCurrentEndTime];
-        
-        controller.currentLat = delegate.currentLat;
-        controller.currentLong = delegate.currentLong;
-        
-        self.modalTransitionStyle = UIModalTransitionStyleCoverVertical;
-        [self presentViewController:navController animated:true completion:^{}];
+    controller.reservation = reservation ;
+     
+    self.modalTransitionStyle = UIModalTransitionStyleCoverVertical;
+    [self presentViewController:navController animated:true completion:^{}];
 }
 
 @end

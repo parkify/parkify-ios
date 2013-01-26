@@ -18,8 +18,8 @@ typedef void(^FailureBlock)(NSError*);
 typedef NSString* (^Formatter)(double val);
 
 #define ADMIN_VER false
-#define DEBUGVER
-#define APIVER @"v2"
+//#define DEBUGVER
+#define APIVER @"v3"
 #ifdef DEBUGVER
    //#define TARGET_SERVER @"192.168.1.119:3000"
      #define TARGET_SERVER @"parkify-rails-staging.herokuapp.com"
@@ -39,7 +39,7 @@ typedef NSString* (^Formatter)(double val);
 #define kAlertViewChoicesForProblems 9992
 #define kPreviewTransaction 9988
 #define kAttempTransaction 9987
-#define kPhoneNumber @"tel:1-800-luv-park"
+#define kPhoneNumber @"tel:1-855-727-5439"
 #define kLoadUDIDandPush 9986
 #define kGetAcceptances 9985
 #define kStripeToken @"pk_XeTF5KrqXMeSyyqApBF4q9qDzniMn"
@@ -58,6 +58,11 @@ typedef NSString* (^Formatter)(double val);
 - (int) idForName:(NSString *)name;
 
 @end
+
+enum {
+    ExtendReservationRequestedActionEvent = 1 << 24,
+    MySecondaryActionEvent = 1 << 25,
+};
 
 /*
 @protocol CreditCardsSource <NSObject>

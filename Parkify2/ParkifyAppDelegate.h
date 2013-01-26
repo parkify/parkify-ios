@@ -34,4 +34,6 @@
 @property (strong, nonatomic) User* user;
 @property (strong, nonatomic) ParkingSpotCollection* parkingSpots;
 
+@property (strong, nonatomic) CLLocationManager* locationManager;
+
 @end

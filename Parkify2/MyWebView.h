@@ -12,7 +12,6 @@
 
 @end
 
-
 @interface MyWebView : UIWebView <UIWebViewDelegate> {
   
   int alertCallbackId;

@@ -8,22 +8,20 @@
 
 #import <UIKit/UIKit.h>
 #import <CoreLocation/CoreLocation.h>
+#import "ParkingSpot.h"
+#import "Acceptance.h"
 
 #import "MyWebView.h"
-@interface mapDirectionsViewController : UIViewController <webViewCustomDelegate, UIWebViewDelegate,CLLocationManagerDelegate>
+@interface mapDirectionsViewController : UIViewController <webViewCustomDelegate, UIWebViewDelegate,CLLocationManagerDelegate, UITabBarDelegate>
 {
-    double currLat;
-    double currLong;
-    double spotLat;
-    double spotLong;
     int spotId;
     UIWebView *currWebView;
     BOOL textDirs;
 }
-@property (nonatomic, assign) int spotId;
-@property (nonatomic, assign) double currLat;
-@property (nonatomic, assign) double currLong;
-@property (nonatomic, assign) double spotLat;
-@property (nonatomic, assign) double spotLong;
+@property (weak, nonatomic) IBOutlet UITabBar *flowTabBar;
+
+@property (nonatomic, strong) Acceptance* reservation;
+@property (nonatomic, strong) ParkingSpot* spot;
+@property BOOL showTopBar;
 
 @end
