@@ -10,11 +10,17 @@
 #import "ExtraTypes.h"
 #import "ASIFormDataRequest.h"
 #import "UIDevice+IdentifierAddition.h"
+#import "User.h"
+#import "Car.h"
+#import "CreditCard.h"
+
+
 #define NO_SERVICE_DEBUG false
 #define NO_SERVICE_DEBUG_SPOTS @"[spots:({\"id\":\"3\",\"location":{\"latitude\":\"37.872654\",\"longitude\":\"-122.266812\"},\"location_name\":\"Mikes Bikes\",\"mLocalID\":\"3\",\"mPrice\":\"1.02\",\"mPhoneNumber\":\"408-421-1194\",\"mDesc\":\"A Fantastic Spot!\",\"mFree\":\"true\"})]"
 #define LOW_PRICE_THRESHOLD 5.01
 #define HIGH_PRICE_THRESHOLD 5.02
 #define kProblemAlertView 9929
+#define kDidntPay 9930
 #define ACCESS_KEY_ID          @"AKIAI2S3XWTFZUBVAIRA"
 #define SECRET_KEY             @"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"
 
@@ -31,20 +37,27 @@
 
 
 //Called for user registration
-+ (void)signUpWithEmail:(NSString*)email 
-           withPassword:(NSString*)password
++(void)signUpWithEmail:(NSString*)email
+          withPassword:(NSString*)password
 withPasswordConfirmation:(NSString*)passwordConfirmation
-          withFirstName:(NSString*)firstName
-           withLastName:(NSString*)lastName
-   withCreditCardNumber:(NSString*)ccn
-                withCVC:(NSString*)cvc
-    withExpirationMonth:(NSNumber*)expMonth
-     withExpirationYear:(NSNumber*)expYear
-       withLicensePlate:(NSString*)licensePlate
-            withZipCode:(NSString*)zipCode
-              withPhone:(NSString*)phone
-            withSuccess:(SuccessBlock)successBlock
-            withFailure:(FailureBlock)failureBlock ;
+         withFirstName:(NSString*)firstName
+          withLastName:(NSString*)lastName
+  withCreditCardNumber:(NSString*)ccn
+               withCVC:(NSString*)cvc
+   withExpirationMonth:(NSNumber*)expMonth
+    withExpirationYear:(NSNumber*)expYear
+      withLicensePlate:(NSString*)licensePlate
+           withZipCode:(NSString*)zipCode
+             withPhone:(NSString*)phone
+      withAcceptanceId:(NSNumber*)acceptanceId
+           withSuccess:(SuccessBlock)successBlock
+           withFailure:(FailureBlock)failureBlock ;
+
+//Called for user registration
++ (void)signUpWithPhoneNumber:(NSString*)phoneNumber
+                withPromoCode:(NSString*)promoCode
+                  withSuccess:(SuccessBlock)successBlock
+                  withFailure:(FailureBlock)failureBlock ;
 
 //Called for card creation
 + (void)registerCardWithCreditCardNumber:(NSString*)ccn
@@ -66,6 +79,8 @@ withPasswordConfirmation:(NSString*)passwordConfirmation
 
 //Called to bring up SettingsVC modally
 + (void)settingsModallyFrom:(UIViewController*)parent withSuccess:(SuccessBlock)successBlock;
+
++ (void)promoteAccountModallyFrom:(UIViewController*)parent withSuccess:(SuccessBlock)successBlock;
 
 //Called to bring up SettingsVC modally
 + (void)webWrapperModallyFrom:(UIViewController*)parent withURL:(NSString*)url;
@@ -106,6 +121,7 @@ withFailure:(FailureBlock)failureBlock;
       withFailure:(FailureBlock)failureBlock;
 
 + (void)addCar:(NSString*)license_plate_number
+     withState:(NSString*)state
    withSuccess:(SuccessBlock)successBlock
    withFailure:(FailureBlock)failureBlock;
 
@@ -122,6 +138,10 @@ withFailure:(FailureBlock)failureBlock;
 + (void)resetPasswordWithEmail:(NSString*)email
           withSuccess:(SuccessBlock)successBlock
           withFailure:(FailureBlock)failureBlock;
+
++ (void)checkPromoCode:(NSString*)promoCode
+                   withSuccess:(SuccessBlock)successBlock
+                   withFailure:(FailureBlock)failureBlock;
 
 #pragma mark startGauravMethods
 
@@ -142,4 +162,21 @@ withFailure:(FailureBlock)failureBlock;
 
 +(void)getListOfCurrentAcceptances:(id)asidelegate;
 +(NSString *)apirootstring;
+
++(void) signUpWithUser:(User*)user withCard:(CreditCard*)card withCar:(Car*)car 
+withSuccess:(SuccessBlock)successBlock
+           withFailure:(FailureBlock)failureBlock;
+
++(void) promoteAccountWithUser:(User*)user withCard:(CreditCard*)card withCar:(Car*)car
+           withSuccess:(SuccessBlock)successBlock
+           withFailure:(FailureBlock)failureBlock;
++(void) addCarForUser:(User*)user withCar:(Car*)car
+               withSuccess:(SuccessBlock)successBlock
+               withFailure:(FailureBlock)failureBlock;
++(void) finishDelayedPaymentWithUser:(User*)user withCard:(CreditCard*)card withCar:(Car*)car
+               withSuccess:(SuccessBlock)successBlock
+               withFailure:(FailureBlock)failureBlock;
++(void) makeDelayedPaymentWithUser:(User*)user withCard:(CreditCard*)card withCar:(Car*)car withAcceptanceId:(int)acceptanceId withSuccess:(SuccessBlock)successBlock
+                       withFailure:(FailureBlock)failureBlock;
+
 @end

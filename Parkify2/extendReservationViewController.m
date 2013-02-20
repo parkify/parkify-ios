@@ -264,7 +264,8 @@
         double durationInSeconds = (dEndTime - dStartTime);
         double fullDurationInSeconds = (dEndTime - dStartOrig);
         ParkingSpot* spot = self.spot;
-        double totalPrice = [spot priceFromNowForDurationInSeconds:durationInSeconds];
+        //double totalPrice = [spot priceFromNowForDurationInSeconds:durationInSeconds];
+        double totalPrice = [spot priceFromStartTime:dStartTime forDuration:durationInSeconds forFlatRate:false];
         
         if(self.timeTypeSelectFlatRateButton.selected) {
             totalPrice = [self.flatRateBar selectedPrice];
@@ -399,7 +400,10 @@
             dEndTime = MIN(dEndTime, [self.spot endTime]);
         }
         
-        Acceptance *reservation = [Persistance addNewTransaction:self.spot withStartTime:[[paymentDetails objectForKey:@"start_time"] doubleValue] andEndTime:[[paymentDetails objectForKey:@"end_time"] doubleValue] andLastPaymentDetails:[paymentDetails objectForKey:@"details"] withTransactionID:[paymentDetails objectForKey:@"id"] ];
+        /*Acceptance *reservation = [Persistance addNewTransaction:self.spot withStartTime:[[paymentDetails objectForKey:@"start_time"] doubleValue] andEndTime:[[paymentDetails objectForKey:@"end_time"] doubleValue] andLastPaymentDetails:[paymentDetails objectForKey:@"details"] withTransactionID:[paymentDetails objectForKey:@"id"] ];*/
+        Acceptance * reservation = [Persistance addNewTransaction: self.spot withStartTime:[[paymentDetails objectForKey:@"start_time"] doubleValue] andEndTime:[[paymentDetails objectForKey:@"end_time"] doubleValue] andLastPaymentDetails:[paymentDetails objectForKey:@"details"] withTransactionID:[paymentDetails objectForKey:@"id"] withNeedsPayment:[[paymentDetails objectForKey:@"needs_payment"] doubleValue] withPayBy:[[paymentDetails objectForKey:@"pay_by"] doubleValue] ];
+        
+        
         ParkifyAppDelegate *delegate = (ParkifyAppDelegate*)[[UIApplication sharedApplication] delegate];
         NSMutableDictionary *actives = [delegate.transactions objectForKey:@"active"];
         NSString *key = [NSString stringWithFormat:@"%@", self.transactioninfo.acceptid];

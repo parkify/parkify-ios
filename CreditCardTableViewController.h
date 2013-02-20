@@ -8,8 +8,9 @@
 
 #import <UIKit/UIKit.h>
 #import "CreditCard.h"
+#import "ParkifyTableViewController.h"
 
-@interface CreditCardTableViewController : UITableViewController
+@interface CreditCardTableViewController : ParkifyTableViewController
 @property (strong, nonatomic) CreditCard* creditCardModel;
 
 

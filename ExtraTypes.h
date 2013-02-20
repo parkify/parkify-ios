@@ -8,28 +8,26 @@
 
 #ifndef Parkify2_ExtraTypes_h
 #define Parkify2_ExtraTypes_h
-
 #define PARKIFY_CYAN ([UIColor colorWithRed:(97.0/255.0) green:(189.0/255.0) blue:(250.0/255.0) alpha:1])
-
 typedef void(^CompletionBlock)(void);
 typedef void(^SuccessBlock)(NSDictionary*);
 typedef void(^FailureBlock)(NSError*);
 
 typedef NSString* (^Formatter)(double val);
 
-#define ADMIN_VER false
-//#define DEBUGVER
+#define ADMIN_VER true
+#define DEBUGVER
 #define APIVER @"v3"
 #ifdef DEBUGVER
-   //#define TARGET_SERVER @"192.168.1.119:3000"
-     #define TARGET_SERVER @"parkify-rails-staging.herokuapp.com"
+//#define TARGET_SERVER @"10.0.2.15:3000"
+#define TARGET_SERVER @"parkify-rails-staging.herokuapp.com"
 #else
     #define TARGET_SERVER @"parkify-rails.herokuapp.com"
 
 #endif
 
 #define NOTRANSACTIONDEBUG false
-
+#define DEBUG_FIRST_FLOW false
 
 
 #define kGenericErrorAlertTag 6727
@@ -61,7 +59,7 @@ typedef NSString* (^Formatter)(double val);
 
 enum {
     ExtendReservationRequestedActionEvent = 1 << 24,
-    MySecondaryActionEvent = 1 << 25,
+    ShouldContinueActionEvent = 1 << 25,
 };
 
 /*

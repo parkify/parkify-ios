@@ -8,8 +8,9 @@
 
 #import <UIKit/UIKit.h>
 #import "Promo.h"
+#import "ParkifyTableViewController.h"
 
-@interface PromoTableViewController : UITableViewController
+@interface PromoTableViewController : ParkifyTableViewController
 @property (strong, nonatomic) Promo* promo;
 
 @end

@@ -234,6 +234,8 @@
                     //[actualSpot.offers addObject:[[actives objectForKey:idIn] objectForKey:@"offers"]];
                 }
                 [self.allParkingSpots setValue:actualSpot forKey:idIn];
+            } else {
+                freeIn = [actualSpot updateFromDictionary:spot withLevelOfDetail:levelOfDetail];
             }
             if (freeIn){
                 [self.parkingSpots setValue:actualSpot forKey:idIn];
@@ -243,6 +245,20 @@
                     [self.parkingSpots removeObjectForKey:idIn];
                 }
             }
+        }
+        
+        //clean up what isn't here...
+        NSMutableArray* toRemove = [[NSMutableArray alloc] init];
+        for (NSNumber* spotID in self.parkingSpots) {
+            if([spots objectForKey:spotID]) {
+                //Everything is good
+            } else {
+                [toRemove addObject:spotID];
+            }
+        }
+        
+        for (NSNumber* spotID in toRemove) {
+            [self.parkingSpots removeObjectForKey:spotID];
         }
         
     }

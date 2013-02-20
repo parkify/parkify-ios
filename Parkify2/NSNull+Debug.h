@@ -12,6 +12,6 @@
 
 @interface NSNull (Debug)
 
-- (int)intValue;
+- (id)objectForKey:(id)key;
 
 @end

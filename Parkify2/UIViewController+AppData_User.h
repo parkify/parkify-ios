@@ -14,3 +14,9 @@
 - (User*)getUser;
 
 @end
+
+@interface UIView (AppData_User)
+
+- (User*)getUser;
+
+@end

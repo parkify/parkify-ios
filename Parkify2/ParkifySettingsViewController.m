@@ -65,6 +65,11 @@
         loginLogoutIconString = @"glyphicons_203_lock.png";
     }
     
+    /*
+    self.tableData = [NSArray arrayWithObjects:loginLogoutString, @"Account Settings", @"Share", @"About", nil ];
+    
+    self.tableImages = [NSArray arrayWithObjects:loginLogoutIconString, @"glyphicons_003_user.png", @"glyphicons_003_user.png", @"glyphicons_195_circle_info.png", nil];
+     */
     self.tableData = [NSArray arrayWithObjects:loginLogoutString, @"Account Settings", @"About", nil ];
     
     self.tableImages = [NSArray arrayWithObjects:loginLogoutIconString, @"glyphicons_003_user.png", @"glyphicons_195_circle_info.png", nil];
@@ -95,6 +100,26 @@
 }
 
 
+- (IBAction)shareButtonTapped:(UIButton*)sender {
+    NSString* authToken = [Persistance retrieveAuthToken];
+    if(!authToken) {
+        UIAlertView* error = [[UIAlertView alloc] initWithTitle:@"Error" message:@"Please log in first" delegate:self cancelButtonTitle:@"Ok"
+                                              otherButtonTitles: nil];
+        [error show];
+    } else {
+        [[self getUser] clear];
+        [[self getUser] updateFromServerWithSuccess:^(NSDictionary * d) {
+            self.tabBarController.selectedViewController = [self.tabBarController.viewControllers objectAtIndex:3];
+            
+        } withFailure:^(NSError * e) {
+            [ErrorTransformer errorToAlert:e withDelegate:self];
+        }];
+    }
+
+    
+}
+
+
 - (IBAction)authButtonTapped:(UIButton *)sender {
     [Api authenticateModallyFrom:self withSuccess:^(NSDictionary *foo) {}];
 }
@@ -110,8 +135,7 @@
         [[self getUser] updateFromServerWithSuccess:^(NSDictionary * d) {
             
             AccountSettingsNavigationViewController* accountSettings = [self.tabBarController.viewControllers objectAtIndex:2];
-            
-            
+                        
             self.tabBarController.selectedViewController = accountSettings;
             
         } withFailure:^(NSError * e) {
@@ -146,6 +170,8 @@
             [self authButtonTapped:nil];
         }, ^{
             [self accountSettingsButtonTapped:nil];
+        }, ^{
+            [self shareButtonTapped:nil];
         }, ^{
             [self aboutButtonTapped:nil];
         }, nil];

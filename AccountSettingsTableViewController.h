@@ -10,7 +10,9 @@
 #import "User.h"
 #import "ELCTextfieldCell.h"
 
-@interface AccountSettingsTableViewController : UITableViewController <ELCTextFieldDelegate>
+#import "ParkifyTableViewController.h"
+
+@interface AccountSettingsTableViewController : ParkifyTableViewController<ELCTextFieldDelegate>
 
 - (IBAction)backButtonTapped:(id)sender;
 - (IBAction)saveButtonTapped:(id)sender;

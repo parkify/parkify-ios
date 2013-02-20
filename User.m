@@ -24,11 +24,19 @@
 @synthesize cars = _cars;
 @synthesize promos = _promos;
 
--(NSArray*)credit_cards {
-  ;
-  return _credit_cards;
+-(NSArray*)cars {
+    if(!_cars) {
+        _cars = [[NSMutableArray alloc] init];
+    }
+    return _cars;
 }
 
+-(NSArray*)credit_cards {
+    if(!_credit_cards) {
+        _credit_cards = [[NSMutableArray alloc] init];
+    }
+  return _credit_cards;
+}
 
 
 - (void)updateFromDictionary:(NSDictionary*)dictIn {
@@ -37,7 +45,7 @@
     self.email = [dictIn objectForKey:@"email"];
     self.phone_number = [dictIn objectForKey:@"phone_number"];
     self.credit = [[dictIn objectForKey:@"credit"] doubleValue];
-    
+    self.accountType = [dictIn objectForKey:@"account_type"];
     
     //Credit Cards
     NSMutableArray* credit_cards = [[NSMutableArray alloc] init];
@@ -91,6 +99,7 @@
                              self.last_name,@"last_name",
                              self.email,@"email",
                              self.phone_number,@"phone_number",
+                             self.accountType, @"account_type",
                              nil];
     
     [Api updateUserProfileWithDict:dictOut withSuccess:^(NSDictionary * dictIn) {
@@ -105,9 +114,56 @@
   self.email = @"";
   self.phone_number = @"";
   self.credit = 0;
-  self.credit_cards = [[NSArray alloc] init];
-  self.cars = [[NSArray alloc] init];
-  self.promos = [[NSArray alloc] init];
+  self.credit_cards = [[NSMutableArray alloc] init];
+  self.cars = [[NSMutableArray alloc] init];
+  self.promos = [[NSMutableArray alloc] init];
+    self.accountType = @"";
 }
+
+- (NSString*) validate {
+    
+    if(self.phone_number.length != 14) {
+        return @"Please give a valid phone number.";
+    }
+    
+    if(self.first_name.length == 0) {
+        return @"Please give a valid name.";
+    }
+    
+    if(self.last_name.length == 0) {
+        return @"Please give a valid name.";
+    }
+    
+    if(self.email.length == 0) {
+        return @"Please give a valid email.";
+    }
+    
+    if(self.password.length == 0) {
+        return @"Please give a valid password.";
+    }
+    
+    return nil;
+    
+    /*
+    if(self.zipField.text.length == 0) {
+        UIAlertView* error = [[UIAlertView alloc] initWithTitle:@"Error" message:@"Please give a valid zip code." delegate:self cancelButtonTitle:@"Ok"
+                                              otherButtonTitles: nil];
+        [error show];
+        return;
+    }
+    
+    if(self.licensePlateField.text.length == 0) {
+        UIAlertView* error = [[UIAlertView alloc] initWithTitle:@"Error" message:@"Please give a valid license plate." delegate:self cancelButtonTitle:@"Ok"
+                                              otherButtonTitles: nil];
+        [error show];
+        return;
+    }
+     */
+    
+}
+
+
+
+
 
 @end

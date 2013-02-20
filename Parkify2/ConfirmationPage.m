@@ -113,12 +113,25 @@
         [self.scrollIndicator setAlpha:1.0];
         [Persistance saveDemoDict:demoDict];
     }
-        UIScrollView* sview = [[UIScrollView alloc] initWithFrame:CGRectMake(5, 5, frame.size.width-10, frame.size.height-10)];
+        UIView* container = [[UIView alloc] initWithFrame:CGRectMake(frame.origin.x + 5, frame.origin.y + 5, frame.size.width - 10, frame.size.height - 10)];
+        
+        container.layer.cornerRadius = 4;
+        container.clipsToBounds = YES;
+        container.layer.borderColor = [UIColor blackColor].CGColor;
+        container.layer.borderWidth = 2.0f;
+        [self addSubview:container];
+        
+        
+        
+        UIScrollView* sview = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 0, container.frame.size.width, container.frame.size.height)];
     self.mainScrollView = sview;
     sview.layer.borderColor = [UIColor blackColor].CGColor;
     sview.layer.borderWidth = 2.0f;
     sview.backgroundColor = [UIColor colorWithWhite:0.17 alpha:1];
-    [self addSubview:self.mainScrollView];
+
+        
+        
+    [container addSubview:self.mainScrollView];
         
     
     [self.mainScrollView setDelegate:self];
@@ -212,6 +225,7 @@
     [self.calloutText addSubview:self.extendButton];
 }
 -(void)prepCallout {
+    
     self.calloutText = [[UIWebView alloc] initWithFrame:CGRectMake(0,0,self.mainScrollView.frame.size.width - 2*CALLOUT_CONTENT_OFFSET,1)];
     self.calloutText.delegate = self;
     self.calloutText.backgroundColor = [UIColor clearColor];

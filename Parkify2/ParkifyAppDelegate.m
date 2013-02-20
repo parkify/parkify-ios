@@ -15,6 +15,7 @@
 #import "SBJson.h"
 #import "ErrorTransformer.h"
 #import "Acceptance.h"
+#import "IntroViewController.h"
 @implementation ParkifyAppDelegate
 
 @synthesize window = _window;
@@ -26,6 +27,7 @@
 @synthesize currentLat = _currentLat;
 @synthesize currentLong = _currentLong;
 @synthesize reservationUsed = _reservationUsed;
+
 -(NSMutableDictionary*)transactions{
     if (![Persistance retrieveAuthToken])
         return nil;
@@ -113,7 +115,7 @@ void uncaughtExceptionHandler(NSException *exception) {
         [[UIApplication sharedApplication] registerForRemoteNotificationTypes:(UIRemoteNotificationTypeAlert |
                                                                                
                                                                                UIRemoteNotificationTypeSound | UIRemoteNotificationTypeBadge)];
-        
+    
     //[Flurry startSession:@"TS2D3KM78SMZ8MJWNYNV"];
     
     //[PlacedAgent initWithAppKey:@"6f15dab4fc2d"];
@@ -123,11 +125,33 @@ void uncaughtExceptionHandler(NSException *exception) {
     [[UINavigationBar appearance] setContentMode:UIViewContentModeScaleToFill];
     [[UIBarButtonItem appearance] setTintColor:[UIColor darkGrayColor]];
     
+    /*
+    [[UITableViewCell appearance] setBackgroundColor: [UIColor colorWithHue:(204.0/255.0) saturation:0.0 brightness:(20.0/255.0) alpha:1]];
+    [[[UITableViewCell appearance] textLabel] setTextColor:[UIColor darkTextColor]];
+    [[[UITableViewCell appearance] detailTextLabel] setTextColor:[UIColor lightTextColor]];
+    */
     
+    //[[UITableViewCell appearance] setFrame:<#(CGRect)#>]
     
     self.locationManager = [[CLLocationManager alloc] init];
     self.locationManager.desiredAccuracy = kCLLocationAccuracyBest;
     [self.locationManager startUpdatingLocation];
+    
+   
+    if(![Persistance retrieveGotPastDemo]) {
+        UIStoryboard *mainStoryboard = [UIStoryboard storyboardWithName:@"MainStoryboard_iPhone"
+                                                                 bundle: nil];
+        
+        IntroViewController *introViewController = [mainStoryboard instantiateViewControllerWithIdentifier:@"introVC"];
+        
+        introViewController.modalTransitionStyle = UIModalTransitionStyleCrossDissolve;
+        //[self.window.rootViewController presentViewController:introViewController animated:false completion:nil];
+        [Api registerUDIDandToken:@"" withASIdelegate:introViewController];
+        
+        self.window.rootViewController = introViewController;
+        [self.window makeKeyAndVisible];
+    }
+    
     return YES;
 }
 - (BOOL)application:(UIApplication *)application handleOpenURL:(NSURL *)url {
@@ -149,13 +173,18 @@ void uncaughtExceptionHandler(NSException *exception) {
 
         BOOL success = [[root objectForKey:@"success"] boolValue];
         isNew = [[root objectForKey:@"isNew"] boolValue];
-        reservationUsed = [[root objectForKey:@"reservationUsed"] boolValue];
         if(success) {
-            NSLog(@"Saved device %@", root);
+            if(isNew) {
+                [Persistance saveFirstUse:@"true"];
+            } else {
+                [Persistance saveFirstUse:@"false"];
+            }
         } else {
             NSLog(@"Failed ot save device %@", root);
+            //Assume that device has exauhsted its trial account.
+            [Persistance saveFirstUse:@"unset"];
         }
-
+        
     }
     
     else if(request.tag == kGetAcceptances){
@@ -181,7 +210,10 @@ void uncaughtExceptionHandler(NSException *exception) {
                 else{
                     ParkingSpot *thisSpot = [self.parkingSpots parkingSpotForIDFromAll: [[acceptance objectForKey:@"resource_offer_id"] intValue] ];
                     if (thisSpot){
-                    Acceptance *thetransaction = [Persistance addNewTransaction: thisSpot withStartTime:[[acceptance objectForKey:@"start_time"] doubleValue] andEndTime:[[acceptance objectForKey:@"end_time"] doubleValue] andLastPaymentDetails:[acceptance objectForKey:@"details"] withTransactionID:[acceptance objectForKey:@"id"]];
+                        
+                        
+                        
+                    Acceptance *thetransaction = [Persistance addNewTransaction: thisSpot withStartTime:[[acceptance objectForKey:@"start_time"] doubleValue] andEndTime:[[acceptance objectForKey:@"end_time"] doubleValue] andLastPaymentDetails:[acceptance objectForKey:@"details"] withTransactionID:[acceptance objectForKey:@"id"] withNeedsPayment:[[acceptance objectForKey:@"needs_payment"] doubleValue] withPayBy:[[acceptance objectForKey:@"pay_by"] doubleValue] ];
                   //  NSLog(@"Transaction not in records, added in %@", thetransaction);
                     }
                     else{
@@ -248,7 +280,6 @@ void uncaughtExceptionHandler(NSException *exception) {
     // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
     [self.locationManager stopUpdatingLocation];
 }
-
 
 
 @end

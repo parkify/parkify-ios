@@ -14,6 +14,7 @@
 @property int mId;
 
 @property (strong, nonatomic) NSString* license_plate_number;
+@property (strong, nonatomic) NSString* state;
 
 - (id)init;
 
@@ -28,4 +29,8 @@
                 withFailure:(FailureBlock)failureBlock;
 
 +(void) pushChangesForCars:(NSArray*)cars toServerWithSuccess:(SuccessBlock)success withFailure:(FailureBlock)failure;
+
++(NSMutableDictionary*) licensePlateLocationDictionary;
++(NSMutableArray*) licensePlateLocationOrder;
+- (NSString*) validate;
 @end

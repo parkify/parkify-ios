@@ -34,6 +34,16 @@
     return request;
 }
 
++ (id)makeUserRegistrationRequestWithPhone:(NSString*)phoneNumber withPromoCode:(NSString*)promoCode {
+    NSDictionary *request;
+    if([promoCode length] == 0) {
+        request = [ NSDictionary dictionaryWithObjectsAndKeys:phoneNumber,@"phone_number", nil ];
+    } else {
+        request = [ NSDictionary dictionaryWithObjectsAndKeys:phoneNumber,@"phone_number", promoCode, @"code_text", nil ];
+    }
+    return request;
+}
+
 + (id) makeTokenRequestWithToken:(NSString*)token {
     return token;
 }

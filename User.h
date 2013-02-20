@@ -20,11 +20,10 @@
 
 @property double credit; //in cents
 
-@property (strong, nonatomic) NSArray* credit_cards;
-@property (strong, nonatomic) NSArray* cars;
-@property (strong, nonatomic) NSArray* promos;
-
-
+@property (strong, nonatomic) NSMutableArray* credit_cards;
+@property (strong, nonatomic) NSMutableArray* cars;
+@property (strong, nonatomic) NSMutableArray* promos;
+@property (strong, nonatomic) NSString* accountType;
 
 - (void)updateFromDictionary:(NSDictionary*)dictIn;
 
@@ -38,5 +37,5 @@
                 withFailure:(FailureBlock)failureBlock;
 
 - (void)clear;
-
+- (NSString*) validate;
 @end

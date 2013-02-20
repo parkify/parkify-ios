@@ -25,6 +25,10 @@
     [aCoder encodeObject:self.acceptid forKey:@"acceptid"];
     [aCoder encodeObject:self.offers forKey:@"offers"];
     [aCoder encodeBool:self.active forKey:@"active"];
+    [aCoder encodeDouble:self.payBy forKey:@"pay_by"];
+    [aCoder encodeDouble:self.needsPayment forKey:@"needs_payment"];
+    
+    
 }
 
 -(id) initWithCoder:(NSCoder *)aDecoder{
@@ -37,7 +41,8 @@
         self.acceptid = [aDecoder decodeObjectForKey:@"acceptid"];
         self.offers = [aDecoder decodeObjectForKey:@"offers"];
         self.active = [aDecoder decodeBoolForKey:@"active"];
-
+        self.payBy = [aDecoder decodeDoubleForKey:@"pay_by"];
+        self.needsPayment = [aDecoder decodeDoubleForKey:@"needs_payment"];
     }
     return self;
 }
@@ -52,6 +57,9 @@
         self.active = [[withInfo objectForKey:@"active"] boolValue];
         self.acceptid = [withInfo objectForKey:@"acceptanceid"];
         self.offers = [withInfo objectForKey:@"offers"];
+        
+        self.payBy = [[withInfo objectForKey:@"pay_by"] doubleValue];
+        self.needsPayment = [[withInfo objectForKey:@"needs_payment"] doubleValue];
     }
     return self;
 }

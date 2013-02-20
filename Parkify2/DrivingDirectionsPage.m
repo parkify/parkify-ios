@@ -59,11 +59,21 @@
         NSString *endpoint = [NSString stringWithFormat: @"http://apps.scout.me/v1/driveto?dt=%@&title=%@&token=%@&name=Parkify", escapedUrlDestination, escapedUrlTitle, escapedUrlToken];
         [[Mixpanel sharedInstance] track:@"loadingDrivingDirections" properties:[NSDictionary dictionaryWithObjects:[NSArray arrayWithObjects:destination,endpoint,[NSNumber numberWithInt:self.spot.mID], nil] forKeys:[NSArray arrayWithObjects:@"destination",@"url",@"spotid", nil]]];
         
-        UIView* webViewContainer = [[UIView alloc] initWithFrame:CGRectMake(5, 5, frame.size.width-10, frame.size.height-10)];
-        webViewContainer.layer.borderColor = [UIColor blackColor].CGColor;
-        webViewContainer.layer.borderWidth = 2.0f;
+        
+        UIView* container = [[UIView alloc] initWithFrame:CGRectMake(frame.origin.x + 5, frame.origin.y + 5, frame.size.width - 10, frame.size.height - 10)];
+        
+        container.layer.cornerRadius = 4;
+        container.clipsToBounds = YES;
+        container.layer.borderColor = [UIColor blackColor].CGColor;
+        container.layer.borderWidth = 2.0f;
+        [self addSubview:container];
+        
+        
+        UIView* webViewContainer = [[UIView alloc] initWithFrame:CGRectMake(0, 0, container.frame.size.width, container.frame.size.height)];
+        //webViewContainer.layer.borderColor = [UIColor blackColor].CGColor;
+        //webViewContainer.layer.borderWidth = 2.0f;
         [webViewContainer setClipsToBounds:true];
-        [self addSubview:webViewContainer];
+        [container addSubview:webViewContainer];
         
         currWebView = [[UIWebView alloc] initWithFrame:CGRectMake(0, -46, frame.size.width-10, frame.size.height+36)];
         currWebView.delegate = self;
@@ -73,6 +83,12 @@
         
         [webViewContainer addSubview:currWebView];
         [currWebView loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:endpoint]]];
+        
+        
+        UIButton* button = [[UIButton alloc] initWithFrame:CGRectMake(currWebView.frame.size.width-50, currWebView.frame.size.height-50, 48,48)];
+        [button addTarget:self action:@selector(test) forControlEvents:UIControlEventTouchUpInside];
+        [button setBackgroundColor:[UIColor blackColor]];
+        //[self addSubview:button];
         
     }
     return self;
@@ -159,6 +175,15 @@ NSString* encodeToPercentEscapeString(NSString *string) {
     
 }
 - (void)moreToRight:(BOOL)isMore {
+    
+}
+
+- (void)webViewDidFinishLoad:(UIWebView *)aWebView {
+    //get rid of popup
+    [currWebView stringByEvaluatingJavaScriptFromString:@"$(\"#social_bubble\").hide()"];
+}
+
+- (void) test {
     
 }
 

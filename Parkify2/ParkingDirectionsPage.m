@@ -64,6 +64,7 @@
     if (self) {
         // Initialization code
         
+        
         self.spot = spot;
         self.reservation = reservation;
         self.index = index;
@@ -75,23 +76,32 @@
             return self;
         }
         
-        double width = (frame.size.width-10);
+        
+        UIView* container = [[UIView alloc] initWithFrame:CGRectMake(frame.origin.x + 5, frame.origin.y + 5, frame.size.width - 10, frame.size.height - 10)];
+        
+        container.layer.cornerRadius = 4;
+        container.clipsToBounds = YES;
+        container.layer.borderColor = [UIColor blackColor].CGColor;
+        container.layer.borderWidth = 2.0f;
+        [self addSubview:container];
+        
+        double width = container.frame.size.width;
         double ySoFar = 0;
         
-        CGRect imageFrame = CGRectMake(5,5,width,width*(2.0/3.0));
+        CGRect imageFrame = CGRectMake(0,0,width,width*(2.0/3.0));
         
         if(self.imageID > 0) {            
             MultiImageViewer* mainImage = [[MultiImageViewer alloc] initWithFrame:imageFrame withImageIds:[NSArray arrayWithObject:[NSNumber numberWithInt:self.imageID ]]];
-            mainImage.layer.borderColor = [UIColor blackColor].CGColor;
-            mainImage.layer.borderWidth = 2.0f;
-            [self addSubview:mainImage];
+            //mainImage.layer.borderColor = [UIColor blackColor].CGColor;
+            //mainImage.layer.borderWidth = 2.0f;
+            [container addSubview:mainImage];
         } else {
         }
         ySoFar += imageFrame.size.height;
         
         NSString* indexText = [NSString stringWithFormat:@"%d/%d", self.index+1, self.totalIndex];
         CGSize labelSize = [indexText sizeWithFont:[UIFont fontWithName:@"HelveticaNeue" size:28]];
-        UILabel* indexLabel = [[UILabel alloc] initWithFrame:CGRectMake(5,5,labelSize.width+2,labelSize.height)];
+        UILabel* indexLabel = [[UILabel alloc] initWithFrame:CGRectMake(0,0,labelSize.width+2,labelSize.height)];
         indexLabel.text = indexText;
         indexLabel.backgroundColor = [UIColor colorWithWhite:0.0 alpha:0.75];
         indexLabel.textColor = [UIColor colorWithWhite:0.8 alpha:0.9];
@@ -100,8 +110,9 @@
         
         
         
-        UIImageView* textBarBackground = [[UIImageView alloc] initWithFrame:CGRectMake(5, ySoFar, width, 50)];
-        textBarBackground.image = [UIImage imageNamed:@"direction_bar.png"];
+        UIImageView* textBarBackground = [[UIImageView alloc] initWithFrame:CGRectMake(0, ySoFar, width, 50)];
+        //textBarBackground.image = [UIImage imageNamed:@"direction_bar.png"];
+        textBarBackground.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"stressed_linen.png"]];
         textBarBackground.layer.borderColor = [UIColor blackColor].CGColor;
         textBarBackground.layer.borderWidth = 2.0f;
         
@@ -128,10 +139,10 @@
         //mapView
         ySoFar += textBarBackground.frame.size.height;
         
-        self.mapView = [[MKMapView alloc] initWithFrame:CGRectMake(5, ySoFar, width, frame.size.height-5 - ySoFar)];
+        self.mapView = [[MKMapView alloc] initWithFrame:CGRectMake(0, ySoFar, width, frame.size.height - ySoFar)];
         [self.mapView setDelegate:self];
-        self.mapView.layer.borderColor = [UIColor blackColor].CGColor;
-        self.mapView.layer.borderWidth = 2.0f;
+        //self.mapView.layer.borderColor = [UIColor blackColor].CGColor;
+        //self.mapView.layer.borderWidth = 2.0f;
         [self.mapView setShowsUserLocation:true];
         [self.mapView addAnnotation:[ParkingSpotAnnotation annotationForSpot:self.spot]];
         [self.mapView setUserInteractionEnabled:false];
@@ -145,15 +156,16 @@
         
         UIView* mapCover = [[UIView alloc] initWithFrame:self.mapView.frame];
         mapCover.alpha = 0;
+        [mapCover setUserInteractionEnabled:true];
         
         //now add them in the right order
         
-        [self addSubview: self.mapView];
-        [self addSubview: mapCover];
+        [container addSubview: self.mapView];
+        [container addSubview: mapCover];
         
-        [self addSubview:indexLabel];
+        [container addSubview:indexLabel];
         
-        [self addSubview:textBarBackground];
+        [container addSubview:textBarBackground];
         [textBarBackground addSubview:textLabel];
         [textBarBackground addSubview:leftChevron];
         [textBarBackground addSubview:rightChevron];
@@ -275,10 +287,20 @@
         frame.size.width = ANNOTATION_MINI_ARROW_WIDTH;
         frame.size.height = ANNOTATION_MINI_ARROW_HEIGHT;
         annotationView.frame = frame;
-        annotationView.centerOffset = CGPointMake(0, ANNOTATION_MINI_RELATIVE_HORIZ_OFFSET);
+        
+        
+        //annotationView.centerOffset = 
         
         
         CGAffineTransform transform = CGAffineTransformMakeRotation(-self.heading);
+        
+        
+        
+        
+        CGPoint origCenterOffset = CGPointMake(0, ANNOTATION_MINI_RELATIVE_HORIZ_OFFSET);
+        CGPoint transformedCenterOffset = CGPointApplyAffineTransform(origCenterOffset,transform);
+        annotationView.centerOffset = transformedCenterOffset;
+        
         annotationView.layer.anchorPoint = CGPointMake(1.0,0.5);
         annotationView.transform = transform;
         return annotationView;

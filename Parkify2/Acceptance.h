@@ -27,6 +27,8 @@
 @property (nonatomic, assign) BOOL active;
 @property (nonatomic, strong) NSMutableArray *offers;
 @property (nonatomic, strong) NSString *acceptid;
+@property double needsPayment;
+@property double payBy;
 
 -(id)init:(NSMutableDictionary *)withInfo;
 

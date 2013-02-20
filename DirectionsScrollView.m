@@ -13,6 +13,9 @@
 #import "ParkingDirectionsPage.h"
 #import "ConfirmationPage.h"
 #import "SBJson.h"
+#import "AccountUpdatePage.h"
+#import "UIViewController+AppData_User.h"
+#import "ErrorTransformer.h"
 
 #define PAGE_CONTROL_VERT_OFFSET (-20)
 #define PAGE_CONTROL_HORIZ_OFFSET 0
@@ -22,6 +25,8 @@
 
 @property (strong, nonatomic) IBOutlet UIScrollView *pageScrollView;
 @property (strong, nonatomic) IBOutlet UIScrollView *parkingPageScrollView;
+
+@property (strong, nonatomic) AccountUpdatePage* accountUpdatePage;
 @end
 
 @implementation DirectionsScrollView
@@ -61,8 +66,11 @@
         // Initialization code
         self.spot = spot;
         self.reservation = reservation;
+        
+        [[self getUser] updateFromServerWithSuccess:^(NSDictionary *d){
+        } withFailure:^(NSError *e){}];
     
-    [self setBackgroundColor:[UIColor clearColor]];
+    [self setBackgroundColor:[UIColor colorWithPatternImage:[UIImage imageNamed:@"otis_redding.png"]]];
     
     CGRect relRect = frame;
     relRect.origin = CGPointMake(0,0);
@@ -100,6 +108,8 @@
 - (void) generatePageContent {
     
     /* Driving Directions Page */
+    
+    
     DrivingDirectionsPage* drivingDirectionsPage=[[DrivingDirectionsPage alloc] initWithFrame:CGRectMake(0, 0, self.pageScrollView.frame.size.width, self.pageScrollView.frame.size.height) withSpot:self.spot withReservation:self.reservation ];
                                                   
     self.drivingDirectionsPage = drivingDirectionsPage;
@@ -125,12 +135,14 @@
     } else {
         for(int i=0; i<totalParkingDirectionsPages; i++) {
             ParkingDirectionsPage* parkingDirectionsPage=[[ParkingDirectionsPage alloc] initWithFrame:CGRectMake(0, 0, self.pageScrollView.frame.size.width, self.pageScrollView.frame.size.height) withSpot:self.spot withReservation:self.reservation withIndex:i withTotalIndex:totalParkingDirectionsPages];
+            
+            
             [self.parkingDirectionsPages addObject:parkingDirectionsPage];
         }
     }
     /* Confirmation Page */
-    ConfirmationPage* confirmationPage=[[ConfirmationPage alloc]initWithFrame:CGRectMake(0, 0, self.pageScrollView.frame.size.width, self.pageScrollView.frame.size.height) withSpot:self.spot withReservation:self.reservation];
-    self.confirmationPage = confirmationPage;
+    self.confirmationPage=[[ConfirmationPage alloc]initWithFrame:CGRectMake(0, 0, self.pageScrollView.frame.size.width, self.pageScrollView.frame.size.height) withSpot:self.spot withReservation:self.reservation];
+    
 }
 
 //TODO: make more general possibly.
@@ -232,6 +244,9 @@
         }
     }
      */
+    
+    
+    [self reconsiderAccountUpdate];
     
 }
 
@@ -335,6 +350,74 @@
     }
 }
 
+
+#pragma mark - account update
+- (void)reconsiderAccountUpdate {
+    [[self getUser] updateFromServerWithSuccess:^(NSDictionary *d){
+    
+        User* user = [self getUser];
+        if(user == nil && self.accountUpdatePage) {
+            [self.accountUpdatePage removeFromSuperview];
+            self.accountUpdatePage = nil;
+            return;
+        }
+        if(self.reservation.needsPayment > 0) {
+            if(!self.accountUpdatePage) {
+                CGRect frame = self.confirmationPage.frame;
+                frame.origin = CGPointZero;
+                self.accountUpdatePage = [[AccountUpdatePage alloc] initWithFrame:frame withUpdateType:@"Pay" withUser:user];
+                [self.confirmationPage addSubview:self.accountUpdatePage];
+                [self.accountUpdatePage addTarget:self action:@selector(makeDelayedPayment) forControlEvents:ShouldContinueActionEvent];
+            }
+            return;
+        }
+        if([user.cars count] == 0) {
+            if(!self.accountUpdatePage) {
+                CGRect frame = self.confirmationPage.frame;
+                frame.origin = CGPointZero;
+                self.accountUpdatePage = [[AccountUpdatePage alloc] initWithFrame:frame withUpdateType:@"AddLicensePlate" withUser:user];
+                
+                [self.confirmationPage addSubview:self.accountUpdatePage];
+                [self.accountUpdatePage addTarget:self action:@selector(addLicensePlate) forControlEvents:ShouldContinueActionEvent];
+            }
+            return;
+        } else {
+            if (self.accountUpdatePage) {
+                [self.accountUpdatePage removeFromSuperview];
+                self.accountUpdatePage = nil;
+                return;
+            }
+        }
+    } withFailure:^(NSError *e){
+        ;
+    }];
+}
+
+-(void) makeDelayedPayment {
+    [Api makeDelayedPaymentWithUser:self.accountUpdatePage.user withCard:self.accountUpdatePage.card withCar:self.accountUpdatePage.car withAcceptanceId:[self.self.reservation.acceptid intValue] withSuccess:^(NSDictionary * result) {
+        if([[result objectForKey:@"success"] boolValue]) {
+            [[self getUser] updateFromServerWithSuccess:^(NSDictionary *d){
+                self.reservation.needsPayment = 0.0;
+                [self reconsiderAccountUpdate];
+            } withFailure:^(NSError *e){}];
+        } else {
+            ;
+        }
+    } withFailure:^(NSError * result) {
+        [ErrorTransformer errorToAlert:result withDelegate:self];
+    }];
+    
+}
+-(void) addLicensePlate {
+    [Api addCar:self.accountUpdatePage.car.license_plate_number withState:self.accountUpdatePage.car.state withSuccess:^(NSDictionary * result) {
+        [[self getUser] updateFromServerWithSuccess:^(NSDictionary *d){
+            [self reconsiderAccountUpdate];
+        } withFailure:^(NSError *e){}];
+    } withFailure:^(NSError * result) {
+        [ErrorTransformer errorToAlert:result withDelegate:self];
+    }];
+     
+}
 
 /*
 // Only override drawRect: if you perform custom drawing.

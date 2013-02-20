@@ -8,7 +8,9 @@
 
 #import <UIKit/UIKit.h>
 
-@interface PasswordTableViewController : UITableViewController
+#import "ParkifyTableViewController.h"
+
+@interface PasswordTableViewController : ParkifyTableViewController
 
 @property (strong, nonatomic) NSString* password;
 @property (strong, nonatomic) NSString* passwordConf;

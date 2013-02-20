@@ -24,6 +24,7 @@
 #import "extendReservationViewController.h"
 #import "Acceptance.h"
 #import "mapDirectionsViewController.h"
+#import "IntroViewController.h"
 
 #define USING_NEW_PIN
 
@@ -899,6 +900,7 @@ typedef struct STargetLocation {
     self.annotations = annotations;
     */
 #if ADMIN_VER
+    /*
         NSMutableArray* ids = [[NSMutableArray alloc] init ];
         for (ParkingSpot* spot in [[self getParkingSpots].parkingSpots allValues]) {
         
@@ -914,7 +916,7 @@ typedef struct STargetLocation {
         }
     
         [[[iToast makeText:toToast] setGravity:iToastGravityBottom ] show];
-
+     */
 #endif
 
     

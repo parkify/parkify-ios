@@ -33,5 +33,5 @@
 
 - (void)pushChangesToServerWithSuccess:(SuccessBlock)successBlock
                 withFailure:(FailureBlock)failureBlock;
-
+- (NSString*) validate;
 @end

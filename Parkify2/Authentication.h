@@ -14,6 +14,8 @@
 
 + (id)makeUserRegistrationRequest:(NSString *)email withPassword:(NSString *)password withPasswordConfirmation:(NSString *)passwordConfirmation withFirstName:(NSString *)firstName withLastName:(NSString*)lastName withZipCode:(NSString*)zipCode withPhone:(NSString*)withPhone;
 
++ (id)makeUserRegistrationRequestWithPhone:phoneNumber withPromoCode:promoCode;
+
 + (id) makeTokenRequestWithToken:(NSString*)token;
 
 + (id) makeTransactionRequestWithUserToken:(NSString*)token withSpotId:(int)spotID withStartTime:(double)startTime withEndTime:(double)endTime withOfferIds:(NSArray*)offerIds withLicensePlate:(NSString*)licensePlate withPriceType:(NSString*)priceType withFlatRateName:(NSString*)flatRateName;

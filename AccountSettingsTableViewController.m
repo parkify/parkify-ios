@@ -13,7 +13,7 @@
 #import "PromoCollectionTableViewController.h"
 #import "UIViewController+AppData_User.h"
 #import "ErrorTransformer.h"
-
+#import "Api.h"
 @interface AccountSettingsTableViewController ()
 
 
@@ -61,12 +61,25 @@
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
     // Return the number of sections.
+    if([[self getUser].accountType isEqualToString: @"trial"]) {
+        return 2;
+    }
     return 3;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
     // Return the number of rows in the section.
+    if([[self getUser].accountType isEqualToString: @"trial"]) {
+        switch (section) {
+            case 0:
+                return 2;
+            case 1:
+                return 1;
+            default:
+                return 0;
+        }
+    }
     switch (section) {
         case 0:
             return 5;
@@ -109,59 +122,99 @@
 }
 
 - (void)configureCell:(ELCTextfieldCell *)cell atIndexPath:(NSIndexPath *)indexPath {
-    
-	cell.indexPath = indexPath;
-	cell.delegate = self;
-    
-    //Disables UITableViewCell from accidentally becoming selected.
-    cell.selectionStyle = UITableViewCellEditingStyleNone;
-    
-    cell.rightTextField.placeholder = @"";
-    
-    // Configure the cell...
-    switch (indexPath.row) {
-        case 0:
-            cell.leftLabel.text = @"First Name";
-            cell.rightTextField.text = [self getUser].first_name;
-            break;
-        case 1:
-            cell.leftLabel.text = @"Last Name";
-            cell.rightTextField.text = [self getUser].last_name;
-            break;
-        case 2:
-            cell.leftLabel.text = @"Email";
-            cell.rightTextField.text = [self getUser].email;
-            [cell.rightTextField setKeyboardType:UIKeyboardTypeEmailAddress];
-            break;
-        case 3:
-            cell.leftLabel.text = @"Phone";
-            cell.rightTextField.text = [self getUser].phone_number;
-            [cell.rightTextField setKeyboardType:UIKeyboardTypeNumberPad];
-            break;
-        case 4:
-            cell.leftLabel.text = @"Credits";
-            cell.rightTextField.text = [NSString stringWithFormat:@"$%0.2f", [self getUser].credit/100.0];
-            [cell.rightTextField setEnabled:false];
-            break;
-        default:
-            break;
+    if([[self getUser].accountType isEqualToString: @"trial"]) {
+        cell.indexPath = indexPath;
+        cell.delegate = self;
+        
+        //Disables UITableViewCell from accidentally becoming selected.
+        cell.selectionStyle = UITableViewCellEditingStyleNone;
+        
+        cell.rightTextField.placeholder = @"";
+        
+        // Configure the cell...
+        switch (indexPath.row) {
+            case 0:
+                cell.leftLabel.text = @"Phone";
+                cell.rightTextField.text = [self getUser].phone_number;
+                [cell.rightTextField setKeyboardType:UIKeyboardTypeNumberPad];
+                break;
+            case 1:
+                cell.leftLabel.text = @"Credits";
+                cell.rightTextField.text = [NSString stringWithFormat:@"$%0.2f", [self getUser].credit/100.0];
+                [cell.rightTextField setEnabled:false];
+                break;
+            default:
+                break;
+        }
+    } else {
+        cell.indexPath = indexPath;
+        cell.delegate = self;
+        
+        //Disables UITableViewCell from accidentally becoming selected.
+        cell.selectionStyle = UITableViewCellEditingStyleNone;
+        
+        cell.rightTextField.placeholder = @"";
+        
+        // Configure the cell...
+        switch (indexPath.row) {
+            case 0:
+                cell.leftLabel.text = @"First Name";
+                cell.rightTextField.text = [self getUser].first_name;
+                break;
+            case 1:
+                cell.leftLabel.text = @"Last Name";
+                cell.rightTextField.text = [self getUser].last_name;
+                break;
+            case 2:
+                cell.leftLabel.text = @"Email";
+                cell.rightTextField.text = [self getUser].email;
+                [cell.rightTextField setKeyboardType:UIKeyboardTypeEmailAddress];
+                break;
+            case 3:
+                cell.leftLabel.text = @"Phone";
+                cell.rightTextField.text = [self getUser].phone_number;
+                [cell.rightTextField setKeyboardType:UIKeyboardTypeNumberPad];
+                break;
+            case 4:
+                cell.leftLabel.text = @"Credits";
+                cell.rightTextField.text = [NSString stringWithFormat:@"$%0.2f", [self getUser].credit/100.0];
+                [cell.rightTextField setEnabled:false];
+                break;
+            default:
+                break;
+        }
+
+        
     }
 }
 - (void)configureSegueCell:(UITableViewCell *)cell atIndexPath:(NSIndexPath *)indexPath {
     // Configure the cell...
-    switch (indexPath.row) {
-        case 0:
-            cell.textLabel.text = (indexPath.section == 1)? @"Credit Cards" : @"Change Password";
-            break;
-        case 1:
-            cell.textLabel.text = @"Registered Vehicles";
-            break;
-        case 2:
-            cell.textLabel.text = @"Promotions";
-            break;
-        default:
-            break;
+    if([[self getUser].accountType isEqualToString: @"trial"]) {
+        switch (indexPath.row) {
+            case 0:
+                cell.textLabel.text = @"Upgrade to Standard Account";
+                break;
+            default:
+                break;
+        }
+    } else {
+        switch (indexPath.row) {
+            case 0:
+                cell.textLabel.text = (indexPath.section == 1)? @"Credit Cards" : @"Change Password";
+                break;
+            case 1:
+                cell.textLabel.text = @"Registered Vehicles";
+                break;
+            case 2:
+                cell.textLabel.text = @"Promotions";
+                break;
+            default:
+                break;
+        }
+        
     }
+    
+    
 }
 /*
 // Override to support conditional editing of the table view.
@@ -206,31 +259,51 @@
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    switch (indexPath.section) {
-        case 1:
-            
-            switch (indexPath.row) {
-                case 0: {
-                    [self performSegueWithIdentifier:@"CreditCardCollection" sender:self];
-                    return;
+    
+    if([[self getUser].accountType isEqualToString: @"trial"]) {
+        switch (indexPath.section) {
+            case 1:
+                switch (indexPath.row) {
+                    case 0: {
+                        [self performSegueWithIdentifier:@"XPromoteAccount" sender:self];
+                        return;
+                    }
+                    default:
+                        return;
                 }
-                case 1: {
-                    [self performSegueWithIdentifier:@"CarCollection" sender:self];
-                    return;
+                break;
+            default:
+                return;
+        }
+        
+    } else {
+        switch (indexPath.section) {
+            case 1:
+                
+                switch (indexPath.row) {
+                    case 0: {
+                        [self performSegueWithIdentifier:@"CreditCardCollection" sender:self];
+                        return;
+                    }
+                    case 1: {
+                        [self performSegueWithIdentifier:@"CarCollection" sender:self];
+                        return;
+                    }
+                    case 2: {
+                        [self performSegueWithIdentifier:@"PromoCollection" sender:self];
+                        return;
+                    }
+                    default:
+                        return;
                 }
-                case 2: {
-                    [self performSegueWithIdentifier:@"PromoCollection" sender:self];
-                    return;
-                }
-                default:
-                    return;
-            }
-            break;
-        case 2: {
-          [self performSegueWithIdentifier:@"Password" sender:self];
-          return;        }
-        default:
-            return;
+                break;
+            case 2: {
+                [self performSegueWithIdentifier:@"Password" sender:self];
+                return;        }
+            default:
+                return;
+        }
+        
     }
     
     // Navigation logic may go here. Create and push another view controller.
@@ -264,22 +337,33 @@
 //Called to the delegate whenever the text in the rightTextField is changed
 - (void)updateTextLabelAtIndexPath:(NSIndexPath*)indexPath string:(NSString*)string {
     // Configure the cell...
-    switch (indexPath.row) {
-        case 0:
-            [self getUser].first_name = string;
-            break;
-        case 1:
-            [self getUser].last_name = string;
-            break;
-        case 2:
-            [self getUser].email = string;
-            break;
-        case 3:
-            [self getUser].phone_number = string;
-            break;
-        default:
-            break;
+    if([[self getUser].accountType isEqualToString: @"trial"]) {
+        switch (indexPath.row) {
+            case 0:
+                [self getUser].phone_number = string;
+                break;
+            default:
+                break;
+        }
+    } else {
+        switch (indexPath.row) {
+            case 0:
+                [self getUser].first_name = string;
+                break;
+            case 1:
+                [self getUser].last_name = string;
+                break;
+            case 2:
+                [self getUser].email = string;
+                break;
+            case 3:
+                [self getUser].phone_number = string;
+                break;
+            default:
+                break;
+        }
     }
+    
 }
 
 
@@ -308,5 +392,10 @@
     if([segue.identifier isEqualToString:@"PromoCollection"]) {
       ;
     }
+    if([segue.identifier isEqualToString:@"XPromoteAccount"]) {
+        ;
+    }
 }
+
+
 @end

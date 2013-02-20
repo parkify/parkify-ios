@@ -72,5 +72,10 @@
   return [NSString stringWithFormat:@"<CreditCard | last4:%@, active:%@>", self.last4, self.active ? @"true" : @"false"];
 }
 
+- (NSString*) validate {
+    return nil;
+    
+}
+
 
 @end

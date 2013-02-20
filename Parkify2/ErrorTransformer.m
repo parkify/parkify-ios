@@ -17,7 +17,7 @@
     //only take the first one.
     
     if(errors.count == 0) {
-        message = @"An unknown error occurred. Please contact us at 1-855-Parkify for assistance.";
+        message = @"Uh oh, something went wrong. Please contact us at 1-855-Parkify for assistance.";
     } else {
     
         id firstKey = [errors.allKeys objectAtIndex:0];
@@ -40,7 +40,7 @@
                 firstValue = [((NSMutableArray*)firstValue) objectAtIndex:0];
                 c = [firstValue class];
             } else {
-                message = @"An unknown error occurred. Please contact us at 1-855-Parkify for assistance.";
+                message = @"Uh oh, something went wrong. Please contact us at 1-855-Parkify for assistance.";
                 break;
             }
         }

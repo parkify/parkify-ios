@@ -189,8 +189,15 @@ standardImageIDs:(NSDictionary*)standardImageIDs
     if(isFlat) {
         return [[self.offers objectAtIndex:0] findCostWithStartTime:startTime endTime:startTime + duration flatDuration:duration];
     } else {
-        [NSException raise:@"UNIMPLEMENTED" format:@"Method ParingSpot::priceFromStartTime:forDuration:forFlatRate: is unimplemented for input isFlat=false"];
-        return -5; //UNIMPLEMENTED
+        double toRtn = 0.0;
+        for (Offer* iterOffer in self.offers) {
+            double iterStartTime = MAX(startTime, iterOffer.startTime);
+            double iterEndTime = MIN(startTime+duration, iterOffer.endTime);
+            if (iterEndTime - iterStartTime > 0) {
+                toRtn += [iterOffer findCostWithStartTime:iterStartTime endTime:iterEndTime];
+            }
+        }
+        return toRtn;
     }
 
 }
@@ -238,9 +245,15 @@ standardImageIDs:(NSDictionary*)standardImageIDs
 - (BOOL) updateFromDictionary:(NSDictionary*)spot withLevelOfDetail:(NSString*)levelOfDetail {
     //ID
     int idIn = [[spot objectForKey:@"id"] intValue];
+    BOOL debug = (idIn == 28);
+    if (debug) {
+        debug = debug;
+    } else {
+        debug = debug;
+    }
     self.mID = [[spot objectForKey:@"signid"] intValue];
     self.actualID = idIn;
-    Boolean freeIn = [[spot objectForKey:@"free"] boolValue];
+    BOOL freeIn = [[spot objectForKey:@"free"] boolValue];
     self.mFree = freeIn;
     
     
@@ -372,7 +385,7 @@ standardImageIDs:(NSDictionary*)standardImageIDs
 - (NSString *)subtitle {
     
     if (ADMIN_VER) {
-        NSString* adminExtra = [NSString stringWithFormat:@" <#%d>", self.spot.mID];
+        NSString* adminExtra = [NSString stringWithFormat:@" <#%d(%d)>", self.spot.mID,self.spot.actualID];
         return [NSString stringWithFormat:@"%@%@", self.spot.mLocationName, adminExtra];
     }
     return [NSString stringWithFormat:@"%@", [TextFormatter formatSecuredAddressString:self.spot.mLocationName]];

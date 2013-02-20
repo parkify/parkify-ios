@@ -53,6 +53,7 @@ withPasswordConfirmation:(NSString*)passwordConfirmation
        withLicensePlate:(NSString*)licensePlate
             withZipCode:(NSString*)zipCode
               withPhone:(NSString*)phone
+       withAcceptanceId:(NSNumber*)acceptanceId
             withSuccess:(SuccessBlock)successBlock
             withFailure:(FailureBlock)failureBlock {
     
@@ -84,6 +85,7 @@ withPasswordConfirmation:(NSString*)passwordConfirmation
                           withLicensePlate:licensePlate
                                withZipCode:zipCode
                                  withPhone:phone
+                          withAcceptanceId:acceptanceId
                                withSuccess:successBlock
                                withFailure:failureBlock];
      }
@@ -106,7 +108,64 @@ withPasswordConfirmation:(NSString*)passwordConfirmation
      }];
 }
 
+//Called for user registration
++ (void)signUpWithPhoneNumber:(NSString*)phoneNumber
+                withPromoCode:(NSString*)promoCode
+                  withSuccess:(SuccessBlock)successBlock
+                  withFailure:(FailureBlock)failureBlock  {
+    
+    id userRequest = [Authentication makeUserRegistrationRequestWithPhone:phoneNumber
+                                                            withPromoCode:promoCode];
+    
+    NSString *urlstring = [Api apirootstring];
+    
+    urlstring = [urlstring stringByAppendingFormat:@"users.json"];
+    
+    NSURL *url = [NSURL URLWithString:urlstring];
+    
+        
+    
+    NSLog(@"%@", [userRequest JSONRepresentation]);
+    
+    ASIFormDataRequest *request = [ASIFormDataRequest requestWithURL:url];
+    [request addPostValue:[userRequest JSONRepresentation] forKey:@"user"];
+    [request addPostValue:[@"true" JSONRepresentation] forKey:@"trial"];
+    
+    [request addRequestHeader:@"User-Agent" value:@"ASIFormDataRequest"];
+    [request addRequestHeader:@"Content-Type" value:@"application/json"];
+    [request setRequestMethod:@"POST"];
+    
+    [request setCompletionBlock:^{
+        [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+        
+        NSString *responseString = [request responseString];
+        NSDictionary * root = [responseString JSONValue];
+        BOOL success = [[root objectForKey:@"success"] boolValue];
+        
+        if(success) {
+            int userID = [[[root objectForKey:@"user"] objectForKey:@"id"] intValue];
+            [Persistance saveUserID:[NSNumber numberWithInt:userID]];
+            [Persistance saveAuthToken:[root objectForKey:@"auth_token"]];
+            [Persistance saveFirstName:[[root objectForKey:@"user"] objectForKey:@"first_name"]];
+            [Persistance saveLastName:[[root objectForKey:@"user"] objectForKey:@"last_name"]];
+            [Api registerUserWithCurrentDevice];
+            successBlock(root);
+        } else {
+            NSError* error = [ErrorTransformer apiErrorToNSError:[root objectForKey:@"error"]];
+            failureBlock(error);
+        }
+    }];
+    
+    [request setFailedBlock:^{
+        [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+        failureBlock([request error]);
+    }];
+    
+    [request startAsynchronous];
+    
 
+    
+}
 
 
 // Helper method for user registration
@@ -121,6 +180,7 @@ withPasswordConfirmation:(NSString*)passwordConfirmation
                    withLicensePlate:(NSString*)licensePlate
                         withZipCode:(NSString*)zipCode
                           withPhone:(NSString *)phone
+                   withAcceptanceId:(NSNumber*)acceptanceId
                         withSuccess:(SuccessBlock)successBlock
                         withFailure:(FailureBlock)failureBlock {
     
@@ -131,12 +191,18 @@ withPasswordConfirmation:(NSString*)passwordConfirmation
                                                        withFirstName:firstName
                                                         withLastName:lastName
                                                          withZipCode:zipCode
-                                                           withPhone:phone];
+                                                           withPhone:phone
+                                        ];
         id tokenRequest = [Authentication makeTokenRequestWithToken:token];
     NSString *urlstring = [Api apirootstring];
     
-    urlstring = [urlstring stringByAppendingFormat:@"users.json"];
-    
+    NSString* authToken = [Persistance retrieveAuthToken];
+    if(authToken) {
+        urlstring = [urlstring stringByAppendingFormat:@"users.json?&auth_token=%@", authToken];
+    } else {
+        urlstring = [urlstring stringByAppendingFormat:@"users.json"];
+    }
+        
     
     
     NSURL *url = [NSURL URLWithString:urlstring];
@@ -146,13 +212,16 @@ withPasswordConfirmation:(NSString*)passwordConfirmation
     
 
         NSLog(@"%@", [userRequest JSONRepresentation]);
-        
+    
         ASIFormDataRequest *request = [ASIFormDataRequest requestWithURL:url];
         [request addPostValue:[userRequest JSONRepresentation] forKey:@"user"];
         [request addPostValue:tokenRequest forKey:@"stripe_token_id"];
         [request addPostValue:licensePlate forKey:@"license_plate_number"];
+    if(acceptanceId) {
+        [request addPostValue:[NSString stringWithFormat:@"%@", acceptanceId ] forKey:@"acceptance_id"];
+    }
         
-        [request addRequestHeader:@"User-Agent" value:@"ASIFormDataRequest"]; 
+        [request addRequestHeader:@"User-Agent" value:@"ASIFormDataRequest"];
         [request addRequestHeader:@"Content-Type" value:@"application/json"];
         [request setRequestMethod:@"POST"];
         
@@ -365,6 +434,19 @@ withPasswordConfirmation:(NSString*)passwordConfirmation
     parent.modalTransitionStyle = style;
 }
 
++ (void)promoteAccountModallyFrom:(UIViewController*)parent withSuccess:(SuccessBlock)successBlock {
+    UIStoryboard *mainStoryboard = [UIStoryboard storyboardWithName:@"MainStoryboard_iPhone"
+                                                             bundle: nil];
+    [[Mixpanel sharedInstance] track:@"AuthenticateModally"];
+    [Crittercism leaveBreadcrumb:@"AuthenticateModally"];
+    ModalSettingsController* controller = [mainStoryboard instantiateViewControllerWithIdentifier: @"PromoteAccountVC"];
+    controller.successBlock = successBlock;
+    
+    UIModalTransitionStyle style = parent.modalTransitionStyle;
+    //parent.modalTransitionStyle = UIModalTransitionStyleCrossDissolve;
+    [parent presentViewController:controller animated:true completion:^{}];
+    parent.modalTransitionStyle = style;
+}
 
 + (void)settingsModallyFrom:(UIViewController*)parent withSuccess:(SuccessBlock)successBlock {
     UIStoryboard *mainStoryboard = [UIStoryboard storyboardWithName:@"MainStoryboard_iPhone"
@@ -378,6 +460,8 @@ withPasswordConfirmation:(NSString*)passwordConfirmation
     [parent presentViewController:controller animated:true completion:^{}];
     parent.modalTransitionStyle = style;
 }
+
+
 //Called to bring up SettingsVC modally
 + (void)webWrapperModallyFrom:(UIViewController*)parent withURL:(NSString*)url {
     UIStoryboard *mainStoryboard = [UIStoryboard storyboardWithName:@"MainStoryboard_iPhone"
@@ -486,7 +570,7 @@ withPasswordConfirmation:(NSString*)passwordConfirmation
     __weak ASIHTTPRequest *request = _request;
     
     request.requestMethod = @"GET";
-    
+    [request setTimeOutSeconds:30];
     
     
     [request setDelegate:self];
@@ -664,8 +748,9 @@ withPasswordConfirmation:(NSString*)passwordConfirmation
 }
 
 + (void)addCar:(NSString*)license_plate_number
-         withSuccess:(SuccessBlock)successBlock
-         withFailure:(FailureBlock)failureBlock {
+     withState:(NSString*)state
+   withSuccess:(SuccessBlock)successBlock
+   withFailure:(FailureBlock)failureBlock {
     NSString* authToken = [Persistance retrieveAuthToken];
     if(!authToken) {
         //NSError* error = [[NSError errorWithDomain:@"Auth" code:0 userInfo:[NSDictionary dictionaryWithObject:<#(id)#> forKey:<#(id<NSCopying>)#>]]]
@@ -687,6 +772,7 @@ withPasswordConfirmation:(NSString*)passwordConfirmation
     
     ASIFormDataRequest *request = [ASIFormDataRequest requestWithURL:url];
     [request addPostValue:license_plate_number forKey:@"license_plate_number"];
+    [request addPostValue:state forKey:@"state"];
     [request addRequestHeader:@"User-Agent" value:@"ASIFormDataRequest"];
     [request addRequestHeader:@"Content-Type" value:@"application/json"];
     [request setRequestMethod:@"POST"];
@@ -924,6 +1010,50 @@ origPassword:(NSString*)origPassword
 }
 
 
++ (void)checkPromoCode:(NSString*)promoCode
+           withSuccess:(SuccessBlock)successBlock
+           withFailure:(FailureBlock)failureBlock {
+    NSString *urlstring = [Api apirootstring];
+    
+    urlstring = [urlstring stringByAppendingFormat:@"account/check_code_text.json"];
+    
+    
+    
+    NSURL *url = [NSURL URLWithString:urlstring];
+    
+    
+    
+    ASIFormDataRequest *request = [ASIFormDataRequest requestWithURL:url];
+    [request addPostValue:promoCode forKey:@"code_text"];
+    [request addRequestHeader:@"User-Agent" value:@"ASIFormDataRequest"];
+    [request addRequestHeader:@"Content-Type" value:@"application/json"];
+    [request setRequestMethod:@"POST"];
+    
+    [request setCompletionBlock:^{
+        [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+        
+        NSString *responseString = [request responseString];
+        NSDictionary * root = [responseString JSONValue];
+        BOOL success = [[root objectForKey:@"success"] boolValue];
+        
+        if(success) {
+            successBlock(root);
+        } else {
+            NSError* error = [ErrorTransformer apiErrorToNSError:[root objectForKey:@"error"]];
+            failureBlock(error);
+        }
+    }];
+    
+    [request setFailedBlock:^{
+        [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+        failureBlock([request error]);
+    }];
+    
+    [request startAsynchronous];
+}
+
+
+
 #pragma mark Gaurav functions start here
 
 #pragma mark AWS methods
@@ -1093,7 +1223,10 @@ origPassword:(NSString*)origPassword
 //    [request addPostValue:[userRequest JSONRepresentation] forKey:@"user"];
     [request addPostValue:[[UIDevice currentDevice] model] forKey:@"devicetype"];
     [request addPostValue:udid forKey:@"device_uid"];
-    [request addPostValue:tokenAsString forKey:@"push_token_id"];
+    
+    if(tokenAsString && [tokenAsString length] > 0) {
+        [request addPostValue:tokenAsString forKey:@"push_token_id"];
+    }
     request.tag = kLoadUDIDandPush;
     [request addRequestHeader:@"User-Agent" value:@"ASIFormDataRequest"];
     [request addRequestHeader:@"Content-Type" value:@"application/json"];
@@ -1209,6 +1342,30 @@ origPassword:(NSString*)origPassword
     return urlstring;
     
 }
+
+
++(void) signUpWithUser:(User*)user withCard:(CreditCard*)card withCar:(Car*)car
+           withSuccess:(SuccessBlock)successBlock
+           withFailure:(FailureBlock)failureBlock {
+    [Api signUpWithEmail:user.email withPassword:user.password withPasswordConfirmation:user.password withFirstName:user.first_name withLastName:user.last_name withCreditCardNumber:card.credit_card_number withCVC:card.cvc withExpirationMonth:card.exp_month withExpirationYear:card.exp_year withLicensePlate:car.license_plate_number withZipCode:card.zip withPhone:user.phone_number withAcceptanceId:nil withSuccess:successBlock withFailure:failureBlock];
+}
+
+
+//Exactly the same, except backend checks for auth token.
++(void) promoteAccountWithUser:(User*)user withCard:(CreditCard*)card withCar:(Car*)car
+                   withSuccess:(SuccessBlock)successBlock
+                   withFailure:(FailureBlock)failureBlock {
+    [Api signUpWithEmail:user.email withPassword:user.password withPasswordConfirmation:user.password withFirstName:user.first_name withLastName:user.last_name withCreditCardNumber:card.credit_card_number withCVC:card.cvc withExpirationMonth:card.exp_month withExpirationYear:card.exp_year withLicensePlate:car.license_plate_number withZipCode:card.zip withPhone:user.phone_number withAcceptanceId:nil withSuccess:successBlock withFailure:failureBlock];
+
+}
+
+//Exactly the same, except backend checks for auth token.
++(void) makeDelayedPaymentWithUser:(User*)user withCard:(CreditCard*)card withCar:(Car*)car withAcceptanceId:(int)acceptanceId withSuccess:(SuccessBlock)successBlock
+        withFailure:(FailureBlock)failureBlock {
+    [Api signUpWithEmail:user.email withPassword:user.password withPasswordConfirmation:user.password withFirstName:user.first_name withLastName:user.last_name withCreditCardNumber:card.credit_card_number withCVC:card.cvc withExpirationMonth:card.exp_month withExpirationYear:card.exp_year withLicensePlate:car.license_plate_number withZipCode:card.zip withPhone:user.phone_number withAcceptanceId:[NSNumber numberWithInt:acceptanceId] withSuccess:successBlock withFailure:failureBlock];
+}
+
+
 @end
 
 

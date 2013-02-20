@@ -42,7 +42,7 @@
     }
     self.imageIDs = imageIds;
     
-    [self setBackgroundColor:[UIColor clearColor]];
+    [self setBackgroundColor:[UIColor colorWithPatternImage:[UIImage imageNamed:@"dark_geometric.png"]]];
     
     CGRect relRect = frame;
     relRect.origin = CGPointMake(0,0);

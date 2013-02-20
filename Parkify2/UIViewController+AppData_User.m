@@ -18,3 +18,14 @@
 
 
 @end
+
+
+@implementation UIView (AppData_User)
+
+- (User*)getUser {
+    return ((ParkifyAppDelegate*)[[UIApplication sharedApplication] delegate]).user;
+}
+
+
+
+@end

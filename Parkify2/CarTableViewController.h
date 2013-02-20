@@ -9,7 +9,9 @@
 #import <UIKit/UIKit.h>
 #import "Car.h"
 
-@interface CarTableViewController : UITableViewController
+#import "ParkifyTableViewController.h"
+
+@interface CarTableViewController : ParkifyTableViewController
 
 @property (strong, nonatomic) Car* car;
 @end

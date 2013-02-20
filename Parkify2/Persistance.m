@@ -8,6 +8,8 @@
 #import "Persistance.h"
 #import "ParkifyAppDelegate.h"
 #import "Acceptance.h"  
+#import "ExtraTypes.h"
+
 @interface  Persistance()
 + (void) saveUserRecord:(id)record withName:(NSString*)name;
 + (id) retrieveUserRecordwithName:(NSString*)name;
@@ -136,6 +138,30 @@
 }
 
 
++(void)saveGotPastDemo:(BOOL)gpd {
+    [Persistance saveRecord:[NSNumber numberWithBool:gpd]withName:@"GotPastDemo"];
+}
+
++(BOOL)retrieveGotPastDemo {
+    if (DEBUG_FIRST_FLOW) {
+        return false;
+    }
+    id toRtn = [Persistance retrieveRecordwithName:@"GotPastDemo"];
+    if (toRtn) return [toRtn boolValue];
+    return false;
+}
+
++(void)saveFirstUse:(NSString*)firstUse {
+    [Persistance saveRecord:firstUse withName:@"FirstUse"];
+}
+
++(NSString*)retrieveFirstUse {
+    id toRtn = [Persistance retrieveRecordwithName:@"FirstUse"];
+    if (toRtn) return toRtn;
+    return @"Unset";
+}
+
+
 +(void)saveLicensePlateNumber:(NSString*)lpn {
     [Persistance saveUserRecord:lpn withName:@"LicensePlateNumber"];
 }
@@ -179,9 +205,24 @@
 }
 
 
-+(Acceptance*)addNewTransaction:(ParkingSpot*)spot withStartTime:(double)timeIn andEndTime:(double)timeOut andLastPaymentDetails:(NSString*)details withTransactionID:(NSString*)acceptanceid
++(Acceptance*)addNewTransaction:(ParkingSpot*)spot withStartTime:(double)timeIn andEndTime:(double)timeOut andLastPaymentDetails:(NSString*)details withTransactionID:(NSString*)acceptanceid withNeedsPayment:(double)needsPayment withPayBy:(double)payBy
 {
-    NSMutableDictionary *newTransaction = [NSMutableDictionary dictionaryWithObjects:[NSArray arrayWithObjects:[NSNumber numberWithInt:spot.actualID], details, [NSNumber numberWithDouble:timeIn],[NSNumber numberWithDouble:timeOut],@"1",spot.offers, acceptanceid, nil] forKeys:[NSArray arrayWithObjects:@"spotid",@"lastpayment", @"starttime",@"endtime",@"active" ,@"offers",@"acceptanceid", nil]];
+    if(spot == NULL){
+        return nil;
+    }
+    if(details == NULL){
+        return nil;
+    }
+    if(acceptanceid == NULL){
+        return nil;
+    }
+    if(spot.offers == NULL) {
+        return nil;
+    }
+    NSMutableDictionary *newTransaction = [NSMutableDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithInt:spot.actualID], @"spotid", details, @"lastpayment", [NSNumber numberWithDouble:timeIn], @"starttime", [NSNumber numberWithDouble:timeOut], @"endtime", @"1", @"active", spot.offers, @"offers", acceptanceid, @"acceptanceid", [NSNumber numberWithDouble:needsPayment], @"needs_payment", [NSNumber numberWithDouble: payBy], @"pay_by", nil];
+    /*
+    NSMutableDictionary *newTransaction = [NSMutableDictionary dictionaryWithObjects:[NSArray arrayWithObjects:[NSNumber numberWithInt:spot.actualID], details, [NSNumber numberWithDouble:timeIn],[NSNumber numberWithDouble:timeOut],@"1",spot.offers, acceptanceid,needsPayment,payBy, nil] forKeys:[NSArray arrayWithObjects:@"spotid",@"lastpayment", @"starttime",@"endtime",@"active" ,@"offers",@"acceptanceid",@"needs_payment",@"pay_by", nil]];
+     */
     Acceptance *newAcceptance = [[Acceptance alloc] init:newTransaction];
     
     ParkifyAppDelegate *delegate = (ParkifyAppDelegate*)[[UIApplication sharedApplication] delegate];

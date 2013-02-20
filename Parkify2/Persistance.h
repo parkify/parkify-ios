@@ -11,7 +11,7 @@
 #import "Acceptance.h"
 @interface Persistance : NSObject
 
-+(Acceptance*)addNewTransaction:(ParkingSpot*)spot withStartTime:(double)timeIn andEndTime:(double)timeOut andLastPaymentDetails:(NSString*)details withTransactionID:(NSString*)acceptanceid;
++(Acceptance*)addNewTransaction:(ParkingSpot*)spot withStartTime:(double)timeIn andEndTime:(double)timeOut andLastPaymentDetails:(NSString*)details withTransactionID:(NSString*)acceptanceid withNeedsPayment:(double)needsPayment withPayBy:(double)payBy;
 +(NSDictionary*)retrieveTransactions;
 +(void)saveUserID:(NSNumber*)user;
 +(NSNumber*)retrieveUserID;
@@ -19,6 +19,9 @@
 +(NSString*)retrieveAuthToken;
 
 +(void)updatePersistedDataWithAppVersion;
+
++(void)saveGotPastDemo:(BOOL)gpd;
++(BOOL)retrieveGotPastDemo;
 
 
 +(void)saveLicensePlateNumber:(NSString*)lpn;
@@ -56,6 +59,12 @@
 +(NSString*)retrieveFirstName;
 +(void)saveLastName:(NSString*)name;
 +(NSString*)retrieveLastName;
+
+
++(void)saveFirstUse:(NSString*)firstUse;
+
++(NSString*)retrieveFirstUse;
+
 
 //ok, so I need to add spots serverside and check if spots are free
 

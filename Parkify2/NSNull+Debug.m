@@ -2,8 +2,8 @@
 
 @implementation NSNull (Debug)
 
-- (int) intValue {
-    NSLog(@"Caught in NSNull::intValue");
+- (id)objectForKey:(id)key {
+    NSLog(@"Caught in NSNull debug");
     return 0;
 }
 

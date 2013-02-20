@@ -531,9 +531,10 @@
                 dEndTime = MIN(dEndTime, [self.spot endTime]);
             }
             
-            
-            
+            reservation = [Persistance addNewTransaction: self.spot withStartTime:[[paymentDetails objectForKey:@"start_time"] doubleValue] andEndTime:[[paymentDetails objectForKey:@"end_time"] doubleValue] andLastPaymentDetails:[paymentDetails objectForKey:@"details"] withTransactionID:[paymentDetails objectForKey:@"id"] withNeedsPayment:[[paymentDetails objectForKey:@"needs_payment"] doubleValue] withPayBy:[[paymentDetails objectForKey:@"pay_by"] doubleValue] ];
+            /*
             reservation = [Persistance addNewTransaction:self.spot withStartTime:dStartTime andEndTime:dEndTime andLastPaymentDetails:[paymentDetails objectForKey:@"details"] withTransactionID:[paymentDetails objectForKey:@"id"] ];
+             */
             [[Mixpanel sharedInstance] track:@"launchConfirmationVC" properties:nil];
             [Persistance saveCurrentSpot:self.spot];
         }
@@ -680,7 +681,7 @@
         //[UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
         NSString *responseString = [request responseString];
         NSDictionary * root = [responseString JSONValue];
-        if([root objectForKey:@"success"]) {
+        if([[root objectForKey:@"success"] boolValue]) {
             //Needs to happen on success
             
             [self.waitingMask removeFromSuperview];

@@ -21,6 +21,7 @@
     NSURL *openURL;
     BOOL isNew;
     BOOL reservationUsed;
+    
 }
 
 @property double currentLat;
@@ -35,5 +36,6 @@
 @property (strong, nonatomic) ParkingSpotCollection* parkingSpots;
 
 @property (strong, nonatomic) CLLocationManager* locationManager;
+
 
 @end

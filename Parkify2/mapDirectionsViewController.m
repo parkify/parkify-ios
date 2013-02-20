@@ -44,6 +44,9 @@
 - (IBAction)extendReservation:(id)sender;
 - (IBAction)topBarButtonTapped:(id)sender;
 
+@property (strong, nonatomic) NSTimer* clockTimer;
+@property (strong, nonatomic) UIImageView* navCover;
+@property (strong, nonatomic) UILabel* clockTimeLabel;
 
 @end
 
@@ -56,6 +59,8 @@
 @synthesize waitingMask = _waitingMask;
 @synthesize showTopBar = _showTopBar;
 @synthesize closeEnough = _closeEnough;
+@synthesize clockTimer = _clockTimer;
+
 CLLocationManager *_locationManager;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
@@ -160,6 +165,18 @@ NSString* encodeToPercentEscapeString(NSString *string) {
 }
 -(void)viewWillAppear:(BOOL)animated    {
     [[ UIApplication sharedApplication ] setIdleTimerDisabled: YES ];
+    
+    if (!self.directionsScrollView) {
+    
+        CGRect frame = CGRectMake(0,0,self.pageContainer.frame.size.width,self.pageContainer.frame.size.height);
+        
+        self.directionsScrollView = [[DirectionsScrollView alloc] initWithFrame:CGRectMake(0,0,self.pageContainer.frame.size.width,self.pageContainer.frame.size.height) withSpot:self.spot withReservation:self.reservation];
+        
+        [self.pageContainer addSubview:self.directionsScrollView];
+        [self.directionsScrollView setPageGroup:0];
+        [self.directionsScrollView addTarget:self action:@selector(extendReservation) forControlEvents: ExtendReservationRequestedActionEvent];
+    }
+    
     ParkifyAppDelegate *delegate = (ParkifyAppDelegate*)[[UIApplication sharedApplication] delegate];
     
     delegate.currentLat = 37.872679;
@@ -168,6 +185,9 @@ NSString* encodeToPercentEscapeString(NSString *string) {
     delegate.locationManager.delegate = self;
     delegate.locationManager.desiredAccuracy = kCLLocationAccuracyBest;
     [delegate.locationManager startUpdatingLocation];
+    if(self.reservation.needsPayment > 0) {
+        [self startTicking];
+    }
 }
 -(void)viewWillDisappear:(BOOL)animated{
     [[ UIApplication sharedApplication ] setIdleTimerDisabled: YES ];
@@ -177,6 +197,7 @@ NSString* encodeToPercentEscapeString(NSString *string) {
     }
     [_locationManager stopMonitoringSignificantLocationChanges];
     _locationManager.delegate=nil;
+    [self stopTicking];
     
     ParkifyAppDelegate *delegate = (ParkifyAppDelegate*)[[UIApplication sharedApplication] delegate];
     delegate.locationManager.delegate = nil;
@@ -193,11 +214,6 @@ NSString* encodeToPercentEscapeString(NSString *string) {
     _locationManager.delegate = self;
     [_locationManager startUpdatingLocation];
     
-    self.directionsScrollView = [[DirectionsScrollView alloc] initWithFrame:CGRectMake(0,0,self.pageContainer.frame.size.width,self.pageContainer.frame.size.height) withSpot:self.spot withReservation:self.reservation];
-    
-    [self.pageContainer addSubview:self.directionsScrollView];
-    [self.directionsScrollView setPageGroup:0];
-    [self.directionsScrollView addTarget:self action:@selector(extendReservation) forControlEvents: ExtendReservationRequestedActionEvent];
 
     
     UIBarButtonItem *closeDirections = [[UIBarButtonItem alloc] initWithTitle:@"Trouble?" style:UIBarButtonItemStyleBordered target:self action:@selector(launchTroubleAlert:)];
@@ -205,8 +221,23 @@ NSString* encodeToPercentEscapeString(NSString *string) {
     
     UIBarButtonItem *backToSpots = [[UIBarButtonItem alloc] initWithTitle:@"Parking Map" style:UIBarButtonItemStyleBordered target:self action:@selector(backButtonTapped:)];
     [self.navigationItem setLeftBarButtonItem:backToSpots];
-
+    
+    
+    if(self.reservation.needsPayment > 0) {
+        self.navCover = [[UIImageView alloc] initWithFrame:CGRectMake((320-112)*0.5, 0, 112, 44)];
+        self.navCover.image = [UIImage imageNamed:@"masthead_cover.png"];
+        //UILabel* timeLeftLabel =
+        self.clockTimeLabel = [[UILabel alloc] initWithFrame:CGRectMake(1,0,79,44)];
+        self.clockTimeLabel.text = @"--:--";
+        self.clockTimeLabel.textAlignment = UITextAlignmentCenter;
+        self.clockTimeLabel.font = [UIFont fontWithName:@"Courier-Bold" size:22];
+        self.clockTimeLabel.backgroundColor = [UIColor clearColor];
+        self.clockTimeLabel.textColor = PARKIFY_CYAN;
+        [self.navigationController.navigationBar addSubview:self.navCover];
         
+        [self.navCover addSubview:self.clockTimeLabel];
+    }
+    
     [self.flowTabBar setDelegate:self];
     
     for (UITabBarItem* item in self.flowTabBar.items) {
@@ -250,6 +281,8 @@ NSString* encodeToPercentEscapeString(NSString *string) {
     } else {
         [self.topBarView setHidden:true];
     }
+    
+    
     
 	// Do any additional setup after loading the view.
 }
@@ -354,6 +387,12 @@ NSString* encodeToPercentEscapeString(NSString *string) {
             [self launchtroubleFindingVC];
             NSLog(@"Launch directions");
         }
+    } else if (alertView.tag == kDidntPay) {
+        //[self.reservation.]
+        NSLog(@"Didn't Pay");
+        [self dismissViewControllerAnimated:true completion:^{
+            ;
+        }];
     }
 }
 - (IBAction)launchTroubleAlert:(id)sender {
@@ -376,7 +415,7 @@ NSString* encodeToPercentEscapeString(NSString *string) {
    
     
     [UIView animateWithDuration:0.5 animations:^{
-        [self.topBarView setAlpha:0.77];
+        [self.topBarView setAlpha:0.95];
     } completion:^(BOOL finished) {
         [NSTimer scheduledTimerWithTimeInterval: 8
                                          target: self
@@ -516,6 +555,70 @@ NSString* encodeToPercentEscapeString(NSString *string) {
     
     //NSLog(@"New latitude: %f", newLocation.coordinate.latitude);
     //NSLog(@"New longitude: %f", newLocation.coordinate.longitude);
+}
+
+
+-(void)startTicking {
+    if (self.clockTimer != nil)
+    {
+        return;
+    } else {
+        self.clockTimer = [NSTimer scheduledTimerWithTimeInterval: 1                                                             target: self
+                                                           selector:@selector(onTick:)
+                                                           userInfo: nil repeats:NO];
+    }
+}
+
+-(void)stopTicking {
+    if (self.clockTimer == nil)
+    {
+        return;
+    } else {
+        [self.clockTimer invalidate];
+        self.clockTimer = nil;
+    }
+}
+
+-(void)onTick:(NSTimer *)timer {
+    //do smth
+    
+    self.clockTimer = [NSTimer scheduledTimerWithTimeInterval: 1
+                                                         target: self
+                                                       selector:@selector(onTick:)
+                                                       userInfo: nil repeats:NO];
+    
+    
+    [self updateCallToAction];
+}
+
+-(void) updateCallToAction {
+    if(self.reservation.needsPayment == 0) {
+        [self stopTicking];
+        if(self.navCover) {
+            [self.navCover removeFromSuperview];
+            self.navCover = nil;
+        }
+        return;
+    }
+    double currentTime = [[NSDate date] timeIntervalSince1970];
+    double timeLeft = self.reservation.payBy - currentTime;
+    if(timeLeft <= 0) {
+        [self stopTicking];
+        UIAlertView *didntPay = [[UIAlertView alloc] initWithTitle:@"Uh oh" message:@"Your reservation is no longer valid since you were unable to pay in time. \n\nTo make any further reservations, please upgrade to a free standard account in the account settings menu." delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
+        didntPay.tag = kDidntPay;
+        [didntPay show];
+    }
+    
+    timeLeft = MAX(0,timeLeft);
+    int iSeconds = ((int)timeLeft)%60;
+    int iMinutes = timeLeft/60;
+    
+    
+    NSString* secondsPadding = (iSeconds < 10) ? @"0" : @"";
+    NSString* minutesPadding = (iMinutes < 10) ? @"0" : @"";
+    
+    
+    self.clockTimeLabel.text = [NSString stringWithFormat:@"%@%d:%@%d",minutesPadding,iMinutes,secondsPadding,iSeconds];
 }
 
 @end
