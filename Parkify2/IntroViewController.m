@@ -34,13 +34,14 @@
 @implementation IntroViewController
 
 @synthesize keyboardAvoidingScrollView = _keyboardAvoidingScrollView;
-
+@synthesize openedFromSettings = _openedFromSettings;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
         // Custom initialization
+        self.openedFromSettings = false;
     }
     return self;
 }
@@ -56,6 +57,7 @@
     
     [self setupPages];
     [self displayPages];
+    
     
     
 	// Do any additional setup after loading the view.
@@ -138,7 +140,7 @@
         [self.pages addObject:page];
     }
 
-    
+    /*
     self.trialAccountPage = [[TrialAccountPage alloc] initWithFrame:frame];
     self.trialAccountPage.keyboardAvoidingScrollView = self.keyboardAvoidingScrollView;
     [self.trialAccountPage addTarget:self action:@selector(switchToMap) forControlEvents:ShouldContinueActionEvent];
@@ -154,13 +156,17 @@
     }
     
     [self.pages addObject:self.trialAccountPage];
-    
+    */
     
     
 }
 
 -(IBAction)skipButtonTapped:(id)sender {
-    [self switchToMap];
+    if(self.openedFromSettings) {
+        self.tabBarController.selectedViewController = [self.tabBarController.viewControllers objectAtIndex:0];
+    } else {
+        [self switchToMap];
+    }
 }
 
 -(void) switchToMap {

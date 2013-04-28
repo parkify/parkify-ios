@@ -17,6 +17,7 @@
 #import "AccountSettingsNavigationViewController.h"
 #import "UIViewController+AppData_User.h"
 #import "ErrorTransformer.h"
+#import "IntroViewController.h"
 
 //#import "PlacedAgent.h"
 
@@ -97,6 +98,7 @@
 
 - (IBAction)aboutButtonTapped:(UIButton*)sender {
     self.tabBarController.selectedViewController = [self.tabBarController.viewControllers objectAtIndex:1];
+    ((IntroViewController*)self.tabBarController.selectedViewController).openedFromSettings = true;
 }
 
 
@@ -171,9 +173,9 @@
         }, ^{
             [self accountSettingsButtonTapped:nil];
         }, ^{
-            [self shareButtonTapped:nil];
-        }, ^{
             [self aboutButtonTapped:nil];
+        }, ^{
+            [self shareButtonTapped:nil];
         }, nil];
     
     [tableView deselectRowAtIndexPath:indexPath animated:YES];

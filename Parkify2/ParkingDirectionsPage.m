@@ -127,6 +127,28 @@
         textLabel.textAlignment = UITextAlignmentLeft;
         textLabel.backgroundColor = [UIColor clearColor];
         
+        
+        UILabel* swipeLeft = [[UILabel alloc] initWithFrame:CGRectMake(3, 0, 28, textBarBackground.frame.size.height)];
+        swipeLeft.numberOfLines = 2;
+        swipeLeft.text = (self.index <= 0) ? @"" : @"swipe left";
+        swipeLeft.textColor = PARKIFY_CYAN;
+        swipeLeft.lineBreakMode = UILineBreakModeWordWrap;
+        swipeLeft.font = [UIFont fontWithName:@"HelveticaNeue-Bold" size:8];
+        swipeLeft.minimumFontSize = 0;
+        swipeLeft.backgroundColor = [UIColor clearColor];
+        
+        UILabel* swipeRight = [[UILabel alloc] initWithFrame:CGRectMake(textBarBackground.frame.size.width-31, 0, 28, textBarBackground.frame.size.height)];
+        swipeRight.numberOfLines = 2;
+        swipeRight.text = (self.index+1 >= self.totalIndex) ? @"" : @"swipe right";
+        swipeRight.textColor = PARKIFY_CYAN;
+        swipeRight.lineBreakMode = UILineBreakModeWordWrap;
+        swipeRight.font = [UIFont fontWithName:@"HelveticaNeue-Bold" size:8];
+        swipeRight.minimumFontSize = 0;
+        swipeRight.backgroundColor = [UIColor clearColor];
+        swipeRight.textAlignment = UITextAlignmentRight;
+        
+        
+        
         UIButton* leftChevron = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, 42, textBarBackground.frame.size.height)];
         
         NSString* leftImage = (self.index <= 0) ? @"chevron_unactive_left.png" : @"chevron_active_left.png";
@@ -135,6 +157,8 @@
         UIButton* rightChevron = [[UIButton alloc] initWithFrame:CGRectMake(textBarBackground.frame.size.width-42, 0, 42, textBarBackground.frame.size.height)];
         NSString* rightImage = (self.index+1 >= self.totalIndex) ? @"chevron_unactive_right.png" : @"chevron_active_right.png";
         [rightChevron setImage:[UIImage imageNamed:rightImage] forState:UIControlStateNormal];
+        
+        
         
         //mapView
         ySoFar += textBarBackground.frame.size.height;
@@ -167,9 +191,12 @@
         
         [container addSubview:textBarBackground];
         [textBarBackground addSubview:textLabel];
+        /*
         [textBarBackground addSubview:leftChevron];
         [textBarBackground addSubview:rightChevron];
-        
+         */
+        [textBarBackground addSubview:swipeLeft];
+        [textBarBackground addSubview:swipeRight];
         ParkifyAppDelegate *delegate = (ParkifyAppDelegate*)[[UIApplication sharedApplication] delegate];
         [self userAt:CLLocationCoordinate2DMake(delegate.currentLat, delegate.currentLong)];
     }

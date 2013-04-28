@@ -461,7 +461,9 @@ typedef struct STargetLocation {
         if(distanceToSpot <= 5) {
             self.bottomBarLabel.text = [NSString stringWithFormat:@"Closest spot is %@ away.", [TextFormatter formatDistanceClose:distanceToSpot]];
         } else {
-            self.bottomBarLabel.text = @"No spots within 5 miles... Yet!";
+            self.bottomBarLabel.text = @"Currently supporting Berkeley and Westwood LA.";
+            //@"No spots within 5 miles... Yet!";
+            //@"We currently have spots in Berkeley and Westwood LA.";
         }
     } else {
         self.bottomBarLabel.text = @"";

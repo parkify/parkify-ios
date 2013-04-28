@@ -13,4 +13,5 @@
 
 @interface IntroViewController : UIViewController <UIScrollViewDelegate, ASIHTTPRequestDelegate>
 @property (weak, nonatomic) IBOutlet TPKeyboardAvoidingScrollView *keyboardAvoidingScrollView;
+@property BOOL openedFromSettings;
 @end

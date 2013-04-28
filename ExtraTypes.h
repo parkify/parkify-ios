@@ -15,20 +15,37 @@ typedef void(^FailureBlock)(NSError*);
 
 typedef NSString* (^Formatter)(double val);
 
-#define ADMIN_VER true
-#define DEBUGVER
-#define APIVER @"v3"
-#ifdef DEBUGVER
-//#define TARGET_SERVER @"10.0.2.15:3000"
-#define TARGET_SERVER @"parkify-rails-staging.herokuapp.com"
+#define APIVER @"v3" //to replace
+
+/*** Target Settings ***/
+#if DEBUG 
+
+    //so we don't mess things up in production
+    #define ADMIN_VER false
+//#define DEBUGVER
+    #ifdef DEBUGVER
+        //#define TARGET_SERVER @"10.0.2.15:3000"
+        #define TARGET_SERVER @"parkify-rails-staging2.herokuapp.com"
+        #define NOTRANSACTIONDEBUG false
+        #define DEBUG_FIRST_FLOW false
+    #else
+#define ADMIN_VER false
+#define TARGET_SERVER @"parkify-rails.herokuapp.com"
+#define NOTRANSACTIONDEBUG false
+#define DEBUG_FIRST_FLOW true
+
+    #endif
+
 #else
+
+    //be careful! These settings will be on the production version
+    #define ADMIN_VER false
     #define TARGET_SERVER @"parkify-rails.herokuapp.com"
+    #define NOTRANSACTIONDEBUG false
+    #define DEBUG_FIRST_FLOW false
 
 #endif
-
-#define NOTRANSACTIONDEBUG false
-#define DEBUG_FIRST_FLOW false
-
+/*** End Target Settings ***/
 
 #define kGenericErrorAlertTag 6727
 #define kAlertViewErrorInProblemUpload 9989
@@ -41,6 +58,7 @@ typedef NSString* (^Formatter)(double val);
 #define kLoadUDIDandPush 9986
 #define kGetAcceptances 9985
 #define kStripeToken @"pk_XeTF5KrqXMeSyyqApBF4q9qDzniMn"
+//#define kStripeToken @"pk_XeTF5KrqXMeSyyqApBF4q9qDzniMn"
 //#define kStripeTest @"pk_GP95lUPyExWOy8e81qL5vIbwMH7G8"
 
 //#define TARGET_SERVER_NORMAL @"parkify-rails.herokuapp.com"
